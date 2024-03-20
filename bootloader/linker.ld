@@ -42,6 +42,7 @@ SECTIONS
     ebss = .;
     ekernel = .;
 
+
     /DISCARD/ : {
         *(.eh_frame)
     }
