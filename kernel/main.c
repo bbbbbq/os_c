@@ -11,6 +11,7 @@ int main_os()
     sbi_console_putchar('1'); 
 }
 
+
 void sbi_console_putchar(int ch) {
     register long a0 asm("a0") = ch; // 将字符存储在 a0 寄存器
     register long a7 asm("a7") = 0x01; // SBI 控制台输出的服务编号存储在 a7 寄存器
