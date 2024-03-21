@@ -1,0 +1,20 @@
+ make qemu_debug 
+mkdir -p obj/kernel
+riscv64-unknown-elf-gcc -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -c kernel/main.c -o obj/kernel/main.o
+mkdir -p obj/kernel/sbi
+riscv64-unknown-elf-gcc -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -c kernel/sbi/sbi.c -o obj/kernel/sbi/sbi.o
+mkdir -p obj/kernel/console
+riscv64-unknown-elf-gcc -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -c kernel/console/console.c -o obj/kernel/console/console.o
+mkdir -p obj/kernel/debug
+riscv64-unknown-elf-gcc -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -c kernel/debug/debug.c -o obj/kernel/debug/debug.o
+mkdir -p obj/kernel/trap
+riscv64-unknown-elf-gcc -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -c kernel/trap/trap.c -o obj/kernel/trap/trap.o
+mkdir -p obj/kernel/trap
+riscv64-unknown-elf-gcc -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -c kernel/trap/timer.c -o obj/kernel/trap/timer.o
+mkdir -p obj/kernel/asm
+riscv64-unknown-elf-as -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -g  kernel/asm/entry.asm -o obj/kernel/asm/entry.o
+mkdir -p obj/kernel/asm
+riscv64-unknown-elf-as -Ikernel/sbi -Ikernel/globle -Ikernel/debug -Ikernel/trap -Ikernel/console  -march=rv64gc -mabi=lp64d -g  kernel/asm/trap.asm -o obj/kernel/asm/trap.o
+riscv64-unknown-elf-ld -Tbootloader/linker.ld -nostartfiles -nostdlib -g -o obj/os_kernel.bin obj/kernel/main.o obj/kernel/sbi/sbi.o obj/kernel/console/console.o obj/kernel/debug/debug.o obj/kernel/trap/trap.o obj/kernel/trap/timer.o obj/kernel/asm/entry.o obj/kernel/asm/trap.o
+qemu-system-riscv64 -machine virt -kernel obj/os_kernel.bin -nographic --bios default -S -s
+QEMU: Terminated

@@ -11,8 +11,7 @@ ELF = $(OBJDIR)/os_kernel.elf
 
 # Include directories
 INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
-				-I$(KERNEL_DIR)/debug -I$(KERNEL_DIR)/console \
-				-I$(KERNEL_DIR)/trap 
+				-I$(KERNEL_DIR)/debug -I$(KERNEL_DIR)/trap -I$(KERNEL_DIR)/console 
 
 # Compilation and linking flags
 CFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g
