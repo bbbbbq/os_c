@@ -62,13 +62,18 @@ $(OBJDIR)/%.d: %.c
 	$(CC) $(CFLAGS) -MM -MT '$(@:.d=.o)' $< -MF $@
 
 run: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default
 
 qemu_debug: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic -S -s
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -S -s
 
 elf: $(ELF)
 
 $(ELF): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $^
+
+disassembe: $(ELF)
+	riscv64-unknown-elf-objdump -d -S -l $(ELF) > os_kernel.asm
+
+
 
