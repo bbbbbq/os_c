@@ -2,13 +2,12 @@
 #include "stdint.h"
 #include "debug.h"
 #include "console.h"
-extern uint64_t __alltraps;
+extern void __alltraps(void);
 void init_trap(void) 
 {
     asm volatile("csrw sscratch, zero");
     //uint64_t trap_handler_addr = (uint64_t)trap_handler;
-    uintptr_t alltraps = (uintptr_t)__alltraps;
-    __asm__ volatile ("csrw stvec, %0" : : "r"(alltraps));
+    asm volatile("csrw stvec, %0" : : "r"(__alltraps));
     print_str("++++ setup interrupt! ++++\n");
 }
 
@@ -23,6 +22,7 @@ __attribute__((noreturn)) void trap_handler(void) {
     // print_str("sepc : ");
     // print_uint32(epc);
     // print_str("\n");
+
     print_str("trap handled!");
     while(1); // 防止返回
 }
