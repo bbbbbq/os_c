@@ -4,6 +4,7 @@
 #include "console.h"
 #include "timer.h"
 #include "stdint.h"
+#include "batch.h"
 extern void __alltraps(void);
 uintptr_t alltraps = (uintptr_t)__alltraps;
 
@@ -94,10 +95,10 @@ void init_trap(void)
     }
  }
 
-void trap_handler(TrapFrame *fp) 
+void trap_handler(TrapContext *fp) 
 {
     //print_str("trap handled!");
-    uint64_t scause = fp->scause;
+    uint64_t scause = fp->sstatus;
     switch (scause)
     {
         case INTERRUPT_SUPERVISOR_TIMER:
@@ -106,6 +107,9 @@ void trap_handler(TrapFrame *fp)
         case EXCEPTION_BREAKPOINT:
             intr_break_handle(&(fp->sepc));
             break;
+        case StoreFault:
+            print_str("run next app!");
+            run_app();
         default:
             print_str("unknow interrupt\n");
             ASSERT(0);

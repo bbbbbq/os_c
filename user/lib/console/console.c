@@ -22,7 +22,7 @@ void print_uint32(unsigned int num) {
 
     buffer[i] = '\0'; // 添加字符串终止符
 
-    strrev(buffer); // 反转字符串，因为我们是从低位向高位生成的字符
+    strrev_user(buffer); // 反转字符串，因为我们是从低位向高位生成的字符
 
     print_str(buffer); // 使用print_str函数打印转换后的字符串
 }

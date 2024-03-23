@@ -1,7 +1,4 @@
-#include "syscall.h"
-#include "string.h"
-#include "debug.h"
-#include "console.h"
+#include "user_lib.h"
 int main()
 {
     char *msg = "hello_word";

@@ -9,13 +9,13 @@ _num_app:
     .quad app_2_end
 .global _app_names
 _app_names:
-    .string "hello_word.elf"
+    .string "hello_word"
 .section .data
 .global app_0_start
 .global app_0_end
 .align 3
 app_0_start:
-    .incbin "../user/build/hello_word.elf"
+    .incbin "/home/caigoubencai/Desktop/os_c/user/build/00.bin"
 app_0_end:
     .string "sret.elf"
 .section .data
@@ -23,7 +23,7 @@ app_0_end:
 .global app_1_end
 .align 3
 app_1_start:
-    .incbin "../user/build/sret.elf"
+    .incbin "/home/caigoubencai/Desktop/os_c/user/build/01.bin"
 app_1_end:
     .string "test.elf"
 .section .data
@@ -31,5 +31,5 @@ app_1_end:
 .global app_2_end
 .align 3
 app_2_start:
-    .incbin "../user/build/test.elf"
+    .incbin "/home/caigoubencai/Desktop/os_c/user/build/02.bin"
 app_2_end:

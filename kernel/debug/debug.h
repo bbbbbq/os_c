@@ -10,5 +10,4 @@
     } 
 
 void panic(const char *file, int line);
-
 #endif // CONSOLE_H
