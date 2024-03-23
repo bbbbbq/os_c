@@ -78,5 +78,3 @@ disassemble_all: $(ELF)
 clean:
 	rm -rf $(OBJDIR)
 	rm -f os_kernel*.asm
-
-
