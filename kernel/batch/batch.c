@@ -5,6 +5,15 @@
 #include "string.h"
 #include "stdint.h"
 static appmanager app_manager;
+extern uint64_t app_0_start, app_1_start, app_2_start;
+extern uint64_t app_0_end, app_1_end, app_2_end;
+uint64_t* app_starts[MAX_APP_NUM] = {&app_0_start, &app_1_start, &app_2_start};
+uint64_t* app_ends[MAX_APP_NUM] = {&app_0_end, &app_1_end, &app_2_end};
+
+void init_app_manager()
+{
+    
+}
 
 static inline uint64_t r_sstatus(void) 
 {
@@ -27,8 +36,8 @@ void load_app(void)
 {
     uint64_t *num_app_ptr = (uint64_t *)_num_app;
     // app数量
-    uint64_t num_app = *num_app_ptr;
-    num_app_ptr ++; // 现在num_app_ptr是app文件起始位置
+    uint64_t num_app = *_num_app;
+    _num_app ++; // 现在num_app_ptr是app文件起始位置
 
     // 刷新缓冲区
     asm volatile("fence.i");
@@ -67,10 +76,8 @@ void run_app() {
     current_app ++;
     tc.sstatus = sstatus & (~SSTATUS_SPP);
     tc.x_regs[2] = get_user_stack_top(); // 保证sscratch指向user_stack
-
     uint64_t store_posi = get_kernel_stack_top() - sizeof(TrapContext);
     *(TrapContext *)store_posi = tc;
-    
     extern void __restore(TrapContext *cx);
     __restore(&tc);
 }

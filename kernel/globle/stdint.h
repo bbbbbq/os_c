@@ -33,4 +33,17 @@ typedef unsigned long int uintptr_t;
 #define UINT32_MAX (4294967295U)
 #define UINT64_MAX (18446744073709551615UL)
 
+
+static inline uint64_t r_scause(void) {
+    uint64_t value;
+    asm volatile("csrr %0, scause" : "=r" (value) :: "memory");
+    return value;
+}
+
+static inline uint64_t r_stval(void) {
+    uint64_t value;
+    asm volatile("csrr %0, stval" : "=r" (value) :: "memory");
+    return value;
+}
+
 #endif // _STDINT_H

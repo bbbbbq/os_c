@@ -1,7 +1,8 @@
 #ifndef BATCH_H
 #define BATCH_H
 #include "stdint.h"
-extern uint64_t _num_app;
+extern uint64_t* _num_app;
+
 #define MAX_APP_NUM 20
 #define APP_SIZE_LIMIT 0x20000
 #define APP_BASE_ADDRESS  0x80400000

@@ -28,6 +28,7 @@ long long sys_write(unsigned long long fd, const char *buf)
 
 void sys_exit(int id) 
 {
+    print_str("sys_exit\n");
     syscall(SYSCALL_EXIT, id, 0, 0);
     run_app();
 }

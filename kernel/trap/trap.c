@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "stdint.h"
 #include "batch.h"
+#include "syscall.h"
 extern void __alltraps(void);
 uintptr_t alltraps = (uintptr_t)__alltraps;
 
@@ -93,26 +94,33 @@ void init_trap(void)
             print_str("Unknown exception\n");
             break;
     }
- }
+}
 
-void trap_handler(TrapContext *fp) 
+TrapContext *trap_handler(TrapContext *cx) 
 {
-    //print_str("trap handled!");
-    uint64_t scause = fp->sstatus;
-    switch (scause)
-    {
-        case INTERRUPT_SUPERVISOR_TIMER:
-            intr_timer_handle();
-            break;
-        case EXCEPTION_BREAKPOINT:
-            intr_break_handle(&(fp->sepc));
-            break;
-        case StoreFault:
-            print_str("run next app!");
-            run_app();
-        default:
-            print_str("unknow interrupt\n");
-            ASSERT(0);
-            break;
-    }   
+    print_str("trap_handler\n");
+    uint64_t scause = r_scause();
+    uint64_t stval = r_stval();
+    uint64_t trap = scause & 0x0fff;
+    if (scause & 0x8000 == 1) {
+        print_str("can't identify interrupt trap");
+        ASSERT(0);
+    } else {
+        switch (trap) {
+            case UserEnvCall:
+                cx->sepc += 4;
+                cx->x_regs[10] = syscall(cx->x_regs[17], cx->x_regs[10], cx->x_regs[11], cx->x_regs[12]);
+                break;
+            case StoreFault:
+                print_str("[kernel] app err: store fault. run next\n");
+                run_app();
+                break;
+            default:
+                print_str("trap scause undefined.");
+                ASSERT(0);
+                break;
+        }
+    }
+
+    return cx;
 }
