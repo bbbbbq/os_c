@@ -1,4 +1,7 @@
 {
     "cmake.sourceDirectory": "/home/caigoubencai/Desktop/gdb-13.1/zlib",
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "console.h": "c"
+    }
 }

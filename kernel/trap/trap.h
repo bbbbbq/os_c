@@ -16,4 +16,8 @@ typedef struct trap_value{
 void init_trap(void);
 
 void trap_handler(TrapFrame *fp);
+
+void enable_global_interrupts();
+
+void disable_global_interrupts();
 #endif

@@ -6,6 +6,24 @@
 #include "stdint.h"
 extern void __alltraps(void);
 uintptr_t alltraps = (uintptr_t)__alltraps;
+
+void enable_global_interrupts() 
+{
+    unsigned long sstatus;
+    __asm__ volatile ("csrr %0, sstatus" : "=r"(sstatus));
+    sstatus |= (1 << 1);
+    __asm__ volatile ("csrw sstatus, %0" : : "r"(sstatus));
+}
+void disable_global_interrupts() 
+{
+    unsigned long sstatus;
+    __asm__ volatile ("csrr %0, sstatus" : "=r"(sstatus));
+    sstatus &= ~(1UL << 1);
+    __asm__ volatile ("csrw sstatus, %0" : : "r"(sstatus));
+}
+
+
+
 void init_trap(void)
 {
     timer_init();
@@ -21,16 +39,64 @@ void init_trap(void)
     print_str("++++ setup interrupt! ++++\n");
 }
 
-
  void intr_break_handle(uint64_t *sepc)
  {
-    print_str("break interrupt \n");
-    *sepc+=2;
+    uint64_t scause;
+    __asm__ volatile ("csrr %0, scause" : "=r"(scause));
+    switch (scause) 
+    {
+        case 0:
+            print_str("Instruction address misaligned\n");
+            break;
+        case 1:
+            print_str("Instruction access fault\n");
+            break;
+        case 2:
+            print_str("Illegal instruction\n");
+            break;
+        case 3:
+            print_str("Breakpoint\n");
+            *sepc += 2;
+            break;
+        case 4:
+            print_str("Load address misaligned\n");
+            break;
+        case 5:
+            print_str("Load access fault\n");
+            break;
+        case 6:
+            print_str("Store/AMO address misaligned\n");
+            break;
+        case 7:
+            print_str("Store/AMO access fault\n");
+            break;
+        case 8:
+            print_str("Environment call from U-mode\n");
+            break;
+        case 9:
+            print_str("Environment call from S-mode\n");
+            break;
+        case 11:
+            print_str("Environment call from M-mode\n");
+            break;
+        case 12:
+            print_str("Instruction page fault\n");
+            break;
+        case 13:
+            print_str("Load page fault\n");
+            break;
+        case 15:
+            print_str("Store/AMO page fault\n");
+            break;
+        default:
+            print_str("Unknown exception\n");
+            break;
+    }
  }
 
 void trap_handler(TrapFrame *fp) 
 {
-    print_str("trap handled!");
+    //print_str("trap handled!");
     uint64_t scause = fp->scause;
     switch (scause)
     {

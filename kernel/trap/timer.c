@@ -1,5 +1,20 @@
 #include "timer.h"
 #include "sbi.h"
+
+
+static inline uint64_t read_time(void) 
+{
+    uint64_t time;
+    __asm__ volatile ("csrr %0, time" : "=r"(time));
+    return time;
+}
+
+void clock_set_next_event() 
+{
+    sbi_set_timer(read_time() + TIMEBASE);
+}
+
+
 void timer_init()
 {
     uint64_t sie_val;
@@ -11,18 +26,6 @@ void timer_init()
     print_str("----timer_init----\n");
 }
 
-static inline uint64_t read_time(void) 
-{
-    uint64_t time;
-    __asm__ volatile ("csrr %0, time" : "=r"(time));
-    return time;
-}
-
-
-void clock_set_next_event() 
-{
-    sbi_set_timer(read_time() + TIMEBASE);
-}
 
 void intr_timer_handle()
 {
@@ -33,6 +36,5 @@ void intr_timer_handle()
         print_str("timer interrupt: ");
         print_uint32(ticks);
         print_str("\n");
-    }
-    if(ticks==100000) ticks=0;
+    }else if(ticks==200) ticks=0;
 }

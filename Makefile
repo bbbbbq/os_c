@@ -11,7 +11,8 @@ ELF = $(OBJDIR)/os_kernel.elf
 
 # Include directories
 INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
-				-I$(KERNEL_DIR)/debug -I$(KERNEL_DIR)/trap -I$(KERNEL_DIR)/console 
+				-I$(KERNEL_DIR)/debug -I$(KERNEL_DIR)/trap -I$(KERNEL_DIR)/console \
+				-I$(KERNEL_DIR)/memory
 
 # Compilation and linking flags
 CFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g
@@ -67,12 +68,15 @@ elf: $(ELF)
 
 $(ELF): $(OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $^
-disassemble: $(ELF)
-	riscv64-unknown-elf-objdump -d -S -l $(ELF) > os_kernel.asm
+disassemble_text: $(ELF)
+	riscv64-unknown-elf-objdump -d -S -l $(ELF) > os_kernel_text.asm
+
+disassemble_all: $(ELF)
+	riscv64-unknown-elf-objdump -D -S -l $(ELF) > os_kernel_all.asm
 
 # Clean build, corrected to remove $(OBJDIR) only once
 clean:
 	rm -rf $(OBJDIR)
-	rm -f os_kernel.asm
+	rm -f os_kernel*.asm
 
 
