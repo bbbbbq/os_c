@@ -52,8 +52,7 @@ void main_os()
     // print_str(", ");
     // print_uint32(PHYSICAL_MEMORY_END);
     // print_str("]\n");
-    load_app();
-    run_app();
+    
     print_str("123123");
     __asm__ volatile ("ebreak");
     ASSERT(0);

@@ -34,3 +34,21 @@ void print_uint32(uint32_t value) {
     reverse_str(buffer, i);
     print_str(buffer);
 }
+
+
+void print_uint64(uint64_t value) 
+{
+    char buffer[21];
+    int i = 0;
+    if (value == 0) {
+        buffer[i++] = '0';
+    }
+    while (value != 0) {
+        int digit = value % 10;
+        buffer[i++] = digit + '0';
+        value /= 10;
+    }
+    buffer[i] = '\0';
+    reverse_str(buffer, i); 
+    print_str(buffer);
+}

@@ -113,7 +113,7 @@ TrapContext *trap_handler(TrapContext *cx)
                 break;
             case StoreFault:
                 print_str("[kernel] app err: store fault. run next\n");
-                run_app();
+                run_next_app();
                 break;
             default:
                 print_str("trap scause undefined.");
