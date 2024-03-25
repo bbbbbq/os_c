@@ -35,3 +35,4 @@ app_1_end:
 app_2_start:
     .incbin "../user/build/hello_world.elf"
 app_2_end:
+
