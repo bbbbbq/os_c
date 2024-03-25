@@ -3,7 +3,7 @@
 #include <string.h>
 #include <dirent.h>
 
-#define TARGET_PATH "../user/build/"
+#define TARGET_PATH "user/build/"
 
 // 检查文件是否为ELF格式
 int is_elf(const char* filename) {
@@ -28,7 +28,7 @@ int main() {
     struct dirent *dir;
     d = opendir(TARGET_PATH);
     if (d) {
-        FILE *f = fopen("./link_app.S", "w");
+        FILE *f = fopen("kernel/asm/link_app.asm", "w");
         if (f == NULL) {
             printf("Failed to open file\n");
             return EXIT_FAILURE;
