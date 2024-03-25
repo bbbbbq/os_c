@@ -4,10 +4,8 @@
 #include "console.h"
 int main()
 {
-    // char *msg = "hello_word";
-    // sys_write(1, msg);
-    asm volatile ("ecall");
-    // sys_exit(0);
+    const char *msg = "hello_word";
+    print_str(msg);
     // ASSERT(0);
     while(1);
 }

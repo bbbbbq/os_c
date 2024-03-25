@@ -34,8 +34,13 @@ void main_os()
     init_trap();
     // print_uint64((uint64_t)&end);
     // print_str("\n");
-    init_app();
-    __asm__ volatile ("ecall");
+    //init_app();
+    uint64_t sstatus;
+    asm volatile("csrr %0, sstatus" : "=r"(sstatus)); // 读取当前sstatus值
+    sstatus &= ~(1UL << 8); // 清除SPP位，设置为0以返回U-mode
+    sstatus |= (1UL << 5); // 设置SPIE位，恢复中断使能
+    asm volatile("csrw sstatus, %0" : : "r"(sstatus)); // 写回修改后的sstatus值
+    
     // __asm__ volatile ("ebreak");
     ASSERT(0);
     while(1);

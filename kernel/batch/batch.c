@@ -27,14 +27,14 @@ struct AppManager appmanager;
 
 void init_app()
 {
-    print_str("init_app\n");
-    print_str("Number of apps: ");
-    print_uint64((uint64_t)*(&(_num_app)));  // 解引用 _num_app 来获取它指向的值
-    print_str("\n");
+    // print_str("init_app\n");
+    // print_str("Number of apps: ");
+    // print_uint64(_num_app);  // 解引用 _num_app 来获取它指向的值
+    // print_str("\n");
     // 打印 _num_app 变量本身的地址
     // print_str("_num_app address: 0x");
     // print_str("\n");
-    appmanager.current_idx = 0;
+    appmanager.current_idx = -1;
     appmanager.app_num = (uint64_t)*(&_num_app);
     // print_str("\n\n appmanager : ");
     // print_uint64(appmanager.app_num);
@@ -44,35 +44,17 @@ void init_app()
     {
         appmanager.APPS_START[i] = (void*)(uintptr_t)*app_information++;
         appmanager.APPS_END[i] = (void*)(uintptr_t)*app_information++;
-        print_str("App ");
-        print_uint32(i);
-        print_str(" Start: 0x");
-        print_uint64((uintptr_t)appmanager.APPS_START[i]);
-        print_str(", End: 0x");
-        print_uint64((uintptr_t)appmanager.APPS_END[i]);
-        print_str("\n");
+        // print_str("App ");
+        // print_uint32(i);
+        // print_str(" Start: 0x");
+        // print_uint64((uintptr_t)appmanager.APPS_START[i]);
+        // print_str(", End: 0x");
+        // print_uint64((uintptr_t)appmanager.APPS_END[i]);
+        // print_str("\n");
     }
     asm volatile ("fence.i");
     print_str("init_app end\n");
-    
-    set_sepc_to_app_start();
-    asm volatile("sret");
-}
-
-void run_next_app() 
-{
-    if (appmanager.current_idx + 1 < appmanager.app_num) 
-    {
-        appmanager.current_idx++;
-    } else 
-    {
-        print_str("No more apps to run. Resetting to first app.\n");
-        appmanager.current_idx = 0;
-        ASSERT(0);
-    }
-    uintptr_t start_addr = (uintptr_t)appmanager.APPS_START[appmanager.current_idx];
-    asm volatile ("csrw sepc, %0" : : "r"(start_addr));
-    asm volatile("sret");
+    run_next_app();
 }
 // void clear_memory(uint64_t app_idx)
 // {
@@ -118,23 +100,19 @@ void run_next_app()
 //     }
 // }
 
-void set_sepc_to_app_start() 
+void app_init_context(struct TrapContext *ctx, uintptr_t entry, uint64_t sp) 
 {
-    print_str("set_sepc_to_app_start\n");
-    uintptr_t sstatus;
-    asm volatile("csrr %0, sstatus" : "=r"(sstatus)); // 读取当前sstatus寄存器的值
-    sstatus &= ~SSTATUS_SPP; 
-    sstatus |= SSTATUS_SPIE; 
-    asm volatile("csrw sstatus, %0" : : "r"(sstatus)); // 更新sstatus寄存器的值
-    uint64_t start_address = (uint64_t)appmanager.APPS_START[appmanager.current_idx];
-    asm volatile (
-    "csrw sepc, %0" 
-    : 
-    : "rK"(start_address)
-    );
-    print_str("set_sepc_to_app_start  end \n");
+    for (int i = 0; i < 32; i++) {
+        ctx->x[i] = 0;
+    }
+    ctx->sepc = (uintptr_t)entry;
+    ctx->x[2] = sp;
+    uint64_t sstatus;
+    asm volatile("csrr %0, sstatus" : "=r"(sstatus));
+    sstatus &= ~(1UL << 8);
+    sstatus |= (1UL << 1);
+    ctx->sstatus = sstatus;
 }
-
 uintptr_t get_kernel_stack_top() 
 {
     return (uintptr_t)&kernel_stack + KERNEL_STACK_SIZE;
@@ -143,4 +121,26 @@ uintptr_t get_kernel_stack_top()
 uintptr_t get_user_stack_top() 
 {
     return (uintptr_t)&user_stack + USER_STACK_SIZE;
+}
+
+void run_next_app() 
+{
+    if (appmanager.current_idx + 1 < appmanager.app_num) 
+    {
+        appmanager.current_idx++;
+    } else 
+    {
+        print_str("No more apps to run. Resetting to first app.\n");
+        appmanager.current_idx = 0;
+        ASSERT(0);
+    }
+
+    struct TrapContext ctx;
+    // 设置应用程序入口点
+    uintptr_t start_addr = (uintptr_t)appmanager.APPS_START[appmanager.current_idx];
+    app_init_context(&ctx,(uint64_t)start_addr,get_user_stack_top());
+    // 调用 __restore 函数，传入ctx地址，从而切换上下文并执行sret，进入用户态执行应用程序
+    extern void __restore(struct TrapContext* ctx);
+    __restore(&ctx);
+    ASSERT(0);
 }

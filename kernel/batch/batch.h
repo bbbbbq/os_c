@@ -1,6 +1,7 @@
 #ifndef BATCH_H
 #define BATCH_H
 #include "stdint.h"
+#include "trap.h"
 #define APP_ADDR_BASE 0x80400000
 #define APP_MEMORY_LIMII 0x2000
 #define MAX_APPS_NUM 20
@@ -22,5 +23,11 @@ void init_app();
 
 void run_next_app();
 
-void set_sepc_to_app_start();
+// void set_sepc_to_app_start();
+
+void app_init_context(struct TrapContext *ctx, uint64_t entry, uint64_t sp);
+
+uintptr_t get_kernel_stack_top();
+
+uintptr_t get_user_stack_top(); 
 #endif

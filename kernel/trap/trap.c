@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "stdint.h"
 #include "batch.h"
+#include "sys_call.h"
 extern void __alltraps(void);
 uintptr_t alltraps = (uintptr_t)__alltraps;
 
@@ -108,10 +109,10 @@ void init_trap(void)
             break;
     }
 }
-void trap_handler(struct TrapContext *cx) 
-{
+void trap_handler(struct TrapContext *cx) {
     uint64_t scause;
     asm volatile("csrr %0, scause" : "=r"(scause));
+
     switch (scause) {
         case INTERRUPT_SUPERVISOR_TIMER:
             intr_timer_handle();
@@ -126,9 +127,22 @@ void trap_handler(struct TrapContext *cx)
         case EXCEPTION_STORE_PAGE_FAULT:
             print_str("[kernel] Page fault in application, kernel killed it.\n");
             break;
+        case EXCEPTION_USER_ECALL:
+        case EXCEPTION_SUPERVISOR_ECALL:
+            {
+                // 引入新的作用域来声明变量
+                int64_t syscall_id = cx->x[17];  // a7 寄存器
+                int64_t arg1 = cx->x[10];  // a0 寄存器
+                int64_t arg2 = cx->x[11];  // a1 寄存器
+                int64_t arg3 = cx->x[12];  // a2 寄存器
+                int64_t result = syscall(syscall_id, arg1, arg2, arg3);
+                cx->x[10] = result;  // 将系统调用的返回值放入 a0 寄存器
+                cx->sepc += 4;  // 调整 sepc 以跳过 ecall 指令
+            }
+            return;  // 避免执行 run_next_app
         default:
             print_str("[kernel] Unknown interrupt or exception\n");
             break;
     }
-    run_next_app();  // 假设每次处理完中断或异常都运行下一个应用程序
+    run_next_app();  // 处理完中断或异常后运行下一个应用程序
 }
