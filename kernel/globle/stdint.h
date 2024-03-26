@@ -33,4 +33,15 @@ typedef unsigned long int uintptr_t;
 #define UINT32_MAX (4294967295U)
 #define UINT64_MAX (18446744073709551615UL)
 
+#define READ_CSR(reg) ({ \
+    unsigned long __val; \
+    asm volatile ("csrr %0, " #reg : "=r"(__val)); \
+    __val; \
+})
+
+#define WRITE_CSR(reg, val) ({ \
+    asm volatile ("csrw " #reg ", %0" :: "rK"(val)); \
+})
+
+
 #endif // _STDINT_H
