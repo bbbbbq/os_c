@@ -4,10 +4,12 @@
 #include "syscall.h"
 #include "debug.h"
 #include "context.h"
+#include "batch.h"
 extern void __alltraps(void);
 
 void init_interrupt()
 {
+    print_str("----init_interrupt----\n");
     uint64_t stvec_value = (uint64_t)(__alltraps);
     // WRITE_CSR(stvec,stvec_value);
     asm volatile("csrw stvec, %0" :: "r"(stvec_value));
@@ -17,6 +19,7 @@ void init_interrupt()
 
 struct TrapContext* trap_handler(struct TrapContext* cx) 
 {
+    print_str("trap_handler\n");
     uint64_t scause = READ_CSR(scause); // get trap cause
     uint64_t stval = READ_CSR(stval); // get extra value
     switch (scause)
@@ -26,16 +29,18 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             cx->sepc += 4;
             uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
             cx->x[10] = syscall(cx->x[17], args);
+            print_str("syscall\n");
+            run_next_app();
             break;
         }
         case TRAP_CAUSE_STORE_FAULT:
         case TRAP_CAUSE_STORE_PAGE_FAULT:
             print_str("[kernel] PageFault in application, kernel killed it.\n");
-            //run_next_app();
+            run_next_app();
             break;
         case TRAP_CAUSE_ILLEGAL_INSTRUCTION:
             print_str("[kernel] IllegalInstruction in application, kernel killed it.\n");
-            //run_next_app();
+            run_next_app();
             break;
         default:
             print_str("Unsupported trap ");

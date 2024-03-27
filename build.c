@@ -28,9 +28,9 @@ int main() {
     struct dirent *dir;
     d = opendir(TARGET_PATH);
     if (d) {
-        FILE *f = fopen("./link_app.S", "w");
+        FILE *f = fopen("kernel/asm/link_app.asm", "w");
         if (f == NULL) {
-            printf("Failed to open file\n");
+            printf("Failed to open file1\n");
             return EXIT_FAILURE;
         }
 

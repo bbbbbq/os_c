@@ -4,6 +4,11 @@
 #include "debug.h"
 #include "context.h"
 #include "stack.h"
+
+
+struct AppManager app_manager;
+
+
 void init_appmanager()
 {
     app_manager.app_num = _num_app[0];
@@ -13,6 +18,7 @@ void init_appmanager()
         app_manager.app_end[i] = _num_app[2 + i * 2];
     }
     app_manager.current_app = 0;
+    print_app_info(&app_manager);
 }
 
 void load_app(uint64_t app_id)
@@ -65,6 +71,9 @@ void print_app_info(struct AppManager *manager) {
 
 void run_next_app()
 {
+    print_str("run_next_app");
+    print_uint64(app_manager.app_num);
+    print_str("\n");
     app_manager.current_app++;
     if(app_manager.current_app>=app_manager.app_num)
     {
@@ -72,10 +81,13 @@ void run_next_app()
         ASSERT(0);
     }
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
-    struct TrapContext trapcontext = app_init_context(start_addr,get_user_sp(&UserStack));
+    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack));
+    __restore(trapcontext);
 }
 
 void run_first_app()
 {
-
+    uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
+    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack));
+    __restore(trapcontext);
 }

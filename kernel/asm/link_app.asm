@@ -7,11 +7,11 @@ _num_app:
     .quad app_0_end
 .global _app_names
 _app_names:
-    .string "02t.elf"
+    .string "00t.bin"
 .section .data
 .global app_0_start
 .global app_0_end
 .align 3
 app_0_start:
-    .incbin "../../user/target/02t.elf"
+    .incbin "user/target/00t.bin"
 app_0_end:
