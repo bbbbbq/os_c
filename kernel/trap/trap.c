@@ -16,39 +16,76 @@ void init_interrupt()
     uint64_t mask = 0x202; // 定义启用S模式时钟中断和软件中断的掩码
     WRITE_CSR(sie,mask);
 }
-
 struct TrapContext* trap_handler(struct TrapContext* cx) 
 {
-    print_str("trap_handler\n");
-    uint64_t scause = READ_CSR(scause); // get trap cause
-    uint64_t stval = READ_CSR(stval); // get extra value
+    uint64_t scause = READ_CSR(scause);
+    uint64_t stval = READ_CSR(stval);
+
     switch (scause)
     {
-        case TRAP_CAUSE_USER_ENV_CALL:
-        {
-            cx->sepc += 4;
+        case 0x00: // 指令地址错位
+            print_str("[kernel] Instruction Address Misaligned.\n");
+            run_next_app();
+            break;
+        case 0x01: // 指令访问故障
+            print_str("[kernel] Instruction Access Fault.\n");
+            run_next_app();
+            break;
+        case 0x02: // 非法指令
+            print_str("[kernel] Illegal Instruction.\n");
+            run_next_app();
+            break;
+        case 0x03: // 断点
+            print_str("[kernel] Breakpoint.\n");
+            // 特定的调试处理或直接运行下一个应用
+            run_next_app();
+            break;
+        case 0x04: // 加载地址错位
+            print_str("[kernel] Load Address Misaligned.\n");
+            run_next_app();
+            break;
+        case 0x05: // 加载访问故障
+            print_str("[kernel] Load Access Fault.\n");
+            run_next_app();
+            break;
+        case 0x06: // 存储地址错位
+            print_str("[kernel] Store/AMO Address Misaligned.\n");
+            run_next_app();
+            break;
+        case 0x07: // 存储/AMO访问故障
+            print_str("[kernel] Store/AMO Access Fault.\n");
+            run_next_app();
+            break;
+        case 0x08: // 环境调用来自U模式
+            cx->sepc += 4; // 跳过环境调用指令
             uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
-            cx->x[10] = syscall(cx->x[17], args);
-            print_str("syscall\n");
+            cx->x[10] = syscall(cx->x[17], args); // 执行系统调用
+            break;
+        case 0x09: // 环境调用来自S模式
+            print_str("[kernel] Environment Call from S-mode.\n");
             run_next_app();
             break;
-        }
-        case TRAP_CAUSE_STORE_FAULT:
-        case TRAP_CAUSE_STORE_PAGE_FAULT:
-            print_str("[kernel] PageFault in application, kernel killed it.\n");
+        case 0x0B: // 环境调用来自M模式
+            print_str("[kernel] Environment Call from M-mode.\n");
+            // 处理或运行下一个应用
             run_next_app();
             break;
-        case TRAP_CAUSE_ILLEGAL_INSTRUCTION:
-            print_str("[kernel] IllegalInstruction in application, kernel killed it.\n");
+        case 0x0C: // 指令页面错误
+            print_str("[kernel] Instruction Page Fault.\n");
+            run_next_app();
+            break;
+        case 0x0D: // 加载页面错误
+            print_str("[kernel] Load Page Fault.\n");
+            run_next_app();
+            break;
+        case 0x0F: // 存储页面错误
+            print_str("[kernel] Store/AMO Page Fault.\n");
             run_next_app();
             break;
         default:
-            print_str("Unsupported trap ");
+            print_str("[kernel] Unsupported trap.\n");
             print_uint64(scause);
-            print_str("\n");
             exit(1);
-            ASSERT(0);
     }
     return cx;
 }
-

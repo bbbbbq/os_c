@@ -3,6 +3,7 @@
 #define USER_STACK_SIZE 4096 * 2
 #define KERNEL_STACK_SIZE 4096 * 2
 #include "stdint.h"
+#include "batch.h"
 extern uint8_t UserStack[USER_STACK_SIZE];
 extern uint8_t Kernelstack[KERNEL_STACK_SIZE];
 
@@ -11,4 +12,8 @@ void init_kernel_stack(uint8_t* stack);
 
 uint8_t* get_kernel_sp(uint8_t *stack);
 uint8_t* get_user_sp(uint8_t *stack);
+
+uint8_t* Kernelstack_push_TrapContext(struct TrapContext trapcontext);
+uint8_t* UserStack_push_TrapContext(struct TrapContext trapcontext);
+
 #endif

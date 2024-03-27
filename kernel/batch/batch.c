@@ -71,8 +71,9 @@ void print_app_info(struct AppManager *manager) {
 
 void run_next_app()
 {
-    print_str("run_next_app");
-    print_uint64(app_manager.app_num);
+    //print_str("run_next_app");
+    print_str("run_next_app : ");
+    print_uint64(app_manager.current_app);
     print_str("\n");
     app_manager.current_app++;
     if(app_manager.current_app>=app_manager.app_num)
@@ -81,7 +82,9 @@ void run_next_app()
         ASSERT(0);
     }
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
+    asm volatile ("fence.i");
     struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack));
+    uint8_t* cx = Kernelstack_push_TrapContext(trapcontext);
     __restore(trapcontext);
 }
 

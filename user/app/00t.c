@@ -6,5 +6,12 @@
 
 i64 main( void )
 {
-    printf("01t\n");
+    printf("00t");
+    int cnt=0;
+    for(int i=0;i<20;i++)
+    {
+        printf("cnt: %d \n",cnt++);
+    }
+    sys_exit(1);
+    return 0;
 }
