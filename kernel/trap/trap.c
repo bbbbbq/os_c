@@ -89,7 +89,7 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             if(cx->x[17] == 124)
             {
                 int64_t idx = find_next_task();
-                __restore((uint64_t)app_init_context(app_manager.app_start,get_kernel_sp(Kernelstack[idx])));
+                //__restore((uint64_t)app_init_context(app_manager.app_start,get_kernel_sp(Kernelstack[idx])));
             }
             break;
         case 0x09: // 环境调用来自S模式
