@@ -43,5 +43,9 @@ typedef unsigned long int uintptr_t;
     asm volatile ("csrw " #reg ", %0" :: "rK"(val)); \
 })
 
+#define SSTATUS_SIE_BIT (1UL << 1) // Supervisor Interrupt Enable bit in sstatus
+#define SIE_SSIE_BIT (1UL << 1)    // Software Interrupt Enable for S-mode
+#define SIE_STIE_BIT (1UL << 5)    // Timer Interrupt Enable for S-mode
+#define SIE_SEIE_BIT (1UL << 9)    // External Interrupt Enable for S-mode
 
 #endif // _STDINT_H

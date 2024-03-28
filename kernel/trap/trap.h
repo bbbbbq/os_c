@@ -10,4 +10,5 @@
 
 void init_interrupt();
 struct TrapContext* trap_handler(struct TrapContext* trapframe);
+void print_sepc();
 #endif

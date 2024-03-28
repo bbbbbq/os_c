@@ -8,6 +8,7 @@ i64 main( void )
 {
     printf("00t");
     int cnt=0;
+    sys_yield();
     for(int i=0;i<20;i++)
     {
         printf("cnt: %d \n",cnt++);

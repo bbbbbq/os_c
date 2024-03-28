@@ -83,14 +83,16 @@ void run_next_app()
     }
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
     asm volatile ("fence.i");
-    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack));
-    uint8_t* cx = Kernelstack_push_TrapContext(trapcontext);
-    __restore(trapcontext);
+    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack[app_manager.current_app]));
+    uint8_t* cx = Kernelstack_push_TrapContext(trapcontext,app_manager.current_app);
+    //__restore(trapcontext);
+    __restore((uint64_t)cx);
 }
 
 void run_first_app()
 {
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
-    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack));
-    __restore(trapcontext);
+    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack[app_manager.current_app]));
+    uint8_t* cx = Kernelstack_push_TrapContext(trapcontext,app_manager.current_app);
+    __restore((uint64_t)cx);
 }

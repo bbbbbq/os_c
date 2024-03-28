@@ -27,7 +27,7 @@ struct TrapContext app_init_context(uint64_t entry, uint64_t sp)
     ctx.sepc = entry; // 设置入口地址
     set_sp(&ctx, sp); // 设置栈指针
     //初始化通用寄存器为0
-    for(int i = 0; i < 32; i++) 
+    for(int i = 0; i < 32; i++)
     {
         ctx.x[i] = 0;
     }

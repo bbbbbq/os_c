@@ -2,7 +2,7 @@
 #define TACK_H
 #include "batch.h"
 #include "stdint.h"
-extern void __restore();
+
 enum TaskStatus 
 {
     UnInit, // 未初始化
@@ -10,6 +10,7 @@ enum TaskStatus
     Running, // 正在运行
     Exited, // 已退出
 };
+
 struct TaskContext
 {
     uint64_t x[12];
@@ -32,5 +33,27 @@ struct TaskManager
 
 extern struct TaskManager task_manager; 
 
+struct TaskContext init_TaskContext(uint64_t task_id);
+
+struct TaskControlBlock init_TaskControlBlock(uint64_t task_id);
+
 void init_TaskManager();
+
+void run_first_task();
+
+struct TaskContext init_zero_TaskContext();
+
+// void suspend_current_and_run_next();
+
+// void mark_current_suspended();
+
+void mark_current_exited();
+
+// int64_t find_next_task();
+
+// void run_next_task_u2u();
+
+// void run_next_task_s2u();
+
+void mark_current_ready();
 #endif

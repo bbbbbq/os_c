@@ -38,3 +38,8 @@ uint64_t console_getchar(void) {
 uint64_t sbi_shutdown(void) {
     return sbi_call(0x08, 0, 0, 0);
 }
+
+uint64_t sbi_set_timer(uint64_t stime_value)
+{
+    return sbi_call(0x00,stime_value,0,0);
+}

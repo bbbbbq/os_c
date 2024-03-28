@@ -5,7 +5,17 @@
 #include "debug.h"
 #include "context.h"
 #include "batch.h"
+#include "timer.h"
+#include "stack.h"
 extern void __alltraps(void);
+
+
+void print_sepc()
+{
+    print_str("sepc : ");
+    print_uint64(READ_CSR(sepc));
+    print_str("\n");    
+}
 
 void init_interrupt()
 {
@@ -15,19 +25,30 @@ void init_interrupt()
     asm volatile("csrw stvec, %0" :: "r"(stvec_value));
     uint64_t mask = 0x202; // 定义启用S模式时钟中断和软件中断的掩码
     WRITE_CSR(sie,mask);
+    uint64_t sstatus = READ_CSR(sstatus);
+    sstatus |= SSTATUS_SIE_BIT;
+    WRITE_CSR(sstatus, sstatus);
+    uint64_t sie = READ_CSR(sie);
+    sie |= SIE_SSIE_BIT | SIE_STIE_BIT | SIE_SEIE_BIT;
+    WRITE_CSR(sie, sie);
+    WRITE_CSR(sscratch,Trap_Stack);
 }
+
 struct TrapContext* trap_handler(struct TrapContext* cx) 
 {
+    //print_str("trap_handler\n");
     uint64_t scause = READ_CSR(scause);
-    uint64_t stval = READ_CSR(stval);
+    //uint64_t stval = READ_CSR(stval);
 
     switch (scause)
     {
         case 0x00: // 指令地址错位
             print_str("[kernel] Instruction Address Misaligned.\n");
+            print_sepc();
             run_next_app();
             break;
         case 0x01: // 指令访问故障
+            print_sepc();
             print_str("[kernel] Instruction Access Fault.\n");
             run_next_app();
             break;
@@ -38,7 +59,8 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
         case 0x03: // 断点
             print_str("[kernel] Breakpoint.\n");
             // 特定的调试处理或直接运行下一个应用
-            run_next_app();
+            cx->sepc +=2;
+            //run_next_app();
             break;
         case 0x04: // 加载地址错位
             print_str("[kernel] Load Address Misaligned.\n");
@@ -46,7 +68,7 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             break;
         case 0x05: // 加载访问故障
             print_str("[kernel] Load Access Fault.\n");
-            run_next_app();
+            //run_next_app();
             break;
         case 0x06: // 存储地址错位
             print_str("[kernel] Store/AMO Address Misaligned.\n");
@@ -54,7 +76,10 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             break;
         case 0x07: // 存储/AMO访问故障
             print_str("[kernel] Store/AMO Access Fault.\n");
-            run_next_app();
+            print_sepc();
+            uint64_t cnt=10000000000;
+            while(cnt--){}
+            //run_next_app();
             break;
         case 0x08: // 环境调用来自U模式
             cx->sepc += 4; // 跳过环境调用指令
@@ -63,6 +88,8 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             break;
         case 0x09: // 环境调用来自S模式
             print_str("[kernel] Environment Call from S-mode.\n");
+            uint64_t cnt1=10000000000;
+            while(cnt1--){}
             run_next_app();
             break;
         case 0x0B: // 环境调用来自M模式
@@ -81,6 +108,10 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
         case 0x0F: // 存储页面错误
             print_str("[kernel] Store/AMO Page Fault.\n");
             run_next_app();
+            break;
+        case 0x8000000000000005: 
+            //print_str("intr_timer_handle\n");
+            intr_timer_handle();
             break;
         default:
             print_str("[kernel] Unsupported trap.\n");

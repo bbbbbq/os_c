@@ -15,9 +15,10 @@ struct AppManager
 };
 extern struct AppManager app_manager;
 extern uint64_t _num_app[];
-extern void __restore(struct TrapContext);
+extern void __restore(uint64_t);
 void init_appmanager();
 void run_next_app();
 void load_app(uint64_t app_id);
 void print_app_info(struct AppManager *manager);
+void run_first_app();
 #endif
