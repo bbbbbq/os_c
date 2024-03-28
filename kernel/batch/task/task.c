@@ -83,8 +83,8 @@ void suspend_current_and_run_next()
     if (next_task < task_manager.num_task)
     {
         task_manager.current_task = next_task;
-        TrapContext* cx = 
-        //__switch(&task_manager.tasks[pre_id].task_cx,&task_manager.tasks[next_task].task_cx);
+        // sTrapContext* cx = 
+        __switch(&task_manager.tasks[pre_id].task_cx,&task_manager.tasks[next_task].task_cx);
     }else
     {
         print_str("task completed\n");
@@ -100,7 +100,7 @@ struct TaskContext init_zero_TaskContext()
     return cx;
 }
 
-void void run_next_task_u2u()
+void run_next_task_u2u()
 {
     mark_current_exited();
     uint64_t current_idx = task_manager.current_task;
@@ -131,30 +131,31 @@ void run_first_task()
 }
 
 
-void run_next_task_s2u()
-{
-    task_manager.tasks[task_manager.current_task].task_status = Ready;
-    int64_t next_app_idx = find_next_task();
-    if(next_app_idx == -1)
-    {
-        print_str("all task is not ready\n");
-        ASSERT(0);
-    }
-    task_manager.tasks[current_idx].task_status = Exited;
-    task_manager.tasks[next_app_idx].task_status = Running;
-    //__restore();
-    __switch(&task_manager.tasks[current_idx].task_cx,&task_manager.tasks[next_app_idx].task_cx);
-}
+// void run_next_task_s2u()
+// {
+//     task_manager.tasks[task_manager.current_task].task_status = Ready;
+//     int64_t next_app_idx = find_next_task();
+//     if(next_app_idx == -1)
+//     {
+//         print_str("all task is not ready\n");
+//         ASSERT(0);
+//     }
+//     task_manager.tasks[current_idx].task_status = Exited;
+//     task_manager.tasks[next_app_idx].task_status = Running;
+//     //__restore();
+//     __switch(&task_manager.tasks[current_idx].task_cx,&task_manager.tasks[next_app_idx].task_cx);
+// }
 
-void mark_current_ready()
-{
-    task_manager.tasks[task_manager.current_task].task_status = Ready;
-}
+// void mark_current_ready()
+// {
+//     task_manager.tasks[task_manager.current_task].task_status = Ready;
+// }
 
-void suspend_current_and_run_next_s2u()
-{
-    mark_current_ready();
-    uint64_t next_idx = find_next_task();
-    struct TaskContext cur_cs = task_manager.tasks[task_manager.current_task].task_cx;
+// void suspend_current_and_run_next_s2u()
+// {
+//     mark_current_ready();
+//     uint64_t next_idx = find_next_task();
+//     struct TaskContext cur_cx = task_manager.tasks[task_manager.current_task].task_cx;
+//     struct TaskContext next_cx = task_manager.tasks[next_idx].task_cx;
 
-}
+// }

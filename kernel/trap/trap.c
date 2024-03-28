@@ -7,6 +7,7 @@
 #include "batch.h"
 #include "timer.h"
 #include "stack.h"
+#include "task.h"
 extern void __alltraps(void);
 
 
@@ -85,6 +86,11 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             cx->sepc += 4; // 跳过环境调用指令
             uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
             cx->x[10] = syscall(cx->x[17], args); // 执行系统调用
+            if(cx->x[17] == 124)
+            {
+                int64_t idx = find_next_task();
+                __restore((uint64_t)app_init_context(app_manager.app_start,get_kernel_sp(Kernelstack[idx])));
+            }
             break;
         case 0x09: // 环境调用来自S模式
             print_str("[kernel] Environment Call from S-mode.\n");
