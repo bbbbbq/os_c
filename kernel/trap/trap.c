@@ -46,16 +46,16 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
         case 0x00: // 指令地址错位
             print_str("[kernel] Instruction Address Misaligned.\n");
             print_sepc();
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x01: // 指令访问故障
             print_sepc();
             print_str("[kernel] Instruction Access Fault.\n");
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x02: // 非法指令
-            print_str("[kernel] Illegal Instruction.\n");
-            run_next_app();
+            print_str("kernel] Illegal Instruction.\n");
+            run_next_task(3);
             break;
         case 0x03: // 断点
             print_str("[kernel] Breakpoint.\n");
@@ -65,19 +65,19 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             break;
         case 0x04: // 加载地址错位
             print_str("[kernel] Load Address Misaligned.\n");
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x05: // 加载访问故障
             print_str("[kernel] Load Access Fault.\n");
-            //run_next_app();
+            run_next_task(3);
             break;
         case 0x06: // 存储地址错位
             print_str("[kernel] Store/AMO Address Misaligned.\n");
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x07: // 存储/AMO访问故障
             print_str("[kernel] Store/AMO Access Fault.\n");
-            print_sepc();
+            print_sepc(3);
             uint64_t cnt=10000000000;
             while(cnt--){}
             //run_next_app();
@@ -86,34 +86,29 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             cx->sepc += 4; // 跳过环境调用指令
             uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
             cx->x[10] = syscall(cx->x[17], args); // 执行系统调用
-            if(cx->x[17] == 124)
-            {
-                int64_t idx = find_next_task();
-                //__restore((uint64_t)app_init_context(app_manager.app_start,get_kernel_sp(Kernelstack[idx])));
-            }
             break;
         case 0x09: // 环境调用来自S模式
             print_str("[kernel] Environment Call from S-mode.\n");
             uint64_t cnt1=10000000000;
             while(cnt1--){}
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x0B: // 环境调用来自M模式
             print_str("[kernel] Environment Call from M-mode.\n");
             // 处理或运行下一个应用
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x0C: // 指令页面错误
             print_str("[kernel] Instruction Page Fault.\n");
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x0D: // 加载页面错误
             print_str("[kernel] Load Page Fault.\n");
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x0F: // 存储页面错误
             print_str("[kernel] Store/AMO Page Fault.\n");
-            run_next_app();
+            run_next_task(3);
             break;
         case 0x8000000000000005: 
             //print_str("intr_timer_handle\n");

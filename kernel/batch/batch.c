@@ -83,7 +83,7 @@ void run_next_app()
     }
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
     asm volatile ("fence.i");
-    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack[app_manager.current_app]));
+    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_stack_top(app_manager.current_app));
     uint8_t* cx = Kernelstack_push_TrapContext(trapcontext,app_manager.current_app);
     //__restore(trapcontext);
     __restore((uint64_t)cx);
@@ -92,7 +92,36 @@ void run_next_app()
 void run_first_app()
 {
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
-    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_sp(UserStack[app_manager.current_app]));
+    struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_stack_top(app_manager.current_app));
     uint8_t* cx = Kernelstack_push_TrapContext(trapcontext,app_manager.current_app);
     __restore((uint64_t)cx);
+}
+
+
+void load_app_test()
+{
+      // Assume _num_app and related variables are defined elsewhere in your project
+    extern uint64_t _num_app[]; // Assuming this is an array holding app info
+    uint64_t num_app = _num_app[0]; // First element holds the number of apps
+    asm volatile("fence.i");
+    for (uint64_t i = 0; i < num_app; i++) {
+        // Calculate the start and end addresses of the app in memory
+        uint64_t app_start = _num_app[1 + i * 2];
+        uint64_t app_end = _num_app[2 + i * 2];
+        uint64_t app_size = app_end - app_start;
+        const void* src = (const void*)app_start;
+        void* dst = (void*)(APP_BASE_ADDRESS + 0x20000 * i);
+
+        print_str("[Test] Loading app from ");
+        print_uint64(app_start);
+        print_str(" to ");
+        print_uint64(app_end);
+        print_str("\n");
+
+        // Clear the application area and copy the new app into place
+        memset_t(dst, 0, 0x20000); // Ensure APP_MAX_SIZE covers the max possible app size
+        memcpy_t(dst, src, app_size);
+        // Instruction synchronization barrier to ensure all instructions are executed correctly
+        __asm__ volatile ("fence.i");
+    }
 }

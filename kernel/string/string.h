@@ -18,5 +18,5 @@ int strcmp_t(const char *str1, const char *str2);
 char *strcpy_t(char *dest, const char *src);
 char *strcat_t(char *dest, const char *src);
 void memcpy(u8 *dest, const u8 *src, u32 len);
-
+void memset(void *dest, u8 val, u32 len);
 #endif // MY_STRING_H

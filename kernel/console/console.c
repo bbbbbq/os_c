@@ -50,3 +50,14 @@ void print_uint64(uint64_t value) {
     reverse_str(buffer, i); // 假设reverse_str函数已经实现
     print_str(buffer); // 假设print_str函数已经实现，用于打印字符串
 }
+
+void print_uint64_hex(uint64_t value) 
+{
+    print_str("0x"); // 打印十六进制前缀
+    for (int i = 15; i >= 0; i--) 
+    {
+        int digit = (value >> (i * 4)) & 0xF; // 获取每个十六进制位
+        char hex = digit < 10 ? '0' + digit : 'A' + digit - 10; // 转换为字符
+        console_putchar((uint64_t)hex); // 输出字符
+    }
+}

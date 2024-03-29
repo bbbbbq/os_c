@@ -31,7 +31,8 @@ int64_t write(uint64_t fd, const void *buf, uint64_t count)
 int64_t yield()
 {
     print_str("\n-------yield------\n");
-    //suspend_current_and_run_next();
+    run_next_task(1);
+    return 1;
 }
 
 int64_t sys_write(uint64_t fd, const void *buf, uint64_t count) 

@@ -4,15 +4,14 @@
 #include "type.h"
 
 
-i64 main( void )
-{
-    printf("00t");
-    int cnt=0;
+i64 main( void ){
+    printf("00t yield\n");
     sys_yield();
-    for(int i=0;i<20;i++)
-    {
-        printf("cnt: %d \n",cnt++);
+    printf("00t yield success\n");
+    for(u64 i = 0; i < 100000000; i ++){
+        if(i % 10000000 == 0){
+            printf("00t: %d\n", i / 10000000);
+        }
     }
-    sys_exit(1);
     return 0;
 }

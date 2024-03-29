@@ -6,30 +6,27 @@ OBJCOPY = rust-objcopy
 OBJDUMP = rust-objdump
 
 INC_DIR = ./include
-APP_NUM = 00
+APP_NUM = 02
 SRC_LINKER = ./linker/${APP_NUM}t_linker.ld
-# SRC_LINKER = ./linker.ld
 TARGET_NAME = ./target/${APP_NUM}t
-TARGET_ELF = ${TARGET_NAME}.elf
-TARGET_BIN = ${TARGET_NAME}.bin
 
 SRC_FILES = ./start.s \
 			./main.c \
 			./syscall.c \
 			./lib/printf.c \
 			./lib/string.c \
-			./app/${APP_NUM}t.c \
-			
+			./app/${APP_NUM}t.c
 
 build: 
-	${CC} ${SRC_FILES} -o ${TARGET_ELF} \
+	${CC} ${SRC_FILES} -o ${TARGET_NAME} \
 		-T${SRC_LINKER} \
 		-I${INC_DIR} \
 		-nostdinc -nostdlib -mcmodel=medany -fno-builtin
-	@${OBJCOPY} -S ${TARGET_ELF} -O binary ${TARGET_BIN}
+	${OBJCOPY} --strip-all ${TARGET_NAME} -O binary ${TARGET_NAME}.bin
 
 dump:
-	${OBJDUMP} -h ${TARGET_ELF}
+	${OBJDUMP} -h ${TARGET_NAME}
+
 
 clean:
 	rm ./target/*

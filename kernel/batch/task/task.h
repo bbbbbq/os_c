@@ -13,9 +13,9 @@ enum TaskStatus
 
 struct TaskContext
 {
-    uint64_t x[12];
     uint64_t ra;
     uint64_t sp;
+    uint64_t x[12];
 };
 
 struct TaskControlBlock
@@ -33,35 +33,7 @@ struct TaskManager
 
 extern struct TaskManager task_manager; 
 
-struct TaskContext init_TaskContext(uint64_t task_id);
-
-struct TaskControlBlock init_TaskControlBlock(uint64_t task_id);
-
-void init_TaskManager();
-
-void run_first_task();
-
-struct TaskContext init_zero_TaskContext();
-
-void suspend_current_and_run_next();
-
-void mark_current_suspended();
-
-void mark_current_exited();
-
-int64_t find_next_task();
-
-void run_next_task_u2u();
-
-void run_next_task_s2u();
-
-void mark_current_ready();
-
-void suspend_current_and_run_next_s2u();
-
-void suspend_current_and_run_next_u2u();
-
-void exit_current_and_run_next_s2u();
-
-
+void task_manager_init(void);
+void run_next_task(uint64_t status);
+void run_first_task(void);
 #endif

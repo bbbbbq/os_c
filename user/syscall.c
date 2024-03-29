@@ -1,7 +1,11 @@
 
 #include "syscall.h"
 #include "lib/string.h"
-#include "include/lib/syscall_id.h"
+
+#define SYSCALL_WRITE      64
+#define SYSCALL_EXIT       93
+#define SYSCALL_YIELD     124
+#define SYSCALL_GET_TIME  169
 
 
 

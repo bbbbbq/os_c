@@ -1,7 +1,6 @@
 #include "timer.h"
 #include "sbi.h"
 #include "task.h"
-
 static inline uint64_t read_time(void) 
 {
     uint64_t time;
@@ -24,11 +23,12 @@ void timer_init()
 
 void intr_timer_handle()
 {
+    run_next_task(1);
     ticks++;
     clock_set_next_event();
-    if(ticks == 10)
+    if(ticks % 10 == 0)
     {
-        
+        print_str("timer_interrupt\n");
     }
     // if(ticks==100)
     // {

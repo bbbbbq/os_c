@@ -5,7 +5,7 @@
 #include "context.h"
 #define MAX_APP_NUM 20
 #define APP_BASE_ADDRESS 0x80400000
-#define APP_SIZE_LIMIT 0x200000
+#define APP_SIZE_LIMIT 0x20000
 struct AppManager
 {
     uint64_t app_num;
@@ -21,4 +21,5 @@ void run_next_app();
 void load_app(uint64_t app_id);
 void print_app_info(struct AppManager *manager);
 void run_first_app();
+void load_app_test();
 #endif

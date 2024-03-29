@@ -95,3 +95,8 @@ void memcpy(u8 *dest, const u8 *src, u32 len)
         *dest++ = *src++;
     }
 }
+
+void memset(void *dest, u8 val, u32 len)
+{
+    memset_t(dest,val,len);
+}

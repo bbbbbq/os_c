@@ -2,15 +2,11 @@
 #include "lib/stdio.h"
 #include "syscall.h"
 
-
-
 #define SYSCALL_WRITE      64
 #define SYSCALL_EXIT       93
 #define SYSCALL_YIELD     124
 #define SYSCALL_GET_TIME  169
 
-
-/* SYSCALL_WRITE */
 #define FD_STDOUT  1
 /**
  *  @brief: 调用sbi输出函数，参数为固定要求，由_vprintk & _vprints调用

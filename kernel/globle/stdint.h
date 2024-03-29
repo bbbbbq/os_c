@@ -47,5 +47,6 @@ typedef unsigned long int uintptr_t;
 #define SIE_SSIE_BIT (1UL << 1)    // Software Interrupt Enable for S-mode
 #define SIE_STIE_BIT (1UL << 5)    // Timer Interrupt Enable for S-mode
 #define SIE_SEIE_BIT (1UL << 9)    // External Interrupt Enable for S-mode
+#define SSTATUS_SPP (1L << 8)  // Previous mode, 1=Supervisor, 0=User
 
 #endif // _STDINT_H

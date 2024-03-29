@@ -74,6 +74,8 @@ $(ELF): $(OBJECTS)
 disassemble: $(ELF)
 	riscv64-unknown-elf-objdump -d -S -l $(ELF) > os_kernel.asm
 
+disassemble_all: $(ELF)
+	riscv64-unknown-elf-objdump -D $(ELF) > os_kernel_all.asm
 # Clean build, corrected to remove $(OBJDIR) only once
 clean:
 	rm -rf $(OBJDIR)
