@@ -7,6 +7,7 @@
 #include "batch.h"
 #include "task.h"
 #include "timer.h"
+#include "kernel_heap.h"
 int main_os()
 {
     console_putchar('1');
@@ -19,12 +20,7 @@ int main_os()
     init_appmanager();
     // init_appmanager();
     task_manager_init();
-    run_first_task();
-    // run_first_task();
-    // __asm__ volatile ("ebreak");
-    //ASSERT(0);
-    //__asm__ volatile ("ecall");
-   // uint64_t cnt = 0;
+    ASSERT(0);
     while(1){}
     ASSERT(0);
 }

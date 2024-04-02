@@ -4,7 +4,8 @@
 #include "type.h"
 
 
-i64 main( void ){
+i64 main( void )
+{
     printf("00t yield\n");
     sys_yield();
     printf("00t yield success\n");

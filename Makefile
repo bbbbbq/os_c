@@ -16,6 +16,10 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/trap/syscall -I$(KERNEL_DIR)/trap \
 				-I$(KERNEL_DIR)/batch/context  -I$(KERNEL_DIR)/batch/stack \
 				-I$(KERNEL_DIR)/batch/task   -I$(KERNEL_DIR)/trap/timer \
+				-I$(KERNEL_DIR)/memory/kernel_heap  -I$(KERNEL_DIR)/memory/address \
+				-I$(KERNEL_DIR)/memory/pte    -I$(KERNEL_DIR)/data_structure \
+				-I$(KERNEL_DIR)/memory/fram_allocator  -I$(KERNEL_DIR)/memory/pagetable
+
 
 # Compilation and linking flags
 CFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -fno-builtin -Wall

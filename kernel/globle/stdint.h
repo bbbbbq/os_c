@@ -17,6 +17,12 @@ typedef unsigned long int uint64_t;
 typedef long int intptr_t;
 typedef unsigned long int uintptr_t;
 
+typedef enum {
+    false, // 0
+    true   // 1
+} bool;
+
+#define NULL ((void*)0)
 // 最小和最大值
 #define INT8_MIN (-128)
 #define INT16_MIN (-32767-1)
