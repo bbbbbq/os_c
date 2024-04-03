@@ -16,7 +16,7 @@ typedef unsigned long int uint64_t;
 // 定义指针大小的整数
 typedef long int intptr_t;
 typedef unsigned long int uintptr_t;
-
+typedef uint64_t size_t;
 typedef enum {
     false, // 0
     true   // 1

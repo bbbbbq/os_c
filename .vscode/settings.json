@@ -2,6 +2,12 @@
     "cmake.sourceDirectory": "/home/caigoubencai/Desktop/gdb-13.1/zlib",
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "addr.h": "c",
+        "kernel_heap.h": "c",
+        "vector.h": "c",
+        "fram_allocator.h": "c",
+        "address.h": "c",
+        "stdarg.h": "c"
     }
 }

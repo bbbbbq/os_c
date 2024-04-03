@@ -14,12 +14,13 @@ int main_os()
     print_str("123123\n");
     init_interrupt();
     load_app_test();
-    timer_init(); 
+    timer_init();
     // init_appmanager();
     // run_first_app();
     init_appmanager();
     // init_appmanager();
     task_manager_init();
+    //printk("123%d\n",12);
     ASSERT(0);
     while(1){}
     ASSERT(0);

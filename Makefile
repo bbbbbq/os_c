@@ -17,8 +17,9 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/batch/context  -I$(KERNEL_DIR)/batch/stack \
 				-I$(KERNEL_DIR)/batch/task   -I$(KERNEL_DIR)/trap/timer \
 				-I$(KERNEL_DIR)/memory/kernel_heap  -I$(KERNEL_DIR)/memory/address \
-				-I$(KERNEL_DIR)/memory/pte    -I$(KERNEL_DIR)/data_structure \
-				-I$(KERNEL_DIR)/memory/fram_allocator  -I$(KERNEL_DIR)/memory/pagetable
+				-I$(KERNEL_DIR)/data_structure   -I$(KERNEL_DIR)/memory/address/fram_allocator \
+				-I$(KERNEL_DIR)/memory/pagetable   -I$(KERNEL_DIR)/memory/pagetable/pte  \
+				-I$(KERNEL_DIR)/memory/task_memory  -I$(KERNEL_DIR)/lib
 
 
 # Compilation and linking flags
