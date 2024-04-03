@@ -1,12 +1,12 @@
     .section .text.entry
     .globl _start
 _start:
-    la sp, bootstacktop
+    la sp, boot_stack_top
     call main_os
+
     .section .bss.stack
-    .align 12
-    .global bootstack
-bootstack:
-    .space 4096 * 4
-    .global bootstacktop
-bootstacktop:
+    .globl boot_stack_lower_bound
+boot_stack_lower_bound:
+    .space 4096 * 16
+    .globl boot_stack_top
+boot_stack_top:

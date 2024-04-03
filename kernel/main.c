@@ -10,8 +10,9 @@
 #include "kernel_heap.h"
 int main_os()
 {
-    console_putchar('1');
-    print_str("123123\n");
+    printk("123%d\n",123);
+    // console_putchar('1');
+    // print_str("123123\n");
     init_interrupt();
     load_app_test();
     timer_init();

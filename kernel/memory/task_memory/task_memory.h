@@ -36,12 +36,15 @@ typedef struct VpnRange
 
 
 // 逻辑段（具有相同权限的段，虚拟地址连续
-typedef struct MapArea{
+typedef struct MapArea
+{
     VpnRange vpn_range;
     enum MapType map_type;
     MapPermission map_premission;
 }MapArea;
 
+
+void memory_set_init();
 void map_area_init(MapArea* ma, VirtAddr start_va, VirtAddr end_va, enum MapType mt, MapPermission mp);
 void map_area_map(MapArea* ma, PageTable* pt);
 void memory_set_init(MemorySet* ms);

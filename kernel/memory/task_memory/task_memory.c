@@ -71,45 +71,49 @@ void memory_set_map_trampoline(MemorySet *ms)
     VirtAddr va;
     va.addr = TRAMPOLINE_FULL;
     PhysAddr pha;
-    // pha.addr = (size_t)&strampoline;
-    // PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(va,0),phys_addr_to_page_num(pha,1),PTE_R|PTE_X);
+    pha.addr = (size_t)&strampoline;
+    PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(va,0),phys_addr_to_page_num(pha,1),PTE_R|PTE_X);
 }
 
 
 void memory_set_kernel_new(MemorySet* ms)
 {
-    // MapArea ma_tmp;
-    // printk("[mm/memory_set.c] text: 0x%x - 0x%x\n", (uint64_t)text_start, (uint64_t)text_end);
-    // printk("[mm/memory_set.c] rodata: 0x%x - 0x%x\n", (uint64_t)rodata_start, (uint64_t)rodata_end);
-    // printk("[mm/memory_set.c] data: 0x%x - 0x%x\n", (uint64_t)data_start, (uint64_t)data_end);
-    // printk("[mm/memory_set.c] bss: 0x%x - 0x%x\n", (uint64_t)bss_start, (uint64_t)bss_end);
-    // memory_set_map_trampoline(ms);
-    // memory_set_map_kernel_stack_kernel(ms);
+    MapArea ma_tmp;
+    printk("[mm/memory_set.c] text: 0x%x - 0x%x\n", (uint64_t)text_start, (uint64_t)text_end);
+    printk("[mm/memory_set.c] rodata: 0x%x - 0x%x\n", (uint64_t)rodata_start, (uint64_t)rodata_end);
+    printk("[mm/memory_set.c] data: 0x%x - 0x%x\n", (uint64_t)data_start, (uint64_t)data_end);
+    printk("[mm/memory_set.c] bss: 0x%x - 0x%x\n", (uint64_t)bss_start, (uint64_t)bss_end);
+    memory_set_map_trampoline(ms);
+    memory_set_map_kernel_stack_kernel(ms);
 
-    // VirtAddr vad1,vad2;
-    // vad1.addr = (uint64_t)&text_start;
-    // vad2.addr = (uint64_t)&text_end;
-    // map_area_init(&ma_tmp, vad1,  vad2,   Identical, MAP_PREMISSION_R | MAP_PREMISSION_X);
-    // memory_set_push(ms, &ma_tmp);
+    VirtAddr vad1,vad2;
+    vad1.addr = (uint64_t)&text_start;
+    vad2.addr = (uint64_t)&text_end;
+    map_area_init(&ma_tmp, vad1,  vad2,   Identical, MAP_PREMISSION_R | MAP_PREMISSION_X);
+    memory_set_push(ms, &ma_tmp);
 
-    // vad1.addr = (uint64_t)&rodata_start;
-    // vad2.addr = (uint64_t)&rodata_end;
-    // map_area_init(&ma_tmp, vad1, vad2, Identical, MAP_PREMISSION_R                   );
-    // memory_set_push(ms, &ma_tmp);
+    vad1.addr = (uint64_t)&rodata_start;
+    vad2.addr = (uint64_t)&rodata_end;
+    map_area_init(&ma_tmp, vad1, vad2, Identical, MAP_PREMISSION_R                   );
+    memory_set_push(ms, &ma_tmp);
 
-    // vad1.addr = (uint64_t)&data_start;
-    // vad2.addr = (uint64_t)&data_end;
-    // map_area_init(&ma_tmp, vad1,  vad2,   Identical, MAP_PREMISSION_R | MAP_PREMISSION_W);
-    // memory_set_push(ms, &ma_tmp);
+    vad1.addr = (uint64_t)&data_start;
+    vad2.addr = (uint64_t)&data_end;
+    map_area_init(&ma_tmp, vad1,  vad2,   Identical, MAP_PREMISSION_R | MAP_PREMISSION_W);
+    memory_set_push(ms, &ma_tmp);
 
-    // vad1.addr = (uint64_t)&bss_start;
-    // vad2.addr = (uint64_t)&bss_end;
-    // map_area_init(&ma_tmp, vad1,   vad2,    Identical, MAP_PREMISSION_R | MAP_PREMISSION_W);
-    // memory_set_push(ms, &ma_tmp);
+    vad1.addr = (uint64_t)&bss_start;
+    vad2.addr = (uint64_t)&bss_end;
+    map_area_init(&ma_tmp, vad1,   vad2,    Identical, MAP_PREMISSION_R | MAP_PREMISSION_W);
+    memory_set_push(ms, &ma_tmp);
 
-    // vad1.addr = (uint64_t)&ekernel;
-    // vad2.addr = MEMORY_END;
-    // map_area_init(&ma_tmp, vad1, vad2, Identical, MAP_PREMISSION_R | MAP_PREMISSION_W);
-    // memory_set_push(ms, &ma_tmp);
+    vad1.addr = (uint64_t)&ekernel;
+    vad2.addr = MEMORY_END;
+    map_area_init(&ma_tmp, vad1, vad2, Identical, MAP_PREMISSION_R | MAP_PREMISSION_W);
+    memory_set_push(ms, &ma_tmp);
 }
 
+void memory_init()
+{
+    memory_set_kernel_new
+}
