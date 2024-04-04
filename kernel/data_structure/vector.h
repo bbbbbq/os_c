@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "kernel_heap.h" // 提供 malloc 和 free
+#include "buddy.h" // 提供 malloc 和 free
 #include "string.h"
 // 泛型 Vector 结构定义
 typedef struct {

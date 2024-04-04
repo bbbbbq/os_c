@@ -1,19 +1,30 @@
 #include "vector.h"
 #include "stdint.h"
-void vector_init(Vector *v) {
+#include "buddy.h"
+
+void vector_init(Vector *v) 
+{
     v->capacity = 4;
     v->total = 0;
-    v->items = malloc(sizeof(void*) * v->capacity);
+    // 这里假设 sizeof(void*) * v->capacity 是以字节为单位的合适大小，需要根据实际情况调整
+    int offset = buddy_alloc(global_buddy, sizeof(void*) * v->capacity); // 这可能需要调整，因为buddy_alloc的参数和返回值可能与你的需求不匹配
+    v->items = (void**)(offset); // 这里需要根据伙伴系统分配器的具体实现来转换offset到指针
 }
-
 size_t vector_total(Vector *v) {
     return v->total;
 }
-
 void vector_resize(Vector *v, size_t capacity) {
-    void **items = realloc(v->items, sizeof(void*) * capacity);
-    if (items) {
-        v->items = items;
+    int new_offset = buddy_alloc(global_buddy, sizeof(void*) * capacity);
+    void **new_items = (void**)(new_offset); // 根据实际情况转换
+    if (new_items) {
+        // 复制旧数据到新位置
+        for (size_t i = 0; i < v->total; i++) {
+            new_items[i] = v->items[i];
+        }
+        // 释放旧内存
+        buddy_free(global_buddy, (int)v->items); // 这里的转换需要根据buddy_free的实现来调整
+        // 更新结构体
+        v->items = new_items;
         v->capacity = capacity;
     }
 }
@@ -45,9 +56,9 @@ void vector_delete(Vector *v, size_t index) {
         }
     }
 }
-
-void vector_free(Vector *v) {
-    free(v->items);
+void vector_free(Vector *v) 
+{
+    buddy_free(global_buddy, (int)v->items); // 这里的转换需要根据buddy_free的实现来调整
     v->items = NULL;
     v->capacity = 0;
     v->total = 0;

@@ -20,7 +20,7 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/data_structure   -I$(KERNEL_DIR)/memory/address/fram_allocator \
 				-I$(KERNEL_DIR)/memory/pagetable   -I$(KERNEL_DIR)/memory/pagetable/pte  \
 				-I$(KERNEL_DIR)/memory/task_memory  -I$(KERNEL_DIR)/lib  \
-				-I$(KERNEL_DIR)/memory  -I$(KERNEL_DIR)/elf
+				-I$(KERNEL_DIR)/memory  -I$(KERNEL_DIR)/memory/buddy
 
 
 # Compilation and linking flags

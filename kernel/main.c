@@ -7,9 +7,7 @@
 #include "batch.h"
 #include "task.h"
 #include "timer.h"
-#include "kernel_heap.h"
-#include "mem.h"
-#include "fram_allocator.h"
+#include "buddy.h"
 int main_os()
 {
     printk("123%d\n",123);
@@ -23,11 +21,11 @@ int main_os()
     init_appmanager();
     // init_appmanager();
     task_manager_init();
-    frame_allocator_init();
+    //frame_allocator_init();
     //printk("123%d\n",12);
     // PhysPageNum tmp =  StackFrameAllocator_alloc(&fram_allocator); 
     // printk("tmp: %d\n",tmp.num);
-    mm_init();
+    //mm_init();
     ASSERT(0);
     while(1){}
     ASSERT(0);
