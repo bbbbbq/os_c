@@ -8,21 +8,18 @@ extern "C" {
 #include "buddy.h" // 提供 malloc 和 free
 #include "string.h"
 // 泛型 Vector 结构定义
-typedef struct {
-    void **items;      // 动态数组的项，使用 void* 来存储任意类型的指针
-    size_t capacity;   // 动态数组的容量
-    size_t total;      // 当前动态数组中项的总数
-} Vector;
+struct vector {
+  uint64_t size, capacity, dsize;
+  char *buffer;
+};
 
-// Vector 相关函数声明
-void vector_init(Vector *v);
-size_t vector_total(Vector *v);
-void vector_resize(Vector *v, size_t capacity);
-void vector_add(Vector *v, void *item);
-void *vector_get(Vector *v, size_t index);  
-void vector_delete(Vector *v, size_t index);
-void vector_free(Vector *v);
-void vector_new(Vector *v, size_t initial_capacity);
+void vector_new(struct vector *, uint64_t);
+void vector_push(struct vector *, void *);
+void vector_pop(struct vector *);
+void *vector_back(struct vector *);
+int vector_empty(struct vector *);
+void vector_free(struct vector *);
+void vector_remove(struct vector *, uint64_t);
 #ifdef __cplusplus
 }
 #endif

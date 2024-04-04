@@ -1,11 +1,7 @@
 #include "console.h"
 #include "sbi.h"
-void panic(const char *file, int line) {
-    print_str("Panic! File: ");
-    print_str(file);
-    print_str(", Line: ");
-    print_uint32(line);
-    print_str("\n");
+// panic函数现在接收文件名和行号作为参数
+void _panic(const char* file, int line, const char* msg) {
+    printk("PANIC in %s at line %d: %s\n", file, line, msg);
     sbi_shutdown();
-    while(1);
 }

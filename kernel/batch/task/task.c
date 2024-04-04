@@ -46,7 +46,7 @@ void task_manager_init( void )
 
 void run_next_task(uint64_t status) 
 {
-    /* 寻找ready的task */
+    // 寻找ready的task
     uint64_t target_task_num;
     for (target_task_num = (task_manager.current_task + 1) % MAX_APP_NUM; target_task_num != task_manager.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
         if (task_manager.tasks[target_task_num].task_status == Ready) {

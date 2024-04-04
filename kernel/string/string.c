@@ -113,3 +113,28 @@ int memcmp(const void *ptr1, const void *ptr2, size_t num)
     }
     return 0;
 }
+
+
+void *memmove(void *dest, const void *src, size_t n) {
+    u8 *d = (u8 *)dest;
+    const u8 *s = (const u8 *)src;
+
+    // 如果源和目标相同，就没有复制的必要
+    if (d == s) {
+        return dest;
+    }
+
+    // 如果源地址小于目标地址，并且两者重叠，则从后向前复制
+    if (s < d && d < s + n) {
+        for (size_t i = n; i != 0; i--) {
+            d[i - 1] = s[i - 1];
+        }
+    } else {
+        // 否则，从前向后复制
+        for (size_t i = 0; i < n; i++) {
+            d[i] = s[i];
+        }
+    }
+
+    return dest;
+}

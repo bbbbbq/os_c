@@ -2,7 +2,7 @@
 #define TACK_H
 #include "batch.h"
 #include "stdint.h"
-
+#include "mem.h"
 enum TaskStatus 
 {
     UnInit, // 未初始化
@@ -22,6 +22,9 @@ struct TaskControlBlock
 {
     struct TaskContext task_cx;
     enum TaskStatus task_status;
+    MemorySet memory_set;
+    PhysPageNum trap_cx_ppn;
+    size_t base_size
 };
 
 struct TaskManager

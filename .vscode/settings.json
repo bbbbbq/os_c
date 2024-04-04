@@ -12,6 +12,9 @@
         "elfparse.h": "c",
         "elf.h": "c",
         "task_memory.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "string.h": "c",
+        "config.h": "c",
+        "buddy.h": "c"
     }
 }

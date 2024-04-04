@@ -7,7 +7,7 @@ SECTIONS
     . = BASE_ADDRESS;
     skernel = .;
 
-    text_start = .;
+    stext = .;
     .text : {
         *(.text.entry)
         . = ALIGN(4K);
@@ -18,24 +18,24 @@ SECTIONS
     }
 
     . = ALIGN(4K);
-    text_end = .;
-    rodata_start = .;
+    etext = .;
+    srodata = .;
     .rodata : {
         *(.rodata .rodata.*)
         *(.srodata .srodata.*)
     }
 
     . = ALIGN(4K);
-    rodata_end = .;
-    data_start = .;
+    erodata = .;
+    sdata = .;
     .data : {
         *(.data .data.*)
         *(.sdata .sdata.*)
     }
 
     . = ALIGN(4K);
-    data_end = .;
-    bss_start = .;
+    edata = .;
+    sbss_with_stack = .;
     .bss : {
         *(.bss.stack)
         sbss = .;
@@ -44,7 +44,7 @@ SECTIONS
     }
 
     . = ALIGN(4K);
-    bss_end = .;
+    ebss = .;
     ekernel = .;
 
     /DISCARD/ : {

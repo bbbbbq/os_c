@@ -1,13 +1,8 @@
 #ifndef BUDDY_H
 #define BUDDY_H
 
-struct buddy;
-
-struct buddy * buddy_new(int level);
-void buddy_delete(struct buddy *);
-int buddy_alloc(struct buddy *, int size);
-void buddy_free(struct buddy *, int offset);
-int buddy_size(struct buddy *, int offset);
-void buddy_dump(struct buddy *);
+void bd_init(void *, void *);
+void bd_free(void *);
+void *bd_malloc(uint64_t);  
 
 #endif
