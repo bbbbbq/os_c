@@ -127,7 +127,7 @@ PageTableEntry *page_table_find_pte_create(PageTable *pt, VirtPageNum vpn)
 {
   // 解析虚拟页号获取三级索引
   uint64_t* idxs;
-  idxs = decompose_vpn(vpn.num);
+  vpn_indexes(vpn,idxs);
   // 从根页表的物理页号开始
   PhysPageNum ppn = pt->root_ppn;
   PageTableEntry *result = NULL;
@@ -141,16 +141,15 @@ PageTableEntry *page_table_find_pte_create(PageTable *pt, VirtPageNum vpn)
       result = pte;
       break;
     }
-    // 如果页表项无效，则为其分配一个新的物理页，并将其设置为有效
-    //!pte_is_valid
+
     printk("pte: addr : %d \n",pte);
     if (!pte_is_valid(*pte)) 
     {
       // 分配新的物理页
       PhysPageNum frame = StackFrameAllocator_alloc(&fram_allocator);
       //trace("frame alloc 0x%llx\n", frame);
-      // 检查物理页分配是否成功
-      if (!frame.num) 
+      // 检查物理页分配是否成功 
+      if (frame.num == 0x80000000 ) 
       {
         return NULL;
       }
@@ -160,8 +159,17 @@ PageTableEntry *page_table_find_pte_create(PageTable *pt, VirtPageNum vpn)
       vector_add(&pt->frames, &frame);
     }
     // 更新当前物理页号为当前页表项指向的下一级物理页号，以便继续遍历
-    ppn.num = pte_ppn(*pte);
+        ppn.num = pte_ppn(*pte);
   }
   // 返回找到或创建的页表项
   return result;
+}
+
+void vpn_indexes(VirtPageNum vpn, uint64_t *idx) 
+{
+  for (int i = 2; i >= 0; i--) 
+  {
+    idx[i] = vpn.num & 0x1ff;
+    vpn.num >>= 9;
+  }
 }

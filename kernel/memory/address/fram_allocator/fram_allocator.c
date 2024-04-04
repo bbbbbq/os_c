@@ -12,7 +12,7 @@ extern uint8_t ekernel;
 void frame_allocator_init() 
 {
   PhysAddr start_addr;
-  start_addr.addr =(size_t)&ekernel; // Manually constructing PhysAddr
+  start_addr.addr = &ekernel; // Manually constructing PhysAddr
   PhysAddr end_addr;                 // Manually constructing PhysAddr
   end_addr.addr = (size_t)MEMORY_END;
   fram_allocator.current = phys_addr_to_page_num(start_addr,0).num;
@@ -23,7 +23,8 @@ void frame_allocator_init()
 // 分配一个物理页帧
 // @param allocator 分配器的指针
 // @return 分配的物理页号，如果内存耗尽则返回特殊值(size_t)-1
-PhysPageNum StackFrameAllocator_alloc(StackFrameAllocator* allocator) {
+PhysPageNum StackFrameAllocator_alloc(StackFrameAllocator* allocator) 
+{
     if (vector_total(&allocator->recycled) > 0) {
         // 如果回收向量中有页号，优先从回收向量中分配
         size_t index = vector_total(&allocator->recycled) - 1; // 获取最后一个元素的索引
@@ -37,7 +38,7 @@ PhysPageNum StackFrameAllocator_alloc(StackFrameAllocator* allocator) {
         return ppn;
     } else {
         // 如果没有可分配的页号，则返回一个特殊值表示内存耗尽
-        return (PhysPageNum){ (size_t)-1 };
+        return (PhysPageNum){ 0x80000000 };
     }
 }
 

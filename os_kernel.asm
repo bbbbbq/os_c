@@ -1272,54 +1272,57 @@ uint32_t printk_port(const char *fmt, ...)
 
 0000000080201920 <main_os>:
 main_os():
-/home/caigoubencai/Desktop/os_c/kernel/main.c:13
-#include "task.h"
+/home/caigoubencai/Desktop/os_c/kernel/main.c:14
 #include "timer.h"
 #include "kernel_heap.h"
 #include "mem.h"
+#include "fram_allocator.h"
 int main_os()
 {
     80201920:	1141                	addi	sp,sp,-16
     80201922:	e406                	sd	ra,8(sp)
     80201924:	e022                	sd	s0,0(sp)
     80201926:	0800                	addi	s0,sp,16
-/home/caigoubencai/Desktop/os_c/kernel/main.c:14
+/home/caigoubencai/Desktop/os_c/kernel/main.c:15
     printk("123%d\n",123);
     80201928:	07b00593          	li	a1,123
     8020192c:	00004517          	auipc	a0,0x4
     80201930:	75c50513          	addi	a0,a0,1884 # 80206088 <rodata_start+0x88>
     80201934:	eb7ff0ef          	jal	ra,802017ea <printk>
-/home/caigoubencai/Desktop/os_c/kernel/main.c:17
+/home/caigoubencai/Desktop/os_c/kernel/main.c:18
     // console_putchar('1');
     // print_str("123123\n");
     init_interrupt();
-    80201938:	13a030ef          	jal	ra,80204a72 <init_interrupt>
-/home/caigoubencai/Desktop/os_c/kernel/main.c:18
-    load_app_test();
-    8020193c:	653020ef          	jal	ra,8020478e <load_app_test>
+    80201938:	196030ef          	jal	ra,80204ace <init_interrupt>
 /home/caigoubencai/Desktop/os_c/kernel/main.c:19
-    timer_init();
-    80201940:	60c030ef          	jal	ra,80204f4c <timer_init>
-/home/caigoubencai/Desktop/os_c/kernel/main.c:22
+    load_app_test();
+    8020193c:	6af020ef          	jal	ra,802047ea <load_app_test>
+/home/caigoubencai/Desktop/os_c/kernel/main.c:23
+    //timer_init();
     // init_appmanager();
     // run_first_app();
     init_appmanager();
-    80201944:	321020ef          	jal	ra,80204464 <init_appmanager>
-/home/caigoubencai/Desktop/os_c/kernel/main.c:24
+    80201940:	381020ef          	jal	ra,802044c0 <init_appmanager>
+/home/caigoubencai/Desktop/os_c/kernel/main.c:25
     // init_appmanager();
     task_manager_init();
-    80201948:	02f020ef          	jal	ra,80204176 <task_manager_init>
+    80201944:	08f020ef          	jal	ra,802041d2 <task_manager_init>
 /home/caigoubencai/Desktop/os_c/kernel/main.c:26
+    frame_allocator_init();
+    80201948:	2dc020ef          	jal	ra,80203c24 <frame_allocator_init>
+/home/caigoubencai/Desktop/os_c/kernel/main.c:30
     //printk("123%d\n",12);
+    // PhysPageNum tmp =  StackFrameAllocator_alloc(&fram_allocator); 
+    // printk("tmp: %d\n",tmp.num);
     mm_init();
     8020194c:	6e3000ef          	jal	ra,8020282e <mm_init>
-/home/caigoubencai/Desktop/os_c/kernel/main.c:27
+/home/caigoubencai/Desktop/os_c/kernel/main.c:31
     ASSERT(0);
-    80201950:	45ed                	li	a1,27
+    80201950:	45fd                	li	a1,31
     80201952:	00004517          	auipc	a0,0x4
     80201956:	73e50513          	addi	a0,a0,1854 # 80206090 <rodata_start+0x90>
-    8020195a:	7ce020ef          	jal	ra,80204128 <panic>
-/home/caigoubencai/Desktop/os_c/kernel/main.c:28 (discriminator 1)
+    8020195a:	02b020ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/main.c:32 (discriminator 1)
     while(1){}
     8020195e:	a001                	j	8020195e <main_os+0x3e>
 
@@ -3575,12 +3578,12 @@ void memory_set_kernel_init()
   memory_set_kernel_new(&KERNEL_SPACE);
     8020280c:	00817517          	auipc	a0,0x817
     80202810:	7fc50513          	addi	a0,a0,2044 # 80a1a008 <KERNEL_SPACE>
-    80202814:	241000ef          	jal	ra,80203254 <memory_set_kernel_new>
+    80202814:	2a9000ef          	jal	ra,802032bc <memory_set_kernel_new>
 /home/caigoubencai/Desktop/os_c/kernel/memory/mem.c:9
   memory_set_activate(&KERNEL_SPACE);
     80202818:	00817517          	auipc	a0,0x817
     8020281c:	7f050513          	addi	a0,a0,2032 # 80a1a008 <KERNEL_SPACE>
-    80202820:	3d3000ef          	jal	ra,802033f2 <memory_set_activate>
+    80202820:	43b000ef          	jal	ra,8020345a <memory_set_activate>
 /home/caigoubencai/Desktop/os_c/kernel/memory/mem.c:10
 }
     80202824:	0001                	nop
@@ -3604,13 +3607,13 @@ void mm_init()
     80202836:	01a000ef          	jal	ra,80202850 <init_heap>
 /home/caigoubencai/Desktop/os_c/kernel/memory/mem.c:15
     frame_allocator_init();
-    8020283a:	38e010ef          	jal	ra,80203bc8 <frame_allocator_init>
+    8020283a:	3ea010ef          	jal	ra,80203c24 <frame_allocator_init>
 /home/caigoubencai/Desktop/os_c/kernel/memory/mem.c:16
     memory_set_kernel_init();
     8020283e:	fc7ff0ef          	jal	ra,80202804 <memory_set_kernel_init>
 /home/caigoubencai/Desktop/os_c/kernel/memory/mem.c:17
     memory_set_remap_test();
-    80202842:	3e1000ef          	jal	ra,80203422 <memory_set_remap_test>
+    80202842:	449000ef          	jal	ra,8020348a <memory_set_remap_test>
 /home/caigoubencai/Desktop/os_c/kernel/memory/mem.c:18
 }
     80202846:	0001                	nop
@@ -3823,18 +3826,18 @@ void print_heap() {
         print_str("Block size: ");
     80202974:	00003517          	auipc	a0,0x3
     80202978:	73450513          	addi	a0,a0,1844 # 802060a8 <rodata_start+0xa8>
-    8020297c:	4e8010ef          	jal	ra,80203e64 <print_str>
+    8020297c:	544010ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/memory/kernel_heap/kernel_heap.c:69
         print_uint64(header->size); // 打印内存块大小
     80202980:	fe843783          	ld	a5,-24(s0)
     80202984:	639c                	ld	a5,0(a5)
     80202986:	853e                	mv	a0,a5
-    80202988:	65a010ef          	jal	ra,80203fe2 <print_uint64>
+    80202988:	6b6010ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/memory/kernel_heap/kernel_heap.c:70
         print_str(", Free: ");
     8020298c:	00003517          	auipc	a0,0x3
     80202990:	72c50513          	addi	a0,a0,1836 # 802060b8 <rodata_start+0xb8>
-    80202994:	4d0010ef          	jal	ra,80203e64 <print_str>
+    80202994:	52c010ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/memory/kernel_heap/kernel_heap.c:71
         print_str(header->free ? "Yes" : "No"); // 打印内存块是否空闲
     80202998:	fe843783          	ld	a5,-24(s0)
@@ -3849,12 +3852,12 @@ void print_heap() {
     802029ae:	72678793          	addi	a5,a5,1830 # 802060d0 <rodata_start+0xd0>
 /home/caigoubencai/Desktop/os_c/kernel/memory/kernel_heap/kernel_heap.c:71 (discriminator 4)
     802029b2:	853e                	mv	a0,a5
-    802029b4:	4b0010ef          	jal	ra,80203e64 <print_str>
+    802029b4:	50c010ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/memory/kernel_heap/kernel_heap.c:72 (discriminator 4)
         print_str("\n");
     802029b8:	00003517          	auipc	a0,0x3
     802029bc:	72050513          	addi	a0,a0,1824 # 802060d8 <rodata_start+0xd8>
-    802029c0:	4a4010ef          	jal	ra,80203e64 <print_str>
+    802029c0:	500010ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/memory/kernel_heap/kernel_heap.c:75 (discriminator 4)
 
         // 移动到下一个内存块
@@ -4079,7 +4082,7 @@ uint64_t pte_ppn(PageTableEntry pte)
     80202b04:	1000                	addi	s0,sp,32
     80202b06:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pte/pte.c:29
-    return pte.bits >> 10 & ((1ULL << 44) - 1); // 从位域中提取物理页号
+    return (((pte.bits) >> 10) & ((1L << 44) - 1)); // 从位域中提取物理页号
     80202b0a:	fe843783          	ld	a5,-24(s0)
     80202b0e:	00a7d713          	srli	a4,a5,0xa
     80202b12:	57fd                	li	a5,-1
@@ -4334,7 +4337,7 @@ PageTable* PageTable_new(void)
     PhysPageNum root_ppn = StackFrameAllocator_alloc(&fram_allocator);
     80202c70:	00817517          	auipc	a0,0x817
     80202c74:	3d050513          	addi	a0,a0,976 # 80a1a040 <fram_allocator>
-    80202c78:	7b5000ef          	jal	ra,80203c2c <StackFrameAllocator_alloc>
+    80202c78:	00e010ef          	jal	ra,80203c86 <StackFrameAllocator_alloc>
     80202c7c:	87aa                	mv	a5,a0
     80202c7e:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:21
@@ -4365,14 +4368,14 @@ PageTable* PageTable_new(void)
     80202c9e:	fe843783          	ld	a5,-24(s0)
     80202ca2:	07a1                	addi	a5,a5,8
     80202ca4:	853e                	mv	a0,a5
-    80202ca6:	31a020ef          	jal	ra,80204fc0 <vector_init>
+    80202ca6:	3fc020ef          	jal	ra,802050a2 <vector_init>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:31
     vector_resize(&pt->frames, sizeof(PhysPageNum));
     80202caa:	fe843783          	ld	a5,-24(s0)
     80202cae:	07a1                	addi	a5,a5,8
     80202cb0:	45a1                	li	a1,8
     80202cb2:	853e                	mv	a0,a5
-    80202cb4:	360020ef          	jal	ra,80205014 <vector_resize>
+    80202cb4:	442020ef          	jal	ra,802050f6 <vector_resize>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:32
     return pt;
     80202cb8:	fe843783          	ld	a5,-24(s0)
@@ -4402,7 +4405,7 @@ void PageTable_free(PageTable* pt)
     80202cd2:	fe843783          	ld	a5,-24(s0)
     80202cd6:	07a1                	addi	a5,a5,8
     80202cd8:	853e                	mv	a0,a5
-    80202cda:	4ea020ef          	jal	ra,802051c4 <vector_free>
+    80202cda:	5cc020ef          	jal	ra,802052a6 <vector_free>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:41
     // 释放页表结构体占用的内存
     free(pt);
@@ -4445,7 +4448,7 @@ PageTableEntry* get_pte_address(PhysPageNum current_ppn, uint64_t index)
     // 获取当前物理页的基地址
     PhysAddr base_address = phys_page_num_to_addr(current_ppn);
     80202d0e:	fd843503          	ld	a0,-40(s0)
-    80202d12:	098010ef          	jal	ra,80203daa <phys_page_num_to_addr>
+    80202d12:	0f4010ef          	jal	ra,80203e06 <phys_page_num_to_addr>
     80202d16:	87aa                	mv	a5,a0
     80202d18:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:55
@@ -4498,7 +4501,7 @@ void PageTable_map_ppn_2_vpn(PageTable* pt, VirtPageNum vpn, PhysPageNum ppn, PT
     80202d6a:	04000593          	li	a1,64
     80202d6e:	00003517          	auipc	a0,0x3
     80202d72:	37250513          	addi	a0,a0,882 # 802060e0 <rodata_start+0xe0>
-    80202d76:	3b2010ef          	jal	ra,80204128 <panic>
+    80202d76:	40e010ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:67
         //panic("VPN 0x%llx is mapped before mapping.\n", vpn);
     }
@@ -4552,7 +4555,7 @@ void PageTable_unmap_ppn_2_vpn(PageTable* pt, VirtPageNum vpn)
     80202dd2:	04b00593          	li	a1,75
     80202dd6:	00003517          	auipc	a0,0x3
     80202dda:	30a50513          	addi	a0,a0,778 # 802060e0 <rodata_start+0xe0>
-    80202dde:	34a010ef          	jal	ra,80204128 <panic>
+    80202dde:	3a6010ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:78
     //panic("VPN 0x%llx is invalid before unmapping.\n", vpn);
   }
@@ -4640,7 +4643,7 @@ PageTableEntry* page_table_find_pte(PageTable *pt, VirtPageNum vpn)
     uint64_t* indexes = decompose_vpn(vpn.num);
     80202e46:	fc043783          	ld	a5,-64(s0)
     80202e4a:	853e                	mv	a0,a5
-    80202e4c:	777000ef          	jal	ra,80203dc2 <decompose_vpn>
+    80202e4c:	7d3000ef          	jal	ra,80203e1e <decompose_vpn>
     80202e50:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:102
     // 从根页表开始
@@ -4737,143 +4740,191 @@ PageTableEntry *page_table_find_pte_create(PageTable *pt, VirtPageNum vpn)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:130
   // 解析虚拟页号获取三级索引
   uint64_t* idxs;
-  idxs = decompose_vpn(vpn.num);
-    80202ee6:	fb043783          	ld	a5,-80(s0)
-    80202eea:	853e                	mv	a0,a5
-    80202eec:	6d7000ef          	jal	ra,80203dc2 <decompose_vpn>
-    80202ef0:	fca43c23          	sd	a0,-40(s0)
+  vpn_indexes(vpn,idxs);
+    80202ee6:	fd843583          	ld	a1,-40(s0)
+    80202eea:	fb043503          	ld	a0,-80(s0)
+    80202eee:	0ec000ef          	jal	ra,80202fda <vpn_indexes>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:132
   // 从根页表的物理页号开始
   PhysPageNum ppn = pt->root_ppn;
-    80202ef4:	fb843783          	ld	a5,-72(s0)
-    80202ef8:	639c                	ld	a5,0(a5)
-    80202efa:	fcf43423          	sd	a5,-56(s0)
+    80202ef2:	fb843783          	ld	a5,-72(s0)
+    80202ef6:	639c                	ld	a5,0(a5)
+    80202ef8:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:133
   PageTableEntry *result = NULL;
-    80202efe:	fe043423          	sd	zero,-24(s0)
+    80202efc:	fe043423          	sd	zero,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:134
   for (unsigned i = 0; i < 3; i++) 
-    80202f02:	fe042223          	sw	zero,-28(s0)
-    80202f06:	a855                	j	80202fba <page_table_find_pte_create+0xe4>
+    80202f00:	fe042223          	sw	zero,-28(s0)
+    80202f04:	a86d                	j	80202fbe <page_table_find_pte_create+0xe8>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:137
   {
     // 根据当前物理页号和索引获取页表项地址
     PageTableEntry *pte = ppn_get_pte_array(ppn) + idxs[i];
-    80202f08:	fc843503          	ld	a0,-56(s0)
-    80202f0c:	d27ff0ef          	jal	ra,80202c32 <ppn_get_pte_array>
-    80202f10:	86aa                	mv	a3,a0
-    80202f12:	fe446783          	lwu	a5,-28(s0)
-    80202f16:	078e                	slli	a5,a5,0x3
-    80202f18:	fd843703          	ld	a4,-40(s0)
-    80202f1c:	97ba                	add	a5,a5,a4
-    80202f1e:	639c                	ld	a5,0(a5)
-    80202f20:	078e                	slli	a5,a5,0x3
-    80202f22:	97b6                	add	a5,a5,a3
-    80202f24:	fcf43823          	sd	a5,-48(s0)
+    80202f06:	fc843503          	ld	a0,-56(s0)
+    80202f0a:	d29ff0ef          	jal	ra,80202c32 <ppn_get_pte_array>
+    80202f0e:	86aa                	mv	a3,a0
+    80202f10:	fe446783          	lwu	a5,-28(s0)
+    80202f14:	078e                	slli	a5,a5,0x3
+    80202f16:	fd843703          	ld	a4,-40(s0)
+    80202f1a:	97ba                	add	a5,a5,a4
+    80202f1c:	639c                	ld	a5,0(a5)
+    80202f1e:	078e                	slli	a5,a5,0x3
+    80202f20:	97b6                	add	a5,a5,a3
+    80202f22:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:139
     // 如果是最后一级页表项，则直接返回该页表项
     if (i == 2) 
-    80202f28:	fe442783          	lw	a5,-28(s0)
-    80202f2c:	0007871b          	sext.w	a4,a5
-    80202f30:	4789                	li	a5,2
-    80202f32:	00f71763          	bne	a4,a5,80202f40 <page_table_find_pte_create+0x6a>
+    80202f26:	fe442783          	lw	a5,-28(s0)
+    80202f2a:	0007871b          	sext.w	a4,a5
+    80202f2e:	4789                	li	a5,2
+    80202f30:	00f71763          	bne	a4,a5,80202f3e <page_table_find_pte_create+0x68>
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:141
     {
       result = pte;
-    80202f36:	fd043783          	ld	a5,-48(s0)
-    80202f3a:	fef43423          	sd	a5,-24(s0)
+    80202f34:	fd043783          	ld	a5,-48(s0)
+    80202f38:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:142
       break;
-    80202f3e:	a069                	j	80202fc8 <page_table_find_pte_create+0xf2>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:146
+    80202f3c:	a841                	j	80202fcc <page_table_find_pte_create+0xf6>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:145
     }
-    // 如果页表项无效，则为其分配一个新的物理页，并将其设置为有效
-    //!pte_is_valid
+
     printk("pte: addr : %d \n",pte);
-    80202f40:	fd043583          	ld	a1,-48(s0)
-    80202f44:	00003517          	auipc	a0,0x3
-    80202f48:	1c450513          	addi	a0,a0,452 # 80206108 <rodata_start+0x108>
-    80202f4c:	89ffe0ef          	jal	ra,802017ea <printk>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:147
+    80202f3e:	fd043583          	ld	a1,-48(s0)
+    80202f42:	00003517          	auipc	a0,0x3
+    80202f46:	1c650513          	addi	a0,a0,454 # 80206108 <rodata_start+0x108>
+    80202f4a:	8a1fe0ef          	jal	ra,802017ea <printk>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:146
     if (!pte_is_valid(*pte)) 
-    80202f50:	fd043783          	ld	a5,-48(s0)
-    80202f54:	6388                	ld	a0,0(a5)
-    80202f56:	be5ff0ef          	jal	ra,80202b3a <pte_is_valid>
-    80202f5a:	87aa                	mv	a5,a0
-    80202f5c:	e3b1                	bnez	a5,80202fa0 <page_table_find_pte_create+0xca>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:150
+    80202f4e:	fd043783          	ld	a5,-48(s0)
+    80202f52:	6388                	ld	a0,0(a5)
+    80202f54:	be7ff0ef          	jal	ra,80202b3a <pte_is_valid>
+    80202f58:	87aa                	mv	a5,a0
+    80202f5a:	e7a9                	bnez	a5,80202fa4 <page_table_find_pte_create+0xce>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:149
     {
       // 分配新的物理页
       PhysPageNum frame = StackFrameAllocator_alloc(&fram_allocator);
-    80202f5e:	00817517          	auipc	a0,0x817
-    80202f62:	0e250513          	addi	a0,a0,226 # 80a1a040 <fram_allocator>
-    80202f66:	4c7000ef          	jal	ra,80203c2c <StackFrameAllocator_alloc>
-    80202f6a:	87aa                	mv	a5,a0
-    80202f6c:	fcf43023          	sd	a5,-64(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:153
+    80202f5c:	00817517          	auipc	a0,0x817
+    80202f60:	0e450513          	addi	a0,a0,228 # 80a1a040 <fram_allocator>
+    80202f64:	523000ef          	jal	ra,80203c86 <StackFrameAllocator_alloc>
+    80202f68:	87aa                	mv	a5,a0
+    80202f6a:	fcf43023          	sd	a5,-64(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:152
       //trace("frame alloc 0x%llx\n", frame);
-      // 检查物理页分配是否成功
-      if (!frame.num) 
-    80202f70:	fc043783          	ld	a5,-64(s0)
-    80202f74:	e399                	bnez	a5,80202f7a <page_table_find_pte_create+0xa4>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:155
+      // 检查物理页分配是否成功 
+      if (frame.num == 0x80000000 ) 
+    80202f6e:	fc043703          	ld	a4,-64(s0)
+    80202f72:	4785                	li	a5,1
+    80202f74:	07fe                	slli	a5,a5,0x1f
+    80202f76:	00f71463          	bne	a4,a5,80202f7e <page_table_find_pte_create+0xa8>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:154
       {
         return NULL;
-    80202f76:	4781                	li	a5,0
-    80202f78:	a891                	j	80202fcc <page_table_find_pte_create+0xf6>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:158
+    80202f7a:	4781                	li	a5,0
+    80202f7c:	a891                	j	80202fd0 <page_table_find_pte_create+0xfa>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:157
       }
       // 将新分配的物理页设置为当前页表项指向的物理页，并标记为有效
       *pte = pte_new(frame.num, PTE_V);
-    80202f7a:	fc043783          	ld	a5,-64(s0)
-    80202f7e:	4585                	li	a1,1
-    80202f80:	853e                	mv	a0,a5
-    80202f82:	b3bff0ef          	jal	ra,80202abc <pte_new>
-    80202f86:	872a                	mv	a4,a0
-    80202f88:	fd043783          	ld	a5,-48(s0)
-    80202f8c:	e398                	sd	a4,0(a5)
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:160
+    80202f7e:	fc043783          	ld	a5,-64(s0)
+    80202f82:	4585                	li	a1,1
+    80202f84:	853e                	mv	a0,a5
+    80202f86:	b37ff0ef          	jal	ra,80202abc <pte_new>
+    80202f8a:	872a                	mv	a4,a0
+    80202f8c:	fd043783          	ld	a5,-48(s0)
+    80202f90:	e398                	sd	a4,0(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:159
       // 将新分配的物理页加入到页表项向量中
       vector_add(&pt->frames, &frame);
-    80202f8e:	fb843783          	ld	a5,-72(s0)
-    80202f92:	07a1                	addi	a5,a5,8
-    80202f94:	fc040713          	addi	a4,s0,-64
-    80202f98:	85ba                	mv	a1,a4
-    80202f9a:	853e                	mv	a0,a5
-    80202f9c:	0c4020ef          	jal	ra,80205060 <vector_add>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:163 (discriminator 2)
+    80202f92:	fb843783          	ld	a5,-72(s0)
+    80202f96:	07a1                	addi	a5,a5,8
+    80202f98:	fc040713          	addi	a4,s0,-64
+    80202f9c:	85ba                	mv	a1,a4
+    80202f9e:	853e                	mv	a0,a5
+    80202fa0:	1a2020ef          	jal	ra,80205142 <vector_add>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:162 (discriminator 2)
     }
     // 更新当前物理页号为当前页表项指向的下一级物理页号，以便继续遍历
-    ppn.num = pte_ppn(*pte);
-    80202fa0:	fd043783          	ld	a5,-48(s0)
-    80202fa4:	6388                	ld	a0,0(a5)
-    80202fa6:	b5bff0ef          	jal	ra,80202b00 <pte_ppn>
-    80202faa:	87aa                	mv	a5,a0
-    80202fac:	fcf43423          	sd	a5,-56(s0)
+        ppn.num = pte_ppn(*pte);
+    80202fa4:	fd043783          	ld	a5,-48(s0)
+    80202fa8:	6388                	ld	a0,0(a5)
+    80202faa:	b57ff0ef          	jal	ra,80202b00 <pte_ppn>
+    80202fae:	87aa                	mv	a5,a0
+    80202fb0:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:134 (discriminator 2)
   for (unsigned i = 0; i < 3; i++) 
-    80202fb0:	fe442783          	lw	a5,-28(s0)
-    80202fb4:	2785                	addiw	a5,a5,1
-    80202fb6:	fef42223          	sw	a5,-28(s0)
+    80202fb4:	fe442783          	lw	a5,-28(s0)
+    80202fb8:	2785                	addiw	a5,a5,1
+    80202fba:	fef42223          	sw	a5,-28(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:134 (discriminator 1)
-    80202fba:	fe442783          	lw	a5,-28(s0)
-    80202fbe:	0007871b          	sext.w	a4,a5
-    80202fc2:	4789                	li	a5,2
-    80202fc4:	f4e7f2e3          	bgeu	a5,a4,80202f08 <page_table_find_pte_create+0x32>
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:166
+    80202fbe:	fe442783          	lw	a5,-28(s0)
+    80202fc2:	0007871b          	sext.w	a4,a5
+    80202fc6:	4789                	li	a5,2
+    80202fc8:	f2e7ffe3          	bgeu	a5,a4,80202f06 <page_table_find_pte_create+0x30>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:165
   }
   // 返回找到或创建的页表项
   return result;
-    80202fc8:	fe843783          	ld	a5,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:167 (discriminator 1)
+    80202fcc:	fe843783          	ld	a5,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:166 (discriminator 1)
 }
-    80202fcc:	853e                	mv	a0,a5
-    80202fce:	60a6                	ld	ra,72(sp)
-    80202fd0:	6406                	ld	s0,64(sp)
-    80202fd2:	6161                	addi	sp,sp,80
-    80202fd4:	8082                	ret
+    80202fd0:	853e                	mv	a0,a5
+    80202fd2:	60a6                	ld	ra,72(sp)
+    80202fd4:	6406                	ld	s0,64(sp)
+    80202fd6:	6161                	addi	sp,sp,80
+    80202fd8:	8082                	ret
 
-0000000080202fd6 <map_area_init>:
+0000000080202fda <vpn_indexes>:
+vpn_indexes():
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:169
+
+void vpn_indexes(VirtPageNum vpn, uint64_t *idx) 
+{
+    80202fda:	7179                	addi	sp,sp,-48
+    80202fdc:	f422                	sd	s0,40(sp)
+    80202fde:	1800                	addi	s0,sp,48
+    80202fe0:	fca43c23          	sd	a0,-40(s0)
+    80202fe4:	fcb43823          	sd	a1,-48(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:170
+  for (int i = 2; i >= 0; i--) 
+    80202fe8:	4789                	li	a5,2
+    80202fea:	fef42623          	sw	a5,-20(s0)
+    80202fee:	a035                	j	8020301a <vpn_indexes+0x40>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:172 (discriminator 3)
+  {
+    idx[i] = vpn.num & 0x1ff;
+    80202ff0:	fd843703          	ld	a4,-40(s0)
+    80202ff4:	fec42783          	lw	a5,-20(s0)
+    80202ff8:	078e                	slli	a5,a5,0x3
+    80202ffa:	fd043683          	ld	a3,-48(s0)
+    80202ffe:	97b6                	add	a5,a5,a3
+    80203000:	1ff77713          	andi	a4,a4,511
+    80203004:	e398                	sd	a4,0(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:173 (discriminator 3)
+    vpn.num >>= 9;
+    80203006:	fd843783          	ld	a5,-40(s0)
+    8020300a:	83a5                	srli	a5,a5,0x9
+    8020300c:	fcf43c23          	sd	a5,-40(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:170 (discriminator 3)
+  for (int i = 2; i >= 0; i--) 
+    80203010:	fec42783          	lw	a5,-20(s0)
+    80203014:	37fd                	addiw	a5,a5,-1
+    80203016:	fef42623          	sw	a5,-20(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:170 (discriminator 1)
+    8020301a:	fec42783          	lw	a5,-20(s0)
+    8020301e:	2781                	sext.w	a5,a5
+    80203020:	fc07d8e3          	bgez	a5,80202ff0 <vpn_indexes+0x16>
+/home/caigoubencai/Desktop/os_c/kernel/memory/pagetable/pagetable.c:175
+  }
+    80203024:	0001                	nop
+    80203026:	0001                	nop
+    80203028:	7422                	ld	s0,40(sp)
+    8020302a:	6145                	addi	sp,sp,48
+    8020302c:	8082                	ret
+
+000000008020302e <map_area_init>:
 map_area_init():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:22
 extern void bss_end();
@@ -4882,1476 +4933,1479 @@ extern void strampoline(); // trap跳板位置
 MemorySet KERNEL_SPACE;
 void map_area_init(MapArea* ma, VirtAddr start_va, VirtAddr end_va, enum MapType mt, MapPermission mp)
 {
-    80202fd6:	7139                	addi	sp,sp,-64
-    80202fd8:	fc06                	sd	ra,56(sp)
-    80202fda:	f822                	sd	s0,48(sp)
-    80202fdc:	f426                	sd	s1,40(sp)
-    80202fde:	0080                	addi	s0,sp,64
-    80202fe0:	fca43c23          	sd	a0,-40(s0)
-    80202fe4:	fcb43823          	sd	a1,-48(s0)
-    80202fe8:	fcc43423          	sd	a2,-56(s0)
-    80202fec:	87b6                	mv	a5,a3
-    80202fee:	fcf42223          	sw	a5,-60(s0)
-    80202ff2:	87ba                	mv	a5,a4
-    80202ff4:	fcf42023          	sw	a5,-64(s0)
+    8020302e:	7139                	addi	sp,sp,-64
+    80203030:	fc06                	sd	ra,56(sp)
+    80203032:	f822                	sd	s0,48(sp)
+    80203034:	f426                	sd	s1,40(sp)
+    80203036:	0080                	addi	s0,sp,64
+    80203038:	fca43c23          	sd	a0,-40(s0)
+    8020303c:	fcb43823          	sd	a1,-48(s0)
+    80203040:	fcc43423          	sd	a2,-56(s0)
+    80203044:	87b6                	mv	a5,a3
+    80203046:	fcf42223          	sw	a5,-60(s0)
+    8020304a:	87ba                	mv	a5,a4
+    8020304c:	fcf42023          	sw	a5,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:23
     ma->vpn_range.start_vpn = virt_addr_to_page_num(start_va, 0);
-    80202ff8:	fd843483          	ld	s1,-40(s0)
-    80202ffc:	4581                	li	a1,0
-    80202ffe:	fd043503          	ld	a0,-48(s0)
-    80203002:	551000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203006:	e088                	sd	a0,0(s1)
+    80203050:	fd843483          	ld	s1,-40(s0)
+    80203054:	4581                	li	a1,0
+    80203056:	fd043503          	ld	a0,-48(s0)
+    8020305a:	555000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    8020305e:	e088                	sd	a0,0(s1)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:24
     ma->vpn_range.size = virt_addr_to_page_num(end_va, 1).num - ma->vpn_range.start_vpn.num;
-    80203008:	4585                	li	a1,1
-    8020300a:	fc843503          	ld	a0,-56(s0)
-    8020300e:	545000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203012:	87aa                	mv	a5,a0
-    80203014:	873e                	mv	a4,a5
-    80203016:	fd843783          	ld	a5,-40(s0)
-    8020301a:	639c                	ld	a5,0(a5)
-    8020301c:	8f1d                	sub	a4,a4,a5
-    8020301e:	fd843783          	ld	a5,-40(s0)
-    80203022:	e798                	sd	a4,8(a5)
+    80203060:	4585                	li	a1,1
+    80203062:	fc843503          	ld	a0,-56(s0)
+    80203066:	549000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    8020306a:	87aa                	mv	a5,a0
+    8020306c:	873e                	mv	a4,a5
+    8020306e:	fd843783          	ld	a5,-40(s0)
+    80203072:	639c                	ld	a5,0(a5)
+    80203074:	8f1d                	sub	a4,a4,a5
+    80203076:	fd843783          	ld	a5,-40(s0)
+    8020307a:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:25
     ma->map_type = mt;
-    80203024:	fd843783          	ld	a5,-40(s0)
-    80203028:	fc442703          	lw	a4,-60(s0)
-    8020302c:	cb98                	sw	a4,16(a5)
+    8020307c:	fd843783          	ld	a5,-40(s0)
+    80203080:	fc442703          	lw	a4,-60(s0)
+    80203084:	cb98                	sw	a4,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:26
     ma->map_premission = mp;
-    8020302e:	fd843783          	ld	a5,-40(s0)
-    80203032:	fc042703          	lw	a4,-64(s0)
-    80203036:	cbd8                	sw	a4,20(a5)
+    80203086:	fd843783          	ld	a5,-40(s0)
+    8020308a:	fc042703          	lw	a4,-64(s0)
+    8020308e:	cbd8                	sw	a4,20(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:27
 }
-    80203038:	0001                	nop
-    8020303a:	70e2                	ld	ra,56(sp)
-    8020303c:	7442                	ld	s0,48(sp)
-    8020303e:	74a2                	ld	s1,40(sp)
-    80203040:	6121                	addi	sp,sp,64
-    80203042:	8082                	ret
+    80203090:	0001                	nop
+    80203092:	70e2                	ld	ra,56(sp)
+    80203094:	7442                	ld	s0,48(sp)
+    80203096:	74a2                	ld	s1,40(sp)
+    80203098:	6121                	addi	sp,sp,64
+    8020309a:	8082                	ret
 
-0000000080203044 <map_area_map>:
+000000008020309c <map_area_map>:
 map_area_map():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:30
 
 void map_area_map(MapArea* ma, PageTable* pt)
 {
-    80203044:	7139                	addi	sp,sp,-64
-    80203046:	fc06                	sd	ra,56(sp)
-    80203048:	f822                	sd	s0,48(sp)
-    8020304a:	0080                	addi	s0,sp,64
-    8020304c:	fca43423          	sd	a0,-56(s0)
-    80203050:	fcb43023          	sd	a1,-64(s0)
+    8020309c:	7139                	addi	sp,sp,-64
+    8020309e:	fc06                	sd	ra,56(sp)
+    802030a0:	f822                	sd	s0,48(sp)
+    802030a2:	0080                	addi	s0,sp,64
+    802030a4:	fca43423          	sd	a0,-56(s0)
+    802030a8:	fcb43023          	sd	a1,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:32
     PhysPageNum target;
     for(int64_t i = 0; i < ma->vpn_range.size; i ++)
-    80203054:	fe043423          	sd	zero,-24(s0)
-    80203058:	a095                	j	802030bc <map_area_map+0x78>
+    802030ac:	fe043423          	sd	zero,-24(s0)
+    802030b0:	a095                	j	80203114 <map_area_map+0x78>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:34
     {
         if (ma->map_type == Identical)
-    8020305a:	fc843783          	ld	a5,-56(s0)
-    8020305e:	4b9c                	lw	a5,16(a5)
-    80203060:	eb91                	bnez	a5,80203074 <map_area_map+0x30>
+    802030b2:	fc843783          	ld	a5,-56(s0)
+    802030b6:	4b9c                	lw	a5,16(a5)
+    802030b8:	eb91                	bnez	a5,802030cc <map_area_map+0x30>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:36
         {
             target.num = ma->vpn_range.start_vpn.num + i;
-    80203062:	fc843783          	ld	a5,-56(s0)
-    80203066:	6398                	ld	a4,0(a5)
-    80203068:	fe843783          	ld	a5,-24(s0)
-    8020306c:	97ba                	add	a5,a5,a4
-    8020306e:	fef43023          	sd	a5,-32(s0)
-    80203072:	a811                	j	80203086 <map_area_map+0x42>
+    802030ba:	fc843783          	ld	a5,-56(s0)
+    802030be:	6398                	ld	a4,0(a5)
+    802030c0:	fe843783          	ld	a5,-24(s0)
+    802030c4:	97ba                	add	a5,a5,a4
+    802030c6:	fef43023          	sd	a5,-32(s0)
+    802030ca:	a811                	j	802030de <map_area_map+0x42>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:39
         } else 
         {
             target = StackFrameAllocator_alloc(&fram_allocator);
-    80203074:	00817517          	auipc	a0,0x817
-    80203078:	fcc50513          	addi	a0,a0,-52 # 80a1a040 <fram_allocator>
-    8020307c:	3b1000ef          	jal	ra,80203c2c <StackFrameAllocator_alloc>
-    80203080:	87aa                	mv	a5,a0
-    80203082:	fef43023          	sd	a5,-32(s0)
+    802030cc:	00817517          	auipc	a0,0x817
+    802030d0:	f7450513          	addi	a0,a0,-140 # 80a1a040 <fram_allocator>
+    802030d4:	3b3000ef          	jal	ra,80203c86 <StackFrameAllocator_alloc>
+    802030d8:	87aa                	mv	a5,a0
+    802030da:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:42 (discriminator 2)
         }
         VirtPageNum vpn;
         vpn.num = ma->vpn_range.start_vpn.num+i;
-    80203086:	fc843783          	ld	a5,-56(s0)
-    8020308a:	6398                	ld	a4,0(a5)
-    8020308c:	fe843783          	ld	a5,-24(s0)
-    80203090:	97ba                	add	a5,a5,a4
-    80203092:	fcf43c23          	sd	a5,-40(s0)
+    802030de:	fc843783          	ld	a5,-56(s0)
+    802030e2:	6398                	ld	a4,0(a5)
+    802030e4:	fe843783          	ld	a5,-24(s0)
+    802030e8:	97ba                	add	a5,a5,a4
+    802030ea:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:43 (discriminator 2)
         PageTable_map_ppn_2_vpn(pt, vpn, target, ma->map_premission);
-    80203096:	fc843783          	ld	a5,-56(s0)
-    8020309a:	4bdc                	lw	a5,20(a5)
-    8020309c:	0ff7f793          	andi	a5,a5,255
-    802030a0:	86be                	mv	a3,a5
-    802030a2:	fe043603          	ld	a2,-32(s0)
-    802030a6:	fd843583          	ld	a1,-40(s0)
-    802030aa:	fc043503          	ld	a0,-64(s0)
-    802030ae:	c85ff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
+    802030ee:	fc843783          	ld	a5,-56(s0)
+    802030f2:	4bdc                	lw	a5,20(a5)
+    802030f4:	0ff7f793          	andi	a5,a5,255
+    802030f8:	86be                	mv	a3,a5
+    802030fa:	fe043603          	ld	a2,-32(s0)
+    802030fe:	fd843583          	ld	a1,-40(s0)
+    80203102:	fc043503          	ld	a0,-64(s0)
+    80203106:	c2dff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:32 (discriminator 2)
     for(int64_t i = 0; i < ma->vpn_range.size; i ++)
-    802030b2:	fe843783          	ld	a5,-24(s0)
-    802030b6:	0785                	addi	a5,a5,1
-    802030b8:	fef43423          	sd	a5,-24(s0)
+    8020310a:	fe843783          	ld	a5,-24(s0)
+    8020310e:	0785                	addi	a5,a5,1
+    80203110:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:32 (discriminator 1)
-    802030bc:	fc843783          	ld	a5,-56(s0)
-    802030c0:	6798                	ld	a4,8(a5)
-    802030c2:	fe843783          	ld	a5,-24(s0)
-    802030c6:	f8e7eae3          	bltu	a5,a4,8020305a <map_area_map+0x16>
+    80203114:	fc843783          	ld	a5,-56(s0)
+    80203118:	6798                	ld	a4,8(a5)
+    8020311a:	fe843783          	ld	a5,-24(s0)
+    8020311e:	f8e7eae3          	bltu	a5,a4,802030b2 <map_area_map+0x16>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:45
     }
 }
-    802030ca:	0001                	nop
-    802030cc:	0001                	nop
-    802030ce:	70e2                	ld	ra,56(sp)
-    802030d0:	7442                	ld	s0,48(sp)
-    802030d2:	6121                	addi	sp,sp,64
-    802030d4:	8082                	ret
+    80203122:	0001                	nop
+    80203124:	0001                	nop
+    80203126:	70e2                	ld	ra,56(sp)
+    80203128:	7442                	ld	s0,48(sp)
+    8020312a:	6121                	addi	sp,sp,64
+    8020312c:	8082                	ret
 
-00000000802030d6 <memory_set_init>:
+000000008020312e <memory_set_init>:
 memory_set_init():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:48
 
 void memory_set_init(MemorySet* ms)
 {
-    802030d6:	1101                	addi	sp,sp,-32
-    802030d8:	ec06                	sd	ra,24(sp)
-    802030da:	e822                	sd	s0,16(sp)
-    802030dc:	1000                	addi	s0,sp,32
-    802030de:	fea43423          	sd	a0,-24(s0)
+    8020312e:	1101                	addi	sp,sp,-32
+    80203130:	ec06                	sd	ra,24(sp)
+    80203132:	e822                	sd	s0,16(sp)
+    80203134:	1000                	addi	s0,sp,32
+    80203136:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:49
     ms->page_table = *PageTable_new();
-    802030e2:	b71ff0ef          	jal	ra,80202c52 <PageTable_new>
-    802030e6:	872a                	mv	a4,a0
-    802030e8:	fe843783          	ld	a5,-24(s0)
-    802030ec:	630c                	ld	a1,0(a4)
-    802030ee:	6710                	ld	a2,8(a4)
-    802030f0:	6b14                	ld	a3,16(a4)
-    802030f2:	6f18                	ld	a4,24(a4)
-    802030f4:	e38c                	sd	a1,0(a5)
-    802030f6:	e790                	sd	a2,8(a5)
-    802030f8:	eb94                	sd	a3,16(a5)
-    802030fa:	ef98                	sd	a4,24(a5)
+    8020313a:	b19ff0ef          	jal	ra,80202c52 <PageTable_new>
+    8020313e:	872a                	mv	a4,a0
+    80203140:	fe843783          	ld	a5,-24(s0)
+    80203144:	630c                	ld	a1,0(a4)
+    80203146:	6710                	ld	a2,8(a4)
+    80203148:	6b14                	ld	a3,16(a4)
+    8020314a:	6f18                	ld	a4,24(a4)
+    8020314c:	e38c                	sd	a1,0(a5)
+    8020314e:	e790                	sd	a2,8(a5)
+    80203150:	eb94                	sd	a3,16(a5)
+    80203152:	ef98                	sd	a4,24(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:50
     vector_init(&ms->areas);
-    802030fc:	fe843783          	ld	a5,-24(s0)
-    80203100:	02078793          	addi	a5,a5,32 # 1020 <n+0x1000>
-    80203104:	853e                	mv	a0,a5
-    80203106:	6bb010ef          	jal	ra,80204fc0 <vector_init>
+    80203154:	fe843783          	ld	a5,-24(s0)
+    80203158:	02078793          	addi	a5,a5,32 # 1020 <n+0x1000>
+    8020315c:	853e                	mv	a0,a5
+    8020315e:	745010ef          	jal	ra,802050a2 <vector_init>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:51
     vector_resize(&ms->areas,sizeof(MapArea));
-    8020310a:	fe843783          	ld	a5,-24(s0)
-    8020310e:	02078793          	addi	a5,a5,32
-    80203112:	45e1                	li	a1,24
-    80203114:	853e                	mv	a0,a5
-    80203116:	6ff010ef          	jal	ra,80205014 <vector_resize>
+    80203162:	fe843783          	ld	a5,-24(s0)
+    80203166:	02078793          	addi	a5,a5,32
+    8020316a:	45e1                	li	a1,24
+    8020316c:	853e                	mv	a0,a5
+    8020316e:	789010ef          	jal	ra,802050f6 <vector_resize>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:52
 }
-    8020311a:	0001                	nop
-    8020311c:	60e2                	ld	ra,24(sp)
-    8020311e:	6442                	ld	s0,16(sp)
-    80203120:	6105                	addi	sp,sp,32
-    80203122:	8082                	ret
+    80203172:	0001                	nop
+    80203174:	60e2                	ld	ra,24(sp)
+    80203176:	6442                	ld	s0,16(sp)
+    80203178:	6105                	addi	sp,sp,32
+    8020317a:	8082                	ret
 
-0000000080203124 <memory_set_push>:
+000000008020317c <memory_set_push>:
 memory_set_push():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:55
 
 void memory_set_push(MemorySet* ms, MapArea* ma)
 {
-    80203124:	1101                	addi	sp,sp,-32
-    80203126:	ec06                	sd	ra,24(sp)
-    80203128:	e822                	sd	s0,16(sp)
-    8020312a:	1000                	addi	s0,sp,32
-    8020312c:	fea43423          	sd	a0,-24(s0)
-    80203130:	feb43023          	sd	a1,-32(s0)
+    8020317c:	1101                	addi	sp,sp,-32
+    8020317e:	ec06                	sd	ra,24(sp)
+    80203180:	e822                	sd	s0,16(sp)
+    80203182:	1000                	addi	s0,sp,32
+    80203184:	fea43423          	sd	a0,-24(s0)
+    80203188:	feb43023          	sd	a1,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:56
     vector_add(&ms->areas, ma);
-    80203134:	fe843783          	ld	a5,-24(s0)
-    80203138:	02078793          	addi	a5,a5,32
-    8020313c:	fe043583          	ld	a1,-32(s0)
-    80203140:	853e                	mv	a0,a5
-    80203142:	71f010ef          	jal	ra,80205060 <vector_add>
+    8020318c:	fe843783          	ld	a5,-24(s0)
+    80203190:	02078793          	addi	a5,a5,32
+    80203194:	fe043583          	ld	a1,-32(s0)
+    80203198:	853e                	mv	a0,a5
+    8020319a:	7a9010ef          	jal	ra,80205142 <vector_add>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:57
     map_area_map(ma, &ms->page_table);
-    80203146:	fe843783          	ld	a5,-24(s0)
-    8020314a:	85be                	mv	a1,a5
-    8020314c:	fe043503          	ld	a0,-32(s0)
-    80203150:	ef5ff0ef          	jal	ra,80203044 <map_area_map>
+    8020319e:	fe843783          	ld	a5,-24(s0)
+    802031a2:	85be                	mv	a1,a5
+    802031a4:	fe043503          	ld	a0,-32(s0)
+    802031a8:	ef5ff0ef          	jal	ra,8020309c <map_area_map>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:58
 }
-    80203154:	0001                	nop
-    80203156:	60e2                	ld	ra,24(sp)
-    80203158:	6442                	ld	s0,16(sp)
-    8020315a:	6105                	addi	sp,sp,32
-    8020315c:	8082                	ret
+    802031ac:	0001                	nop
+    802031ae:	60e2                	ld	ra,24(sp)
+    802031b0:	6442                	ld	s0,16(sp)
+    802031b2:	6105                	addi	sp,sp,32
+    802031b4:	8082                	ret
 
-000000008020315e <memory_set_map_user_stack>:
+00000000802031b6 <memory_set_map_user_stack>:
 memory_set_map_user_stack():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:61
 
 void memory_set_map_user_stack(MemorySet *ms, VirtAddr user_stack_low_va)
 {
-    8020315e:	7139                	addi	sp,sp,-64
-    80203160:	fc06                	sd	ra,56(sp)
-    80203162:	f822                	sd	s0,48(sp)
-    80203164:	f426                	sd	s1,40(sp)
-    80203166:	0080                	addi	s0,sp,64
-    80203168:	fca43423          	sd	a0,-56(s0)
-    8020316c:	fcb43023          	sd	a1,-64(s0)
+    802031b6:	7139                	addi	sp,sp,-64
+    802031b8:	fc06                	sd	ra,56(sp)
+    802031ba:	f822                	sd	s0,48(sp)
+    802031bc:	f426                	sd	s1,40(sp)
+    802031be:	0080                	addi	s0,sp,64
+    802031c0:	fca43423          	sd	a0,-56(s0)
+    802031c4:	fcb43023          	sd	a1,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:62
     PhysPageNum user_stack_ppn = StackFrameAllocator_alloc(&fram_allocator);
-    80203170:	00817517          	auipc	a0,0x817
-    80203174:	ed050513          	addi	a0,a0,-304 # 80a1a040 <fram_allocator>
-    80203178:	2b5000ef          	jal	ra,80203c2c <StackFrameAllocator_alloc>
-    8020317c:	87aa                	mv	a5,a0
-    8020317e:	fcf43c23          	sd	a5,-40(s0)
+    802031c8:	00817517          	auipc	a0,0x817
+    802031cc:	e7850513          	addi	a0,a0,-392 # 80a1a040 <fram_allocator>
+    802031d0:	2b7000ef          	jal	ra,80203c86 <StackFrameAllocator_alloc>
+    802031d4:	87aa                	mv	a5,a0
+    802031d6:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:63
     PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(user_stack_low_va,1),user_stack_ppn,PTE_R|PTE_W|PTE_U);
-    80203182:	fc843483          	ld	s1,-56(s0)
-    80203186:	4585                	li	a1,1
-    80203188:	fc043503          	ld	a0,-64(s0)
-    8020318c:	3c7000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203190:	87aa                	mv	a5,a0
-    80203192:	46d9                	li	a3,22
-    80203194:	fd843603          	ld	a2,-40(s0)
-    80203198:	85be                	mv	a1,a5
-    8020319a:	8526                	mv	a0,s1
-    8020319c:	b97ff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
+    802031da:	fc843483          	ld	s1,-56(s0)
+    802031de:	4585                	li	a1,1
+    802031e0:	fc043503          	ld	a0,-64(s0)
+    802031e4:	3cb000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    802031e8:	87aa                	mv	a5,a0
+    802031ea:	46d9                	li	a3,22
+    802031ec:	fd843603          	ld	a2,-40(s0)
+    802031f0:	85be                	mv	a1,a5
+    802031f2:	8526                	mv	a0,s1
+    802031f4:	b3fff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:64
 }
-    802031a0:	0001                	nop
-    802031a2:	70e2                	ld	ra,56(sp)
-    802031a4:	7442                	ld	s0,48(sp)
-    802031a6:	74a2                	ld	s1,40(sp)
-    802031a8:	6121                	addi	sp,sp,64
-    802031aa:	8082                	ret
+    802031f8:	0001                	nop
+    802031fa:	70e2                	ld	ra,56(sp)
+    802031fc:	7442                	ld	s0,48(sp)
+    802031fe:	74a2                	ld	s1,40(sp)
+    80203200:	6121                	addi	sp,sp,64
+    80203202:	8082                	ret
 
-00000000802031ac <memory_set_map_kernel_stack_kernel>:
+0000000080203204 <memory_set_map_kernel_stack_kernel>:
 memory_set_map_kernel_stack_kernel():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:67
 
 void memory_set_map_kernel_stack_kernel(MemorySet *ms)
 {
-    802031ac:	7139                	addi	sp,sp,-64
-    802031ae:	fc06                	sd	ra,56(sp)
-    802031b0:	f822                	sd	s0,48(sp)
-    802031b2:	f426                	sd	s1,40(sp)
-    802031b4:	0080                	addi	s0,sp,64
-    802031b6:	fca43423          	sd	a0,-56(s0)
+    80203204:	7139                	addi	sp,sp,-64
+    80203206:	fc06                	sd	ra,56(sp)
+    80203208:	f822                	sd	s0,48(sp)
+    8020320a:	f426                	sd	s1,40(sp)
+    8020320c:	0080                	addi	s0,sp,64
+    8020320e:	fca43423          	sd	a0,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:68
     PhysPageNum kernel_stack = StackFrameAllocator_alloc(&fram_allocator);
-    802031ba:	00817517          	auipc	a0,0x817
-    802031be:	e8650513          	addi	a0,a0,-378 # 80a1a040 <fram_allocator>
-    802031c2:	26b000ef          	jal	ra,80203c2c <StackFrameAllocator_alloc>
-    802031c6:	87aa                	mv	a5,a0
-    802031c8:	fcf43c23          	sd	a5,-40(s0)
+    80203212:	00817517          	auipc	a0,0x817
+    80203216:	e2e50513          	addi	a0,a0,-466 # 80a1a040 <fram_allocator>
+    8020321a:	26d000ef          	jal	ra,80203c86 <StackFrameAllocator_alloc>
+    8020321e:	87aa                	mv	a5,a0
+    80203220:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:70
     VirtAddr va;
     va.addr = TRAP_CONTEXT_FULL;
-    802031cc:	77f9                	lui	a5,0xffffe
-    802031ce:	fcf43823          	sd	a5,-48(s0)
+    80203224:	77f9                	lui	a5,0xffffe
+    80203226:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:71
     PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(va,1),kernel_stack,(PTE_R|PTE_W));
-    802031d2:	fc843483          	ld	s1,-56(s0)
-    802031d6:	4585                	li	a1,1
-    802031d8:	fd043503          	ld	a0,-48(s0)
-    802031dc:	377000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    802031e0:	87aa                	mv	a5,a0
-    802031e2:	4699                	li	a3,6
-    802031e4:	fd843603          	ld	a2,-40(s0)
-    802031e8:	85be                	mv	a1,a5
-    802031ea:	8526                	mv	a0,s1
-    802031ec:	b47ff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
+    8020322a:	fc843483          	ld	s1,-56(s0)
+    8020322e:	4585                	li	a1,1
+    80203230:	fd043503          	ld	a0,-48(s0)
+    80203234:	37b000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203238:	87aa                	mv	a5,a0
+    8020323a:	4699                	li	a3,6
+    8020323c:	fd843603          	ld	a2,-40(s0)
+    80203240:	85be                	mv	a1,a5
+    80203242:	8526                	mv	a0,s1
+    80203244:	aefff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:72
 }
-    802031f0:	0001                	nop
-    802031f2:	70e2                	ld	ra,56(sp)
-    802031f4:	7442                	ld	s0,48(sp)
-    802031f6:	74a2                	ld	s1,40(sp)
-    802031f8:	6121                	addi	sp,sp,64
-    802031fa:	8082                	ret
+    80203248:	0001                	nop
+    8020324a:	70e2                	ld	ra,56(sp)
+    8020324c:	7442                	ld	s0,48(sp)
+    8020324e:	74a2                	ld	s1,40(sp)
+    80203250:	6121                	addi	sp,sp,64
+    80203252:	8082                	ret
 
-00000000802031fc <memory_set_map_trampoline>:
+0000000080203254 <memory_set_map_trampoline>:
 memory_set_map_trampoline():
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:75
 
 void memory_set_map_trampoline(MemorySet *ms)
 {
-    802031fc:	7139                	addi	sp,sp,-64
-    802031fe:	fc06                	sd	ra,56(sp)
-    80203200:	f822                	sd	s0,48(sp)
-    80203202:	f426                	sd	s1,40(sp)
-    80203204:	f04a                	sd	s2,32(sp)
-    80203206:	0080                	addi	s0,sp,64
-    80203208:	fca43423          	sd	a0,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:77
-    VirtAddr va;
-    va.addr = TRAMPOLINE_FULL;
-    8020320c:	77fd                	lui	a5,0xfffff
-    8020320e:	fcf43c23          	sd	a5,-40(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:79
-    PhysAddr pha;
-    pha.addr = (size_t)&strampoline;
-    80203212:	ffffe797          	auipc	a5,0xffffe
-    80203216:	dee78793          	addi	a5,a5,-530 # 80201000 <port_write>
-    8020321a:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:80
-    PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(va,0),phys_addr_to_page_num(pha,1),PTE_R|PTE_X);
-    8020321e:	fc843483          	ld	s1,-56(s0)
-    80203222:	4581                	li	a1,0
-    80203224:	fd843503          	ld	a0,-40(s0)
-    80203228:	32b000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    8020322c:	892a                	mv	s2,a0
-    8020322e:	4585                	li	a1,1
-    80203230:	fd043503          	ld	a0,-48(s0)
-    80203234:	2df000ef          	jal	ra,80203d12 <phys_addr_to_page_num>
-    80203238:	87aa                	mv	a5,a0
-    8020323a:	46a9                	li	a3,10
-    8020323c:	863e                	mv	a2,a5
-    8020323e:	85ca                	mv	a1,s2
-    80203240:	8526                	mv	a0,s1
-    80203242:	af1ff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:81
-}
-    80203246:	0001                	nop
-    80203248:	70e2                	ld	ra,56(sp)
-    8020324a:	7442                	ld	s0,48(sp)
-    8020324c:	74a2                	ld	s1,40(sp)
-    8020324e:	7902                	ld	s2,32(sp)
-    80203250:	6121                	addi	sp,sp,64
-    80203252:	8082                	ret
-
-0000000080203254 <memory_set_kernel_new>:
-memory_set_kernel_new():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:83
-
-void memory_set_kernel_new(MemorySet* ms) {
     80203254:	715d                	addi	sp,sp,-80
     80203256:	e486                	sd	ra,72(sp)
     80203258:	e0a2                	sd	s0,64(sp)
-    8020325a:	0880                	addi	s0,sp,80
-    8020325c:	faa43c23          	sd	a0,-72(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:85
+    8020325a:	fc26                	sd	s1,56(sp)
+    8020325c:	f84a                	sd	s2,48(sp)
+    8020325e:	0880                	addi	s0,sp,80
+    80203260:	faa43c23          	sd	a0,-72(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:77
+    VirtAddr va;
+    va.addr = TRAMPOLINE;
+    80203264:	77fd                	lui	a5,0xfffff
+    80203266:	fcf43c23          	sd	a5,-40(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:79
+    PhysAddr pha;
+    pha.addr = (size_t)&strampoline;
+    8020326a:	ffffe797          	auipc	a5,0xffffe
+    8020326e:	d9678793          	addi	a5,a5,-618 # 80201000 <port_write>
+    80203272:	fcf43823          	sd	a5,-48(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:80
+    VirtPageNum tmp = virt_addr_to_page_num(va,1);
+    80203276:	4585                	li	a1,1
+    80203278:	fd843503          	ld	a0,-40(s0)
+    8020327c:	333000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203280:	87aa                	mv	a5,a0
+    80203282:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:81
+    PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(va,0),phys_addr_to_page_num(pha,1),PTE_R|PTE_X);
+    80203286:	fb843483          	ld	s1,-72(s0)
+    8020328a:	4581                	li	a1,0
+    8020328c:	fd843503          	ld	a0,-40(s0)
+    80203290:	31f000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203294:	892a                	mv	s2,a0
+    80203296:	4585                	li	a1,1
+    80203298:	fd043503          	ld	a0,-48(s0)
+    8020329c:	2d3000ef          	jal	ra,80203d6e <phys_addr_to_page_num>
+    802032a0:	87aa                	mv	a5,a0
+    802032a2:	46a9                	li	a3,10
+    802032a4:	863e                	mv	a2,a5
+    802032a6:	85ca                	mv	a1,s2
+    802032a8:	8526                	mv	a0,s1
+    802032aa:	a89ff0ef          	jal	ra,80202d32 <PageTable_map_ppn_2_vpn>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:82
+}
+    802032ae:	0001                	nop
+    802032b0:	60a6                	ld	ra,72(sp)
+    802032b2:	6406                	ld	s0,64(sp)
+    802032b4:	74e2                	ld	s1,56(sp)
+    802032b6:	7942                	ld	s2,48(sp)
+    802032b8:	6161                	addi	sp,sp,80
+    802032ba:	8082                	ret
+
+00000000802032bc <memory_set_kernel_new>:
+memory_set_kernel_new():
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:84
+
+void memory_set_kernel_new(MemorySet* ms) {
+    802032bc:	715d                	addi	sp,sp,-80
+    802032be:	e486                	sd	ra,72(sp)
+    802032c0:	e0a2                	sd	s0,64(sp)
+    802032c2:	0880                	addi	s0,sp,80
+    802032c4:	faa43c23          	sd	a0,-72(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:86
     MapArea ma_tmp;
     printk("[mm/memory_set.c] text: 0x%x - 0x%x\n", (uint64_t)text_start, (uint64_t)text_end);
-    80203260:	ffffd797          	auipc	a5,0xffffd
-    80203264:	da078793          	addi	a5,a5,-608 # 80200000 <_start>
-    80203268:	00003717          	auipc	a4,0x3
-    8020326c:	d9870713          	addi	a4,a4,-616 # 80206000 <rodata_start>
-    80203270:	863a                	mv	a2,a4
-    80203272:	85be                	mv	a1,a5
-    80203274:	00003517          	auipc	a0,0x3
-    80203278:	eac50513          	addi	a0,a0,-340 # 80206120 <rodata_start+0x120>
-    8020327c:	d6efe0ef          	jal	ra,802017ea <printk>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:86
-    printk("[mm/memory_set.c] rodata: 0x%x - 0x%x\n", (uint64_t)rodata_start, (uint64_t)rodata_end);
-    80203280:	00003797          	auipc	a5,0x3
-    80203284:	d8078793          	addi	a5,a5,-640 # 80206000 <rodata_start>
-    80203288:	00004717          	auipc	a4,0x4
-    8020328c:	d7870713          	addi	a4,a4,-648 # 80207000 <_num_app>
-    80203290:	863a                	mv	a2,a4
-    80203292:	85be                	mv	a1,a5
-    80203294:	00003517          	auipc	a0,0x3
-    80203298:	eb450513          	addi	a0,a0,-332 # 80206148 <rodata_start+0x148>
-    8020329c:	d4efe0ef          	jal	ra,802017ea <printk>
+    802032c8:	ffffd797          	auipc	a5,0xffffd
+    802032cc:	d3878793          	addi	a5,a5,-712 # 80200000 <_start>
+    802032d0:	00003717          	auipc	a4,0x3
+    802032d4:	d3070713          	addi	a4,a4,-720 # 80206000 <rodata_start>
+    802032d8:	863a                	mv	a2,a4
+    802032da:	85be                	mv	a1,a5
+    802032dc:	00003517          	auipc	a0,0x3
+    802032e0:	e4450513          	addi	a0,a0,-444 # 80206120 <rodata_start+0x120>
+    802032e4:	d06fe0ef          	jal	ra,802017ea <printk>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:87
-    printk("[mm/memory_set.c] data: 0x%x - 0x%x\n", (uint64_t)data_start, (uint64_t)data_end);
-    802032a0:	00004797          	auipc	a5,0x4
-    802032a4:	d6078793          	addi	a5,a5,-672 # 80207000 <_num_app>
-    802032a8:	00007717          	auipc	a4,0x7
-    802032ac:	d5870713          	addi	a4,a4,-680 # 8020a000 <boot_stack_lower_bound>
-    802032b0:	863a                	mv	a2,a4
-    802032b2:	85be                	mv	a1,a5
-    802032b4:	00003517          	auipc	a0,0x3
-    802032b8:	ebc50513          	addi	a0,a0,-324 # 80206170 <rodata_start+0x170>
-    802032bc:	d2efe0ef          	jal	ra,802017ea <printk>
+    printk("[mm/memory_set.c] rodata: 0x%x - 0x%x\n", (uint64_t)rodata_start, (uint64_t)rodata_end);
+    802032e8:	00003797          	auipc	a5,0x3
+    802032ec:	d1878793          	addi	a5,a5,-744 # 80206000 <rodata_start>
+    802032f0:	00004717          	auipc	a4,0x4
+    802032f4:	d1070713          	addi	a4,a4,-752 # 80207000 <_num_app>
+    802032f8:	863a                	mv	a2,a4
+    802032fa:	85be                	mv	a1,a5
+    802032fc:	00003517          	auipc	a0,0x3
+    80203300:	e4c50513          	addi	a0,a0,-436 # 80206148 <rodata_start+0x148>
+    80203304:	ce6fe0ef          	jal	ra,802017ea <printk>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:88
-    printk("[mm/memory_set.c] bss: 0x%x - 0x%x\n", (uint64_t)bss_start, (uint64_t)bss_end);
-    802032c0:	00007797          	auipc	a5,0x7
-    802032c4:	d4078793          	addi	a5,a5,-704 # 8020a000 <boot_stack_lower_bound>
-    802032c8:	00868717          	auipc	a4,0x868
-    802032cc:	d3870713          	addi	a4,a4,-712 # 80a6b000 <bss_end>
-    802032d0:	863a                	mv	a2,a4
-    802032d2:	85be                	mv	a1,a5
-    802032d4:	00003517          	auipc	a0,0x3
-    802032d8:	ec450513          	addi	a0,a0,-316 # 80206198 <rodata_start+0x198>
-    802032dc:	d0efe0ef          	jal	ra,802017ea <printk>
+    printk("[mm/memory_set.c] data: 0x%x - 0x%x\n", (uint64_t)data_start, (uint64_t)data_end);
+    80203308:	00004797          	auipc	a5,0x4
+    8020330c:	cf878793          	addi	a5,a5,-776 # 80207000 <_num_app>
+    80203310:	00007717          	auipc	a4,0x7
+    80203314:	cf070713          	addi	a4,a4,-784 # 8020a000 <boot_stack_lower_bound>
+    80203318:	863a                	mv	a2,a4
+    8020331a:	85be                	mv	a1,a5
+    8020331c:	00003517          	auipc	a0,0x3
+    80203320:	e5450513          	addi	a0,a0,-428 # 80206170 <rodata_start+0x170>
+    80203324:	cc6fe0ef          	jal	ra,802017ea <printk>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:89
-    memory_set_new_bare(ms);
-    802032e0:	fb843503          	ld	a0,-72(s0)
-    802032e4:	288000ef          	jal	ra,8020356c <memory_set_new_bare>
+    printk("[mm/memory_set.c] bss: 0x%x - 0x%x\n", (uint64_t)bss_start, (uint64_t)bss_end);
+    80203328:	00007797          	auipc	a5,0x7
+    8020332c:	cd878793          	addi	a5,a5,-808 # 8020a000 <boot_stack_lower_bound>
+    80203330:	00868717          	auipc	a4,0x868
+    80203334:	cd070713          	addi	a4,a4,-816 # 80a6b000 <bss_end>
+    80203338:	863a                	mv	a2,a4
+    8020333a:	85be                	mv	a1,a5
+    8020333c:	00003517          	auipc	a0,0x3
+    80203340:	e5c50513          	addi	a0,a0,-420 # 80206198 <rodata_start+0x198>
+    80203344:	ca6fe0ef          	jal	ra,802017ea <printk>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:90
-    memory_set_map_trampoline(ms);
-    802032e8:	fb843503          	ld	a0,-72(s0)
-    802032ec:	f11ff0ef          	jal	ra,802031fc <memory_set_map_trampoline>
+    memory_set_new_bare(ms);
+    80203348:	fb843503          	ld	a0,-72(s0)
+    8020334c:	288000ef          	jal	ra,802035d4 <memory_set_new_bare>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:91
+    memory_set_map_trampoline(ms);
+    80203350:	fb843503          	ld	a0,-72(s0)
+    80203354:	f01ff0ef          	jal	ra,80203254 <memory_set_map_trampoline>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:92
     memory_set_map_kernel_stack_kernel(ms);
-    802032f0:	fb843503          	ld	a0,-72(s0)
-    802032f4:	eb9ff0ef          	jal	ra,802031ac <memory_set_map_kernel_stack_kernel>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:93
+    80203358:	fb843503          	ld	a0,-72(s0)
+    8020335c:	ea9ff0ef          	jal	ra,80203204 <memory_set_map_kernel_stack_kernel>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:94
     VirtAddr vads, vade;
     vads.addr = (uint64_t)text_start;
-    802032f8:	ffffd797          	auipc	a5,0xffffd
-    802032fc:	d0878793          	addi	a5,a5,-760 # 80200000 <_start>
-    80203300:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:94
-    vade.addr = (uint64_t)text_end;
-    80203304:	00003797          	auipc	a5,0x3
-    80203308:	cfc78793          	addi	a5,a5,-772 # 80206000 <rodata_start>
-    8020330c:	fcf43423          	sd	a5,-56(s0)
+    80203360:	ffffd797          	auipc	a5,0xffffd
+    80203364:	ca078793          	addi	a5,a5,-864 # 80200000 <_start>
+    80203368:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:95
-    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R | MAP_PERM_X);
-    80203310:	fd840793          	addi	a5,s0,-40
-    80203314:	4729                	li	a4,10
-    80203316:	4681                	li	a3,0
-    80203318:	fc843603          	ld	a2,-56(s0)
-    8020331c:	fd043583          	ld	a1,-48(s0)
-    80203320:	853e                	mv	a0,a5
-    80203322:	cb5ff0ef          	jal	ra,80202fd6 <map_area_init>
+    vade.addr = (uint64_t)text_end;
+    8020336c:	00003797          	auipc	a5,0x3
+    80203370:	c9478793          	addi	a5,a5,-876 # 80206000 <rodata_start>
+    80203374:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:96
+    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R | MAP_PERM_X);
+    80203378:	fd840793          	addi	a5,s0,-40
+    8020337c:	4729                	li	a4,10
+    8020337e:	4681                	li	a3,0
+    80203380:	fc843603          	ld	a2,-56(s0)
+    80203384:	fd043583          	ld	a1,-48(s0)
+    80203388:	853e                	mv	a0,a5
+    8020338a:	ca5ff0ef          	jal	ra,8020302e <map_area_init>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:97
     memory_set_push(ms, &ma_tmp);
-    80203326:	fd840793          	addi	a5,s0,-40
-    8020332a:	85be                	mv	a1,a5
-    8020332c:	fb843503          	ld	a0,-72(s0)
-    80203330:	df5ff0ef          	jal	ra,80203124 <memory_set_push>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:99
+    8020338e:	fd840793          	addi	a5,s0,-40
+    80203392:	85be                	mv	a1,a5
+    80203394:	fb843503          	ld	a0,-72(s0)
+    80203398:	de5ff0ef          	jal	ra,8020317c <memory_set_push>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:100
 
     // .rodata segment
     vads.addr = (uint64_t)rodata_start;
-    80203334:	00003797          	auipc	a5,0x3
-    80203338:	ccc78793          	addi	a5,a5,-820 # 80206000 <rodata_start>
-    8020333c:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:100
-    vade.addr = (uint64_t)rodata_end;
-    80203340:	00004797          	auipc	a5,0x4
-    80203344:	cc078793          	addi	a5,a5,-832 # 80207000 <_num_app>
-    80203348:	fcf43423          	sd	a5,-56(s0)
+    8020339c:	00003797          	auipc	a5,0x3
+    802033a0:	c6478793          	addi	a5,a5,-924 # 80206000 <rodata_start>
+    802033a4:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:101
-    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R);
-    8020334c:	fd840793          	addi	a5,s0,-40
-    80203350:	4709                	li	a4,2
-    80203352:	4681                	li	a3,0
-    80203354:	fc843603          	ld	a2,-56(s0)
-    80203358:	fd043583          	ld	a1,-48(s0)
-    8020335c:	853e                	mv	a0,a5
-    8020335e:	c79ff0ef          	jal	ra,80202fd6 <map_area_init>
+    vade.addr = (uint64_t)rodata_end;
+    802033a8:	00004797          	auipc	a5,0x4
+    802033ac:	c5878793          	addi	a5,a5,-936 # 80207000 <_num_app>
+    802033b0:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:102
+    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R);
+    802033b4:	fd840793          	addi	a5,s0,-40
+    802033b8:	4709                	li	a4,2
+    802033ba:	4681                	li	a3,0
+    802033bc:	fc843603          	ld	a2,-56(s0)
+    802033c0:	fd043583          	ld	a1,-48(s0)
+    802033c4:	853e                	mv	a0,a5
+    802033c6:	c69ff0ef          	jal	ra,8020302e <map_area_init>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:103
     memory_set_push(ms, &ma_tmp);
-    80203362:	fd840793          	addi	a5,s0,-40
-    80203366:	85be                	mv	a1,a5
-    80203368:	fb843503          	ld	a0,-72(s0)
-    8020336c:	db9ff0ef          	jal	ra,80203124 <memory_set_push>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:105
+    802033ca:	fd840793          	addi	a5,s0,-40
+    802033ce:	85be                	mv	a1,a5
+    802033d0:	fb843503          	ld	a0,-72(s0)
+    802033d4:	da9ff0ef          	jal	ra,8020317c <memory_set_push>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:106
 
     // .data segment
     vads.addr = (uint64_t)data_start;
-    80203370:	00004797          	auipc	a5,0x4
-    80203374:	c9078793          	addi	a5,a5,-880 # 80207000 <_num_app>
-    80203378:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:106
-    vade.addr = (uint64_t)data_end;
-    8020337c:	00007797          	auipc	a5,0x7
-    80203380:	c8478793          	addi	a5,a5,-892 # 8020a000 <boot_stack_lower_bound>
-    80203384:	fcf43423          	sd	a5,-56(s0)
+    802033d8:	00004797          	auipc	a5,0x4
+    802033dc:	c2878793          	addi	a5,a5,-984 # 80207000 <_num_app>
+    802033e0:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:107
-    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R | MAP_PERM_W);
-    80203388:	fd840793          	addi	a5,s0,-40
-    8020338c:	4719                	li	a4,6
-    8020338e:	4681                	li	a3,0
-    80203390:	fc843603          	ld	a2,-56(s0)
-    80203394:	fd043583          	ld	a1,-48(s0)
-    80203398:	853e                	mv	a0,a5
-    8020339a:	c3dff0ef          	jal	ra,80202fd6 <map_area_init>
+    vade.addr = (uint64_t)data_end;
+    802033e4:	00007797          	auipc	a5,0x7
+    802033e8:	c1c78793          	addi	a5,a5,-996 # 8020a000 <boot_stack_lower_bound>
+    802033ec:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:108
+    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R | MAP_PERM_W);
+    802033f0:	fd840793          	addi	a5,s0,-40
+    802033f4:	4719                	li	a4,6
+    802033f6:	4681                	li	a3,0
+    802033f8:	fc843603          	ld	a2,-56(s0)
+    802033fc:	fd043583          	ld	a1,-48(s0)
+    80203400:	853e                	mv	a0,a5
+    80203402:	c2dff0ef          	jal	ra,8020302e <map_area_init>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:109
     memory_set_push(ms, &ma_tmp);
-    8020339e:	fd840793          	addi	a5,s0,-40
-    802033a2:	85be                	mv	a1,a5
-    802033a4:	fb843503          	ld	a0,-72(s0)
-    802033a8:	d7dff0ef          	jal	ra,80203124 <memory_set_push>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:111
+    80203406:	fd840793          	addi	a5,s0,-40
+    8020340a:	85be                	mv	a1,a5
+    8020340c:	fb843503          	ld	a0,-72(s0)
+    80203410:	d6dff0ef          	jal	ra,8020317c <memory_set_push>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:112
 
     // .bss segment
     vads.addr = (uint64_t)bss_start;
-    802033ac:	00007797          	auipc	a5,0x7
-    802033b0:	c5478793          	addi	a5,a5,-940 # 8020a000 <boot_stack_lower_bound>
-    802033b4:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:112
-    vade.addr = (uint64_t)bss_end;
-    802033b8:	00868797          	auipc	a5,0x868
-    802033bc:	c4878793          	addi	a5,a5,-952 # 80a6b000 <bss_end>
-    802033c0:	fcf43423          	sd	a5,-56(s0)
+    80203414:	00007797          	auipc	a5,0x7
+    80203418:	bec78793          	addi	a5,a5,-1044 # 8020a000 <boot_stack_lower_bound>
+    8020341c:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:113
-    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R | MAP_PERM_W);
-    802033c4:	fd840793          	addi	a5,s0,-40
-    802033c8:	4719                	li	a4,6
-    802033ca:	4681                	li	a3,0
-    802033cc:	fc843603          	ld	a2,-56(s0)
-    802033d0:	fd043583          	ld	a1,-48(s0)
-    802033d4:	853e                	mv	a0,a5
-    802033d6:	c01ff0ef          	jal	ra,80202fd6 <map_area_init>
+    vade.addr = (uint64_t)bss_end;
+    80203420:	00868797          	auipc	a5,0x868
+    80203424:	be078793          	addi	a5,a5,-1056 # 80a6b000 <bss_end>
+    80203428:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:114
-    memory_set_push(ms, &ma_tmp);
-    802033da:	fd840793          	addi	a5,s0,-40
-    802033de:	85be                	mv	a1,a5
-    802033e0:	fb843503          	ld	a0,-72(s0)
-    802033e4:	d41ff0ef          	jal	ra,80203124 <memory_set_push>
+    map_area_init(&ma_tmp, vads, vade, MAP_IDENTICAL, MAP_PERM_R | MAP_PERM_W);
+    8020342c:	fd840793          	addi	a5,s0,-40
+    80203430:	4719                	li	a4,6
+    80203432:	4681                	li	a3,0
+    80203434:	fc843603          	ld	a2,-56(s0)
+    80203438:	fd043583          	ld	a1,-48(s0)
+    8020343c:	853e                	mv	a0,a5
+    8020343e:	bf1ff0ef          	jal	ra,8020302e <map_area_init>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:115
+    memory_set_push(ms, &ma_tmp);
+    80203442:	fd840793          	addi	a5,s0,-40
+    80203446:	85be                	mv	a1,a5
+    80203448:	fb843503          	ld	a0,-72(s0)
+    8020344c:	d31ff0ef          	jal	ra,8020317c <memory_set_push>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:116
 }
-    802033e8:	0001                	nop
-    802033ea:	60a6                	ld	ra,72(sp)
-    802033ec:	6406                	ld	s0,64(sp)
-    802033ee:	6161                	addi	sp,sp,80
-    802033f0:	8082                	ret
+    80203450:	0001                	nop
+    80203452:	60a6                	ld	ra,72(sp)
+    80203454:	6406                	ld	s0,64(sp)
+    80203456:	6161                	addi	sp,sp,80
+    80203458:	8082                	ret
 
-00000000802033f2 <memory_set_activate>:
+000000008020345a <memory_set_activate>:
 memory_set_activate():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:118
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:119
 
 void memory_set_activate(MemorySet *memory_set)
 {
-    802033f2:	7179                	addi	sp,sp,-48
-    802033f4:	f406                	sd	ra,40(sp)
-    802033f6:	f022                	sd	s0,32(sp)
-    802033f8:	1800                	addi	s0,sp,48
-    802033fa:	fca43c23          	sd	a0,-40(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:119
-    uint64_t satp = page_table_token(&memory_set->page_table);
-    802033fe:	fd843783          	ld	a5,-40(s0)
-    80203402:	853e                	mv	a0,a5
-    80203404:	a15ff0ef          	jal	ra,80202e18 <page_table_token>
-    80203408:	fea43423          	sd	a0,-24(s0)
+    8020345a:	7179                	addi	sp,sp,-48
+    8020345c:	f406                	sd	ra,40(sp)
+    8020345e:	f022                	sd	s0,32(sp)
+    80203460:	1800                	addi	s0,sp,48
+    80203462:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:120
-    WRITE_CSR(satp,satp);
-    8020340c:	fe843783          	ld	a5,-24(s0)
-    80203410:	18079073          	csrw	satp,a5
+    uint64_t satp = page_table_token(&memory_set->page_table);
+    80203466:	fd843783          	ld	a5,-40(s0)
+    8020346a:	853e                	mv	a0,a5
+    8020346c:	9adff0ef          	jal	ra,80202e18 <page_table_token>
+    80203470:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:121
-    asm volatile("sfence.vma zero, zero");
-    80203414:	12000073          	sfence.vma
+    WRITE_CSR(satp,satp);
+    80203474:	fe843783          	ld	a5,-24(s0)
+    80203478:	18079073          	csrw	satp,a5
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:122
+    asm volatile("sfence.vma zero, zero");
+    8020347c:	12000073          	sfence.vma
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:123
 }
-    80203418:	0001                	nop
-    8020341a:	70a2                	ld	ra,40(sp)
-    8020341c:	7402                	ld	s0,32(sp)
-    8020341e:	6145                	addi	sp,sp,48
-    80203420:	8082                	ret
+    80203480:	0001                	nop
+    80203482:	70a2                	ld	ra,40(sp)
+    80203484:	7402                	ld	s0,32(sp)
+    80203486:	6145                	addi	sp,sp,48
+    80203488:	8082                	ret
 
-0000000080203422 <memory_set_remap_test>:
+000000008020348a <memory_set_remap_test>:
 memory_set_remap_test():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:125
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:126
 
 void memory_set_remap_test()
 {
-    80203422:	711d                	addi	sp,sp,-96
-    80203424:	ec86                	sd	ra,88(sp)
-    80203426:	e8a2                	sd	s0,80(sp)
-    80203428:	1080                	addi	s0,sp,96
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:127
+    8020348a:	711d                	addi	sp,sp,-96
+    8020348c:	ec86                	sd	ra,88(sp)
+    8020348e:	e8a2                	sd	s0,80(sp)
+    80203490:	1080                	addi	s0,sp,96
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:128
     VirtAddr mid_text;
     mid_text.addr = (((uint64_t)&text_start + (uint64_t)&text_end) / 2);
-    8020342a:	ffffd717          	auipc	a4,0xffffd
-    8020342e:	bd670713          	addi	a4,a4,-1066 # 80200000 <_start>
-    80203432:	00003797          	auipc	a5,0x3
-    80203436:	bce78793          	addi	a5,a5,-1074 # 80206000 <rodata_start>
-    8020343a:	97ba                	add	a5,a5,a4
-    8020343c:	8385                	srli	a5,a5,0x1
-    8020343e:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:129
+    80203492:	ffffd717          	auipc	a4,0xffffd
+    80203496:	b6e70713          	addi	a4,a4,-1170 # 80200000 <_start>
+    8020349a:	00003797          	auipc	a5,0x3
+    8020349e:	b6678793          	addi	a5,a5,-1178 # 80206000 <rodata_start>
+    802034a2:	97ba                	add	a5,a5,a4
+    802034a4:	8385                	srli	a5,a5,0x1
+    802034a6:	fcf43823          	sd	a5,-48(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:130
     VirtAddr mid_rodata;
     mid_rodata.addr = (((uint64_t)&rodata_start + (uint64_t)&rodata_end) / 2);
-    80203442:	00003717          	auipc	a4,0x3
-    80203446:	bbe70713          	addi	a4,a4,-1090 # 80206000 <rodata_start>
-    8020344a:	00004797          	auipc	a5,0x4
-    8020344e:	bb678793          	addi	a5,a5,-1098 # 80207000 <_num_app>
-    80203452:	97ba                	add	a5,a5,a4
-    80203454:	8385                	srli	a5,a5,0x1
-    80203456:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:131
+    802034aa:	00003717          	auipc	a4,0x3
+    802034ae:	b5670713          	addi	a4,a4,-1194 # 80206000 <rodata_start>
+    802034b2:	00004797          	auipc	a5,0x4
+    802034b6:	b4e78793          	addi	a5,a5,-1202 # 80207000 <_num_app>
+    802034ba:	97ba                	add	a5,a5,a4
+    802034bc:	8385                	srli	a5,a5,0x1
+    802034be:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:132
     VirtAddr mid_data;
     mid_data.addr = (((uint64_t)&data_start + (uint64_t)&data_end) / 2);
-    8020345a:	00004717          	auipc	a4,0x4
-    8020345e:	ba670713          	addi	a4,a4,-1114 # 80207000 <_num_app>
-    80203462:	00007797          	auipc	a5,0x7
-    80203466:	b9e78793          	addi	a5,a5,-1122 # 8020a000 <boot_stack_lower_bound>
-    8020346a:	97ba                	add	a5,a5,a4
-    8020346c:	8385                	srli	a5,a5,0x1
-    8020346e:	fcf43023          	sd	a5,-64(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:133
+    802034c2:	00004717          	auipc	a4,0x4
+    802034c6:	b3e70713          	addi	a4,a4,-1218 # 80207000 <_num_app>
+    802034ca:	00007797          	auipc	a5,0x7
+    802034ce:	b3678793          	addi	a5,a5,-1226 # 8020a000 <boot_stack_lower_bound>
+    802034d2:	97ba                	add	a5,a5,a4
+    802034d4:	8385                	srli	a5,a5,0x1
+    802034d6:	fcf43023          	sd	a5,-64(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:134
 
     VirtPageNum text = virt_addr_to_page_num(mid_text,1);
-    80203472:	4585                	li	a1,1
-    80203474:	fd043503          	ld	a0,-48(s0)
-    80203478:	0db000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    8020347c:	87aa                	mv	a5,a0
-    8020347e:	faf43c23          	sd	a5,-72(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:134
-    VirtPageNum rodata = virt_addr_to_page_num(mid_rodata,1);
-    80203482:	4585                	li	a1,1
-    80203484:	fc843503          	ld	a0,-56(s0)
-    80203488:	0cb000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    8020348c:	87aa                	mv	a5,a0
-    8020348e:	faf43823          	sd	a5,-80(s0)
+    802034da:	4585                	li	a1,1
+    802034dc:	fd043503          	ld	a0,-48(s0)
+    802034e0:	0cf000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    802034e4:	87aa                	mv	a5,a0
+    802034e6:	faf43c23          	sd	a5,-72(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:135
-    VirtPageNum data = virt_addr_to_page_num(mid_data,1);
-    80203492:	4585                	li	a1,1
-    80203494:	fc043503          	ld	a0,-64(s0)
-    80203498:	0bb000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    8020349c:	87aa                	mv	a5,a0
-    8020349e:	faf43423          	sd	a5,-88(s0)
+    VirtPageNum rodata = virt_addr_to_page_num(mid_rodata,1);
+    802034ea:	4585                	li	a1,1
+    802034ec:	fc843503          	ld	a0,-56(s0)
+    802034f0:	0bf000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    802034f4:	87aa                	mv	a5,a0
+    802034f6:	faf43823          	sd	a5,-80(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:136
-    PageTableEntry* p1 = page_table_find_pte(&(KERNEL_SPACE.page_table),text);
-    802034a2:	fb843583          	ld	a1,-72(s0)
-    802034a6:	00817517          	auipc	a0,0x817
-    802034aa:	b6250513          	addi	a0,a0,-1182 # 80a1a008 <KERNEL_SPACE>
-    802034ae:	989ff0ef          	jal	ra,80202e36 <page_table_find_pte>
-    802034b2:	fea43423          	sd	a0,-24(s0)
+    VirtPageNum data = virt_addr_to_page_num(mid_data,1);
+    802034fa:	4585                	li	a1,1
+    802034fc:	fc043503          	ld	a0,-64(s0)
+    80203500:	0af000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203504:	87aa                	mv	a5,a0
+    80203506:	faf43423          	sd	a5,-88(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:137
-    PageTableEntry* p2 = page_table_find_pte(&(KERNEL_SPACE.page_table),rodata);
-    802034b6:	fb043583          	ld	a1,-80(s0)
-    802034ba:	00817517          	auipc	a0,0x817
-    802034be:	b4e50513          	addi	a0,a0,-1202 # 80a1a008 <KERNEL_SPACE>
-    802034c2:	975ff0ef          	jal	ra,80202e36 <page_table_find_pte>
-    802034c6:	fea43023          	sd	a0,-32(s0)
+    PageTableEntry* p1 = page_table_find_pte(&(KERNEL_SPACE.page_table),text);
+    8020350a:	fb843583          	ld	a1,-72(s0)
+    8020350e:	00817517          	auipc	a0,0x817
+    80203512:	afa50513          	addi	a0,a0,-1286 # 80a1a008 <KERNEL_SPACE>
+    80203516:	921ff0ef          	jal	ra,80202e36 <page_table_find_pte>
+    8020351a:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:138
+    PageTableEntry* p2 = page_table_find_pte(&(KERNEL_SPACE.page_table),rodata);
+    8020351e:	fb043583          	ld	a1,-80(s0)
+    80203522:	00817517          	auipc	a0,0x817
+    80203526:	ae650513          	addi	a0,a0,-1306 # 80a1a008 <KERNEL_SPACE>
+    8020352a:	90dff0ef          	jal	ra,80202e36 <page_table_find_pte>
+    8020352e:	fea43023          	sd	a0,-32(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:139
     PageTableEntry* p3 = page_table_find_pte(&(KERNEL_SPACE.page_table),data);
-    802034ca:	fa843583          	ld	a1,-88(s0)
-    802034ce:	00817517          	auipc	a0,0x817
-    802034d2:	b3a50513          	addi	a0,a0,-1222 # 80a1a008 <KERNEL_SPACE>
-    802034d6:	961ff0ef          	jal	ra,80202e36 <page_table_find_pte>
-    802034da:	fca43c23          	sd	a0,-40(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:141
+    80203532:	fa843583          	ld	a1,-88(s0)
+    80203536:	00817517          	auipc	a0,0x817
+    8020353a:	ad250513          	addi	a0,a0,-1326 # 80a1a008 <KERNEL_SPACE>
+    8020353e:	8f9ff0ef          	jal	ra,80202e36 <page_table_find_pte>
+    80203542:	fca43c23          	sd	a0,-40(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:142
 
     // 检查text区域是否可执行且不可写
     ASSERT(pte_is_executable(*p1) && !pte_is_writable(*p1));
-    802034de:	fe843783          	ld	a5,-24(s0)
-    802034e2:	6388                	ld	a0,0(a5)
-    802034e4:	ee6ff0ef          	jal	ra,80202bca <pte_is_executable>
-    802034e8:	87aa                	mv	a5,a0
-    802034ea:	cb81                	beqz	a5,802034fa <memory_set_remap_test+0xd8>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:141 (discriminator 2)
-    802034ec:	fe843783          	ld	a5,-24(s0)
-    802034f0:	6388                	ld	a0,0(a5)
-    802034f2:	ea8ff0ef          	jal	ra,80202b9a <pte_is_writable>
-    802034f6:	87aa                	mv	a5,a0
-    802034f8:	cb89                	beqz	a5,8020350a <memory_set_remap_test+0xe8>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:141 (discriminator 3)
-    802034fa:	08d00593          	li	a1,141
-    802034fe:	00003517          	auipc	a0,0x3
-    80203502:	cc250513          	addi	a0,a0,-830 # 802061c0 <rodata_start+0x1c0>
-    80203506:	423000ef          	jal	ra,80204128 <panic>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:144
+    80203546:	fe843783          	ld	a5,-24(s0)
+    8020354a:	6388                	ld	a0,0(a5)
+    8020354c:	e7eff0ef          	jal	ra,80202bca <pte_is_executable>
+    80203550:	87aa                	mv	a5,a0
+    80203552:	cb81                	beqz	a5,80203562 <memory_set_remap_test+0xd8>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:142 (discriminator 2)
+    80203554:	fe843783          	ld	a5,-24(s0)
+    80203558:	6388                	ld	a0,0(a5)
+    8020355a:	e40ff0ef          	jal	ra,80202b9a <pte_is_writable>
+    8020355e:	87aa                	mv	a5,a0
+    80203560:	cb89                	beqz	a5,80203572 <memory_set_remap_test+0xe8>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:142 (discriminator 3)
+    80203562:	08e00593          	li	a1,142
+    80203566:	00003517          	auipc	a0,0x3
+    8020356a:	c5a50513          	addi	a0,a0,-934 # 802061c0 <rodata_start+0x1c0>
+    8020356e:	417000ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:145
 
     // 检查rodata区域是否可读且不可写
     ASSERT(pte_is_readable(*p2) && !pte_is_writable(*p2));
-    8020350a:	fe043783          	ld	a5,-32(s0)
-    8020350e:	6388                	ld	a0,0(a5)
-    80203510:	e5aff0ef          	jal	ra,80202b6a <pte_is_readable>
-    80203514:	87aa                	mv	a5,a0
-    80203516:	cb81                	beqz	a5,80203526 <memory_set_remap_test+0x104>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:144 (discriminator 2)
-    80203518:	fe043783          	ld	a5,-32(s0)
-    8020351c:	6388                	ld	a0,0(a5)
-    8020351e:	e7cff0ef          	jal	ra,80202b9a <pte_is_writable>
-    80203522:	87aa                	mv	a5,a0
-    80203524:	cb89                	beqz	a5,80203536 <memory_set_remap_test+0x114>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:144 (discriminator 3)
-    80203526:	09000593          	li	a1,144
-    8020352a:	00003517          	auipc	a0,0x3
-    8020352e:	c9650513          	addi	a0,a0,-874 # 802061c0 <rodata_start+0x1c0>
-    80203532:	3f7000ef          	jal	ra,80204128 <panic>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:147
+    80203572:	fe043783          	ld	a5,-32(s0)
+    80203576:	6388                	ld	a0,0(a5)
+    80203578:	df2ff0ef          	jal	ra,80202b6a <pte_is_readable>
+    8020357c:	87aa                	mv	a5,a0
+    8020357e:	cb81                	beqz	a5,8020358e <memory_set_remap_test+0x104>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:145 (discriminator 2)
+    80203580:	fe043783          	ld	a5,-32(s0)
+    80203584:	6388                	ld	a0,0(a5)
+    80203586:	e14ff0ef          	jal	ra,80202b9a <pte_is_writable>
+    8020358a:	87aa                	mv	a5,a0
+    8020358c:	cb89                	beqz	a5,8020359e <memory_set_remap_test+0x114>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:145 (discriminator 3)
+    8020358e:	09100593          	li	a1,145
+    80203592:	00003517          	auipc	a0,0x3
+    80203596:	c2e50513          	addi	a0,a0,-978 # 802061c0 <rodata_start+0x1c0>
+    8020359a:	3eb000ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:148
 
     // 检查data区域是否可读写
     ASSERT(pte_is_readable(*p3) && pte_is_writable(*p3));
-    80203536:	fd843783          	ld	a5,-40(s0)
-    8020353a:	6388                	ld	a0,0(a5)
-    8020353c:	e2eff0ef          	jal	ra,80202b6a <pte_is_readable>
-    80203540:	87aa                	mv	a5,a0
-    80203542:	cb81                	beqz	a5,80203552 <memory_set_remap_test+0x130>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:147 (discriminator 2)
-    80203544:	fd843783          	ld	a5,-40(s0)
-    80203548:	6388                	ld	a0,0(a5)
-    8020354a:	e50ff0ef          	jal	ra,80202b9a <pte_is_writable>
-    8020354e:	87aa                	mv	a5,a0
-    80203550:	eb89                	bnez	a5,80203562 <memory_set_remap_test+0x140>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:147 (discriminator 3)
-    80203552:	09300593          	li	a1,147
-    80203556:	00003517          	auipc	a0,0x3
-    8020355a:	c6a50513          	addi	a0,a0,-918 # 802061c0 <rodata_start+0x1c0>
-    8020355e:	3cb000ef          	jal	ra,80204128 <panic>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:148
+    8020359e:	fd843783          	ld	a5,-40(s0)
+    802035a2:	6388                	ld	a0,0(a5)
+    802035a4:	dc6ff0ef          	jal	ra,80202b6a <pte_is_readable>
+    802035a8:	87aa                	mv	a5,a0
+    802035aa:	cb81                	beqz	a5,802035ba <memory_set_remap_test+0x130>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:148 (discriminator 2)
+    802035ac:	fd843783          	ld	a5,-40(s0)
+    802035b0:	6388                	ld	a0,0(a5)
+    802035b2:	de8ff0ef          	jal	ra,80202b9a <pte_is_writable>
+    802035b6:	87aa                	mv	a5,a0
+    802035b8:	eb89                	bnez	a5,802035ca <memory_set_remap_test+0x140>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:148 (discriminator 3)
+    802035ba:	09400593          	li	a1,148
+    802035be:	00003517          	auipc	a0,0x3
+    802035c2:	c0250513          	addi	a0,a0,-1022 # 802061c0 <rodata_start+0x1c0>
+    802035c6:	3bf000ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:149
 }
-    80203562:	0001                	nop
-    80203564:	60e6                	ld	ra,88(sp)
-    80203566:	6446                	ld	s0,80(sp)
-    80203568:	6125                	addi	sp,sp,96
-    8020356a:	8082                	ret
+    802035ca:	0001                	nop
+    802035cc:	60e6                	ld	ra,88(sp)
+    802035ce:	6446                	ld	s0,80(sp)
+    802035d0:	6125                	addi	sp,sp,96
+    802035d2:	8082                	ret
 
-000000008020356c <memory_set_new_bare>:
+00000000802035d4 <memory_set_new_bare>:
 memory_set_new_bare():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:151
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:152
 
 void memory_set_new_bare(MemorySet *memory_set) 
 {
-    8020356c:	1101                	addi	sp,sp,-32
-    8020356e:	ec06                	sd	ra,24(sp)
-    80203570:	e822                	sd	s0,16(sp)
-    80203572:	1000                	addi	s0,sp,32
-    80203574:	fea43423          	sd	a0,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:152
-    memory_set->page_table = *PageTable_new();
-    80203578:	edaff0ef          	jal	ra,80202c52 <PageTable_new>
-    8020357c:	872a                	mv	a4,a0
-    8020357e:	fe843783          	ld	a5,-24(s0)
-    80203582:	630c                	ld	a1,0(a4)
-    80203584:	6710                	ld	a2,8(a4)
-    80203586:	6b14                	ld	a3,16(a4)
-    80203588:	6f18                	ld	a4,24(a4)
-    8020358a:	e38c                	sd	a1,0(a5)
-    8020358c:	e790                	sd	a2,8(a5)
-    8020358e:	eb94                	sd	a3,16(a5)
-    80203590:	ef98                	sd	a4,24(a5)
+    802035d4:	1101                	addi	sp,sp,-32
+    802035d6:	ec06                	sd	ra,24(sp)
+    802035d8:	e822                	sd	s0,16(sp)
+    802035da:	1000                	addi	s0,sp,32
+    802035dc:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:153
-    vector_new(&memory_set->areas, sizeof(MapArea));
-    80203592:	fe843783          	ld	a5,-24(s0)
-    80203596:	02078793          	addi	a5,a5,32
-    8020359a:	45e1                	li	a1,24
-    8020359c:	853e                	mv	a0,a5
-    8020359e:	461010ef          	jal	ra,802051fe <vector_new>
+    memory_set->page_table = *PageTable_new();
+    802035e0:	e72ff0ef          	jal	ra,80202c52 <PageTable_new>
+    802035e4:	872a                	mv	a4,a0
+    802035e6:	fe843783          	ld	a5,-24(s0)
+    802035ea:	630c                	ld	a1,0(a4)
+    802035ec:	6710                	ld	a2,8(a4)
+    802035ee:	6b14                	ld	a3,16(a4)
+    802035f0:	6f18                	ld	a4,24(a4)
+    802035f2:	e38c                	sd	a1,0(a5)
+    802035f4:	e790                	sd	a2,8(a5)
+    802035f6:	eb94                	sd	a3,16(a5)
+    802035f8:	ef98                	sd	a4,24(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:154
+    vector_new(&memory_set->areas, sizeof(MapArea));
+    802035fa:	fe843783          	ld	a5,-24(s0)
+    802035fe:	02078793          	addi	a5,a5,32
+    80203602:	45e1                	li	a1,24
+    80203604:	853e                	mv	a0,a5
+    80203606:	4db010ef          	jal	ra,802052e0 <vector_new>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:155
 }
-    802035a2:	0001                	nop
-    802035a4:	60e2                	ld	ra,24(sp)
-    802035a6:	6442                	ld	s0,16(sp)
-    802035a8:	6105                	addi	sp,sp,32
-    802035aa:	8082                	ret
+    8020360a:	0001                	nop
+    8020360c:	60e2                	ld	ra,24(sp)
+    8020360e:	6442                	ld	s0,16(sp)
+    80203610:	6105                	addi	sp,sp,32
+    80203612:	8082                	ret
 
-00000000802035ac <ppn_get_bytes_array>:
+0000000080203614 <ppn_get_bytes_array>:
 ppn_get_bytes_array():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:159
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:160
 
 
 
 uint8_t* ppn_get_bytes_array(PhysPageNum ppn) 
 {
-    802035ac:	7179                	addi	sp,sp,-48
-    802035ae:	f406                	sd	ra,40(sp)
-    802035b0:	f022                	sd	s0,32(sp)
-    802035b2:	1800                	addi	s0,sp,48
-    802035b4:	fca43c23          	sd	a0,-40(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:160
-  PhysAddr pa = phys_page_num_to_addr(ppn);
-    802035b8:	fd843503          	ld	a0,-40(s0)
-    802035bc:	7ee000ef          	jal	ra,80203daa <phys_page_num_to_addr>
-    802035c0:	87aa                	mv	a5,a0
-    802035c2:	fef43423          	sd	a5,-24(s0)
+    80203614:	7179                	addi	sp,sp,-48
+    80203616:	f406                	sd	ra,40(sp)
+    80203618:	f022                	sd	s0,32(sp)
+    8020361a:	1800                	addi	s0,sp,48
+    8020361c:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:161
-  return (uint8_t *)pa.addr;
-    802035c6:	fe843783          	ld	a5,-24(s0)
+  PhysAddr pa = phys_page_num_to_addr(ppn);
+    80203620:	fd843503          	ld	a0,-40(s0)
+    80203624:	7e2000ef          	jal	ra,80203e06 <phys_page_num_to_addr>
+    80203628:	87aa                	mv	a5,a0
+    8020362a:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:162
+  return (uint8_t *)pa.addr;
+    8020362e:	fe843783          	ld	a5,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:163
 }
-    802035ca:	853e                	mv	a0,a5
-    802035cc:	70a2                	ld	ra,40(sp)
-    802035ce:	7402                	ld	s0,32(sp)
-    802035d0:	6145                	addi	sp,sp,48
-    802035d2:	8082                	ret
+    80203632:	853e                	mv	a0,a5
+    80203634:	70a2                	ld	ra,40(sp)
+    80203636:	7402                	ld	s0,32(sp)
+    80203638:	6145                	addi	sp,sp,48
+    8020363a:	8082                	ret
 
-00000000802035d4 <map_area_copy_data>:
+000000008020363c <map_area_copy_data>:
 map_area_copy_data():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:168
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:169
 
 
 
 static void map_area_copy_data(MapArea *map_area, PageTable *pt, uint8_t *data,
                                uint64_t len) 
 {
-    802035d4:	711d                	addi	sp,sp,-96
-    802035d6:	ec86                	sd	ra,88(sp)
-    802035d8:	e8a2                	sd	s0,80(sp)
-    802035da:	1080                	addi	s0,sp,96
-    802035dc:	faa43c23          	sd	a0,-72(s0)
-    802035e0:	fab43823          	sd	a1,-80(s0)
-    802035e4:	fac43423          	sd	a2,-88(s0)
-    802035e8:	fad43023          	sd	a3,-96(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:169
-  uint64_t start = 0;
-    802035ec:	fe043423          	sd	zero,-24(s0)
+    8020363c:	711d                	addi	sp,sp,-96
+    8020363e:	ec86                	sd	ra,88(sp)
+    80203640:	e8a2                	sd	s0,80(sp)
+    80203642:	1080                	addi	s0,sp,96
+    80203644:	faa43c23          	sd	a0,-72(s0)
+    80203648:	fab43823          	sd	a1,-80(s0)
+    8020364c:	fac43423          	sd	a2,-88(s0)
+    80203650:	fad43023          	sd	a3,-96(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:170
+  uint64_t start = 0;
+    80203654:	fe043423          	sd	zero,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:171
   VirtPageNum current_vpn = map_area->vpn_range.start_vpn;
-    802035f0:	fb843783          	ld	a5,-72(s0)
-    802035f4:	639c                	ld	a5,0(a5)
-    802035f6:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:173
+    80203658:	fb843783          	ld	a5,-72(s0)
+    8020365c:	639c                	ld	a5,0(a5)
+    8020365e:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:174
   for (;;) {
     PhysPageNum tmp;
     tmp.num = pte_ppn(*page_table_find_pte(pt, current_vpn));
-    802035fa:	fc843583          	ld	a1,-56(s0)
-    802035fe:	fb043503          	ld	a0,-80(s0)
-    80203602:	835ff0ef          	jal	ra,80202e36 <page_table_find_pte>
-    80203606:	87aa                	mv	a5,a0
-    80203608:	6388                	ld	a0,0(a5)
-    8020360a:	cf6ff0ef          	jal	ra,80202b00 <pte_ppn>
-    8020360e:	87aa                	mv	a5,a0
-    80203610:	fcf43023          	sd	a5,-64(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:174
-    uint8_t *src = &data[start];
-    80203614:	fa843703          	ld	a4,-88(s0)
-    80203618:	fe843783          	ld	a5,-24(s0)
-    8020361c:	97ba                	add	a5,a5,a4
-    8020361e:	fef43023          	sd	a5,-32(s0)
+    80203662:	fc843583          	ld	a1,-56(s0)
+    80203666:	fb043503          	ld	a0,-80(s0)
+    8020366a:	fccff0ef          	jal	ra,80202e36 <page_table_find_pte>
+    8020366e:	87aa                	mv	a5,a0
+    80203670:	6388                	ld	a0,0(a5)
+    80203672:	c8eff0ef          	jal	ra,80202b00 <pte_ppn>
+    80203676:	87aa                	mv	a5,a0
+    80203678:	fcf43023          	sd	a5,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:175
-    uint8_t *dst = ppn_get_bytes_array(tmp);
-    80203622:	fc043503          	ld	a0,-64(s0)
-    80203626:	f87ff0ef          	jal	ra,802035ac <ppn_get_bytes_array>
-    8020362a:	fca43c23          	sd	a0,-40(s0)
+    uint8_t *src = &data[start];
+    8020367c:	fa843703          	ld	a4,-88(s0)
+    80203680:	fe843783          	ld	a5,-24(s0)
+    80203684:	97ba                	add	a5,a5,a4
+    80203686:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:176
-    uint64_t cpy_len = (len - start >= PAGE_SIZE) ? PAGE_SIZE : (len - start);
-    8020362e:	fa043703          	ld	a4,-96(s0)
-    80203632:	fe843783          	ld	a5,-24(s0)
-    80203636:	40f707b3          	sub	a5,a4,a5
-    8020363a:	6705                	lui	a4,0x1
-    8020363c:	00f77363          	bgeu	a4,a5,80203642 <map_area_copy_data+0x6e>
-    80203640:	6785                	lui	a5,0x1
-    80203642:	fcf43823          	sd	a5,-48(s0)
+    uint8_t *dst = ppn_get_bytes_array(tmp);
+    8020368a:	fc043503          	ld	a0,-64(s0)
+    8020368e:	f87ff0ef          	jal	ra,80203614 <ppn_get_bytes_array>
+    80203692:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:177
-    memcpy(dst, src, cpy_len);
-    80203646:	fd043783          	ld	a5,-48(s0)
-    8020364a:	2781                	sext.w	a5,a5
-    8020364c:	863e                	mv	a2,a5
-    8020364e:	fe043583          	ld	a1,-32(s0)
-    80203652:	fd843503          	ld	a0,-40(s0)
-    80203656:	894ff0ef          	jal	ra,802026ea <memcpy>
+    uint64_t cpy_len = (len - start >= PAGE_SIZE) ? PAGE_SIZE : (len - start);
+    80203696:	fa043703          	ld	a4,-96(s0)
+    8020369a:	fe843783          	ld	a5,-24(s0)
+    8020369e:	40f707b3          	sub	a5,a4,a5
+    802036a2:	6705                	lui	a4,0x1
+    802036a4:	00f77363          	bgeu	a4,a5,802036aa <map_area_copy_data+0x6e>
+    802036a8:	6785                	lui	a5,0x1
+    802036aa:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:178
-    start += PAGE_SIZE;
-    8020365a:	fe843703          	ld	a4,-24(s0)
-    8020365e:	6785                	lui	a5,0x1
-    80203660:	97ba                	add	a5,a5,a4
-    80203662:	fef43423          	sd	a5,-24(s0)
+    memcpy(dst, src, cpy_len);
+    802036ae:	fd043783          	ld	a5,-48(s0)
+    802036b2:	2781                	sext.w	a5,a5
+    802036b4:	863e                	mv	a2,a5
+    802036b6:	fe043583          	ld	a1,-32(s0)
+    802036ba:	fd843503          	ld	a0,-40(s0)
+    802036be:	82cff0ef          	jal	ra,802026ea <memcpy>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:179
+    start += PAGE_SIZE;
+    802036c2:	fe843703          	ld	a4,-24(s0)
+    802036c6:	6785                	lui	a5,0x1
+    802036c8:	97ba                	add	a5,a5,a4
+    802036ca:	fef43423          	sd	a5,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:180
     if (start >= len) {
-    80203666:	fe843703          	ld	a4,-24(s0)
-    8020366a:	fa043783          	ld	a5,-96(s0)
-    8020366e:	00f77863          	bgeu	a4,a5,8020367e <map_area_copy_data+0xaa>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:182
+    802036ce:	fe843703          	ld	a4,-24(s0)
+    802036d2:	fa043783          	ld	a5,-96(s0)
+    802036d6:	00f77863          	bgeu	a4,a5,802036e6 <map_area_copy_data+0xaa>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:183
       break;
     }
     current_vpn.num += 1;
-    80203672:	fc843783          	ld	a5,-56(s0)
-    80203676:	0785                	addi	a5,a5,1
-    80203678:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:171
+    802036da:	fc843783          	ld	a5,-56(s0)
+    802036de:	0785                	addi	a5,a5,1
+    802036e0:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:172
   for (;;) {
-    8020367c:	bfbd                	j	802035fa <map_area_copy_data+0x26>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:184
+    802036e4:	bfbd                	j	80203662 <map_area_copy_data+0x26>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:185
   }
 }
-    8020367e:	0001                	nop
-    80203680:	60e6                	ld	ra,88(sp)
-    80203682:	6446                	ld	s0,80(sp)
-    80203684:	6125                	addi	sp,sp,96
-    80203686:	8082                	ret
+    802036e6:	0001                	nop
+    802036e8:	60e6                	ld	ra,88(sp)
+    802036ea:	6446                	ld	s0,80(sp)
+    802036ec:	6125                	addi	sp,sp,96
+    802036ee:	8082                	ret
 
-0000000080203688 <memory_set_push_pro>:
+00000000802036f0 <memory_set_push_pro>:
 memory_set_push_pro():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:189
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:190
 
 
 void memory_set_push_pro(MemorySet *memory_set, MapArea *map_area,
                             uint8_t *data, uint64_t len)
 {
-    80203688:	7179                	addi	sp,sp,-48
-    8020368a:	f406                	sd	ra,40(sp)
-    8020368c:	f022                	sd	s0,32(sp)
-    8020368e:	1800                	addi	s0,sp,48
-    80203690:	fea43423          	sd	a0,-24(s0)
-    80203694:	feb43023          	sd	a1,-32(s0)
-    80203698:	fcc43c23          	sd	a2,-40(s0)
-    8020369c:	fcd43823          	sd	a3,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:190
-    map_area_map(map_area, &memory_set->page_table);
-    802036a0:	fe843783          	ld	a5,-24(s0)
-    802036a4:	85be                	mv	a1,a5
-    802036a6:	fe043503          	ld	a0,-32(s0)
-    802036aa:	99bff0ef          	jal	ra,80203044 <map_area_map>
+    802036f0:	7179                	addi	sp,sp,-48
+    802036f2:	f406                	sd	ra,40(sp)
+    802036f4:	f022                	sd	s0,32(sp)
+    802036f6:	1800                	addi	s0,sp,48
+    802036f8:	fea43423          	sd	a0,-24(s0)
+    802036fc:	feb43023          	sd	a1,-32(s0)
+    80203700:	fcc43c23          	sd	a2,-40(s0)
+    80203704:	fcd43823          	sd	a3,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:191
+    map_area_map(map_area, &memory_set->page_table);
+    80203708:	fe843783          	ld	a5,-24(s0)
+    8020370c:	85be                	mv	a1,a5
+    8020370e:	fe043503          	ld	a0,-32(s0)
+    80203712:	98bff0ef          	jal	ra,8020309c <map_area_map>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:192
     if (data && len >= 0) 
-    802036ae:	fd843783          	ld	a5,-40(s0)
-    802036b2:	cf81                	beqz	a5,802036ca <memory_set_push_pro+0x42>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:193
+    80203716:	fd843783          	ld	a5,-40(s0)
+    8020371a:	cf81                	beqz	a5,80203732 <memory_set_push_pro+0x42>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:194
     {
         map_area_copy_data(map_area, &memory_set->page_table, data, len);
-    802036b4:	fe843783          	ld	a5,-24(s0)
-    802036b8:	fd043683          	ld	a3,-48(s0)
-    802036bc:	fd843603          	ld	a2,-40(s0)
-    802036c0:	85be                	mv	a1,a5
-    802036c2:	fe043503          	ld	a0,-32(s0)
-    802036c6:	f0fff0ef          	jal	ra,802035d4 <map_area_copy_data>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:195
+    8020371c:	fe843783          	ld	a5,-24(s0)
+    80203720:	fd043683          	ld	a3,-48(s0)
+    80203724:	fd843603          	ld	a2,-40(s0)
+    80203728:	85be                	mv	a1,a5
+    8020372a:	fe043503          	ld	a0,-32(s0)
+    8020372e:	f0fff0ef          	jal	ra,8020363c <map_area_copy_data>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:196
     }
     vector_add(&memory_set->areas, map_area);
-    802036ca:	fe843783          	ld	a5,-24(s0)
-    802036ce:	02078793          	addi	a5,a5,32 # 1020 <n+0x1000>
-    802036d2:	fe043583          	ld	a1,-32(s0)
-    802036d6:	853e                	mv	a0,a5
-    802036d8:	189010ef          	jal	ra,80205060 <vector_add>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:196
+    80203732:	fe843783          	ld	a5,-24(s0)
+    80203736:	02078793          	addi	a5,a5,32 # 1020 <n+0x1000>
+    8020373a:	fe043583          	ld	a1,-32(s0)
+    8020373e:	853e                	mv	a0,a5
+    80203740:	203010ef          	jal	ra,80205142 <vector_add>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:197
 }
-    802036dc:	0001                	nop
-    802036de:	70a2                	ld	ra,40(sp)
-    802036e0:	7402                	ld	s0,32(sp)
-    802036e2:	6145                	addi	sp,sp,48
-    802036e4:	8082                	ret
+    80203744:	0001                	nop
+    80203746:	70a2                	ld	ra,40(sp)
+    80203748:	7402                	ld	s0,32(sp)
+    8020374a:	6145                	addi	sp,sp,48
+    8020374c:	8082                	ret
 
-00000000802036e6 <memory_set_from_elf>:
+000000008020374e <memory_set_from_elf>:
 memory_set_from_elf():
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:201
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:202
 
 
 void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,
                          size_t elf_size, uint64_t *user_sp,
                          uint64_t *entry_point) {
-    802036e6:	716d                	addi	sp,sp,-272
-    802036e8:	e606                	sd	ra,264(sp)
-    802036ea:	e222                	sd	s0,256(sp)
-    802036ec:	fda6                	sd	s1,248(sp)
-    802036ee:	0a00                	addi	s0,sp,272
-    802036f0:	81010113          	addi	sp,sp,-2032 # 80219810 <boot_stack_lower_bound+0xf810>
-    802036f4:	77fd                	lui	a5,0xfffff
-    802036f6:	fe040493          	addi	s1,s0,-32
-    802036fa:	97a6                	add	a5,a5,s1
-    802036fc:	74a7b423          	sd	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
-    80203700:	77fd                	lui	a5,0xfffff
-    80203702:	fe040513          	addi	a0,s0,-32
-    80203706:	97aa                	add	a5,a5,a0
-    80203708:	74b7b023          	sd	a1,1856(a5) # fffffffffffff740 <bss_end+0xffffffff7f594740>
-    8020370c:	77fd                	lui	a5,0xfffff
-    8020370e:	fe040593          	addi	a1,s0,-32
-    80203712:	97ae                	add	a5,a5,a1
-    80203714:	72c7bc23          	sd	a2,1848(a5) # fffffffffffff738 <bss_end+0xffffffff7f594738>
-    80203718:	77fd                	lui	a5,0xfffff
-    8020371a:	fe040613          	addi	a2,s0,-32
-    8020371e:	97b2                	add	a5,a5,a2
-    80203720:	72d7b823          	sd	a3,1840(a5) # fffffffffffff730 <bss_end+0xffffffff7f594730>
-    80203724:	77fd                	lui	a5,0xfffff
-    80203726:	fe040693          	addi	a3,s0,-32
-    8020372a:	97b6                	add	a5,a5,a3
-    8020372c:	72e7b423          	sd	a4,1832(a5) # fffffffffffff728 <bss_end+0xffffffff7f594728>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:202
+    8020374e:	716d                	addi	sp,sp,-272
+    80203750:	e606                	sd	ra,264(sp)
+    80203752:	e222                	sd	s0,256(sp)
+    80203754:	fda6                	sd	s1,248(sp)
+    80203756:	0a00                	addi	s0,sp,272
+    80203758:	81010113          	addi	sp,sp,-2032 # 80219810 <boot_stack_lower_bound+0xf810>
+    8020375c:	77fd                	lui	a5,0xfffff
+    8020375e:	fe040493          	addi	s1,s0,-32
+    80203762:	97a6                	add	a5,a5,s1
+    80203764:	74a7b423          	sd	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
+    80203768:	77fd                	lui	a5,0xfffff
+    8020376a:	fe040513          	addi	a0,s0,-32
+    8020376e:	97aa                	add	a5,a5,a0
+    80203770:	74b7b023          	sd	a1,1856(a5) # fffffffffffff740 <bss_end+0xffffffff7f594740>
+    80203774:	77fd                	lui	a5,0xfffff
+    80203776:	fe040593          	addi	a1,s0,-32
+    8020377a:	97ae                	add	a5,a5,a1
+    8020377c:	72c7bc23          	sd	a2,1848(a5) # fffffffffffff738 <bss_end+0xffffffff7f594738>
+    80203780:	77fd                	lui	a5,0xfffff
+    80203782:	fe040613          	addi	a2,s0,-32
+    80203786:	97b2                	add	a5,a5,a2
+    80203788:	72d7b823          	sd	a3,1840(a5) # fffffffffffff730 <bss_end+0xffffffff7f594730>
+    8020378c:	77fd                	lui	a5,0xfffff
+    8020378e:	fe040693          	addi	a3,s0,-32
+    80203792:	97b6                	add	a5,a5,a3
+    80203794:	72e7b423          	sd	a4,1832(a5) # fffffffffffff728 <bss_end+0xffffffff7f594728>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:203
   memory_set_new_bare(memory_set);
-    80203730:	77fd                	lui	a5,0xfffff
-    80203732:	fe040713          	addi	a4,s0,-32
-    80203736:	97ba                	add	a5,a5,a4
-    80203738:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
-    8020373c:	e31ff0ef          	jal	ra,8020356c <memory_set_new_bare>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:205
+    80203798:	77fd                	lui	a5,0xfffff
+    8020379a:	fe040713          	addi	a4,s0,-32
+    8020379e:	97ba                	add	a5,a5,a4
+    802037a0:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
+    802037a4:	e31ff0ef          	jal	ra,802035d4 <memory_set_new_bare>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:206
 
   // map trampoline
   memory_set_map_trampoline(memory_set);
-    80203740:	77fd                	lui	a5,0xfffff
-    80203742:	fe040713          	addi	a4,s0,-32
-    80203746:	97ba                	add	a5,a5,a4
-    80203748:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
-    8020374c:	ab1ff0ef          	jal	ra,802031fc <memory_set_map_trampoline>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:209
+    802037a8:	77fd                	lui	a5,0xfffff
+    802037aa:	fe040713          	addi	a4,s0,-32
+    802037ae:	97ba                	add	a5,a5,a4
+    802037b0:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
+    802037b4:	aa1ff0ef          	jal	ra,80203254 <memory_set_map_trampoline>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:210
 
   // map progam headers of elf, with U flag
   t_elf elf;
   int elf_load_ret = elf_load(elf_data, elf_size, &elf);
-    80203750:	77fd                	lui	a5,0xfffff
-    80203752:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    80203756:	fe040713          	addi	a4,s0,-32
-    8020375a:	00f706b3          	add	a3,a4,a5
-    8020375e:	77fd                	lui	a5,0xfffff
-    80203760:	fe040713          	addi	a4,s0,-32
-    80203764:	973e                	add	a4,a4,a5
-    80203766:	77fd                	lui	a5,0xfffff
-    80203768:	fe040613          	addi	a2,s0,-32
-    8020376c:	97b2                	add	a5,a5,a2
-    8020376e:	8636                	mv	a2,a3
-    80203770:	73873583          	ld	a1,1848(a4) # 1738 <n+0x1718>
-    80203774:	7407b503          	ld	a0,1856(a5) # fffffffffffff740 <bss_end+0xffffffff7f594740>
-    80203778:	f58fe0ef          	jal	ra,80201ed0 <elf_load>
-    8020377c:	87aa                	mv	a5,a0
-    8020377e:	fcf42a23          	sw	a5,-44(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:210
-  if (elf_load_ret != 0) {
-    80203782:	fd442783          	lw	a5,-44(s0)
-    80203786:	2781                	sext.w	a5,a5
-    80203788:	cf99                	beqz	a5,802037a6 <memory_set_from_elf+0xc0>
+    802037b8:	77fd                	lui	a5,0xfffff
+    802037ba:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    802037be:	fe040713          	addi	a4,s0,-32
+    802037c2:	00f706b3          	add	a3,a4,a5
+    802037c6:	77fd                	lui	a5,0xfffff
+    802037c8:	fe040713          	addi	a4,s0,-32
+    802037cc:	973e                	add	a4,a4,a5
+    802037ce:	77fd                	lui	a5,0xfffff
+    802037d0:	fe040613          	addi	a2,s0,-32
+    802037d4:	97b2                	add	a5,a5,a2
+    802037d6:	8636                	mv	a2,a3
+    802037d8:	73873583          	ld	a1,1848(a4) # 1738 <n+0x1718>
+    802037dc:	7407b503          	ld	a0,1856(a5) # fffffffffffff740 <bss_end+0xffffffff7f594740>
+    802037e0:	ef0fe0ef          	jal	ra,80201ed0 <elf_load>
+    802037e4:	87aa                	mv	a5,a0
+    802037e6:	fcf42a23          	sw	a5,-44(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:211
-    printk("Elf load error.\n");
-    8020378a:	00003517          	auipc	a0,0x3
-    8020378e:	a5e50513          	addi	a0,a0,-1442 # 802061e8 <rodata_start+0x1e8>
-    80203792:	858fe0ef          	jal	ra,802017ea <printk>
+  if (elf_load_ret != 0) {
+    802037ea:	fd442783          	lw	a5,-44(s0)
+    802037ee:	2781                	sext.w	a5,a5
+    802037f0:	cf99                	beqz	a5,8020380e <memory_set_from_elf+0xc0>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:212
+    printk("Elf load error.\n");
+    802037f2:	00003517          	auipc	a0,0x3
+    802037f6:	9f650513          	addi	a0,a0,-1546 # 802061e8 <rodata_start+0x1e8>
+    802037fa:	ff1fd0ef          	jal	ra,802017ea <printk>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:213
     ASSERT(0);
-    80203796:	0d400593          	li	a1,212
-    8020379a:	00003517          	auipc	a0,0x3
-    8020379e:	a2650513          	addi	a0,a0,-1498 # 802061c0 <rodata_start+0x1c0>
-    802037a2:	187000ef          	jal	ra,80204128 <panic>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:215
+    802037fe:	0d500593          	li	a1,213
+    80203802:	00003517          	auipc	a0,0x3
+    80203806:	9be50513          	addi	a0,a0,-1602 # 802061c0 <rodata_start+0x1c0>
+    8020380a:	17b000ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:216
   }
 
   size_t ph_count = elf_header_get_phnum(&elf);
-    802037a6:	77fd                	lui	a5,0xfffff
-    802037a8:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    802037ac:	fe040713          	addi	a4,s0,-32
-    802037b0:	97ba                	add	a5,a5,a4
-    802037b2:	853e                	mv	a0,a5
-    802037b4:	8edfe0ef          	jal	ra,802020a0 <elf_header_get_phnum>
-    802037b8:	fca43423          	sd	a0,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:221
+    8020380e:	77fd                	lui	a5,0xfffff
+    80203810:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    80203814:	fe040713          	addi	a4,s0,-32
+    80203818:	97ba                	add	a5,a5,a4
+    8020381a:	853e                	mv	a0,a5
+    8020381c:	885fe0ef          	jal	ra,802020a0 <elf_header_get_phnum>
+    80203820:	fca43423          	sd	a0,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:222
   VirtAddr start_va, end_va;
   MapPermission map_perm;
   uint64_t ph_flags;
   MapArea map_area;
   VirtPageNum max_end_vpn;
   max_end_vpn.num=0;
-    802037bc:	77fd                	lui	a5,0xfffff
-    802037be:	fe040713          	addi	a4,s0,-32
-    802037c2:	97ba                	add	a5,a5,a4
-    802037c4:	7607bc23          	sd	zero,1912(a5) # fffffffffffff778 <bss_end+0xffffffff7f594778>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:222
-  for (size_t i = 0; i < ph_count; i++) {
-    802037c8:	fc043c23          	sd	zero,-40(s0)
-    802037cc:	a2fd                	j	802039ba <memory_set_from_elf+0x2d4>
+    80203824:	77fd                	lui	a5,0xfffff
+    80203826:	fe040713          	addi	a4,s0,-32
+    8020382a:	97ba                	add	a5,a5,a4
+    8020382c:	7607bc23          	sd	zero,1912(a5) # fffffffffffff778 <bss_end+0xffffffff7f594778>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:223
-    t_elf_program *ph = &elf.programs[i];
-    802037ce:	77fd                	lui	a5,0xfffff
-    802037d0:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    802037d4:	fe040713          	addi	a4,s0,-32
-    802037d8:	973e                	add	a4,a4,a5
-    802037da:	fd843783          	ld	a5,-40(s0)
-    802037de:	04278793          	addi	a5,a5,66
-    802037e2:	0792                	slli	a5,a5,0x4
-    802037e4:	97ba                	add	a5,a5,a4
-    802037e6:	07a1                	addi	a5,a5,8
-    802037e8:	fcf43023          	sd	a5,-64(s0)
+  for (size_t i = 0; i < ph_count; i++) {
+    80203830:	fc043c23          	sd	zero,-40(s0)
+    80203834:	a2fd                	j	80203a22 <memory_set_from_elf+0x2d4>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:224
-    if (elf_program_get_type(&elf, ph) == PT_LOAD) {
-    802037ec:	77fd                	lui	a5,0xfffff
-    802037ee:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    802037f2:	fe040713          	addi	a4,s0,-32
-    802037f6:	97ba                	add	a5,a5,a4
-    802037f8:	fc043583          	ld	a1,-64(s0)
-    802037fc:	853e                	mv	a0,a5
-    802037fe:	c24fe0ef          	jal	ra,80201c22 <elf_program_get_type>
-    80203802:	87aa                	mv	a5,a0
-    80203804:	2781                	sext.w	a5,a5
-    80203806:	873e                	mv	a4,a5
-    80203808:	4785                	li	a5,1
-    8020380a:	1af71363          	bne	a4,a5,802039b0 <memory_set_from_elf+0x2ca>
+    t_elf_program *ph = &elf.programs[i];
+    80203836:	77fd                	lui	a5,0xfffff
+    80203838:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    8020383c:	fe040713          	addi	a4,s0,-32
+    80203840:	973e                	add	a4,a4,a5
+    80203842:	fd843783          	ld	a5,-40(s0)
+    80203846:	04278793          	addi	a5,a5,66
+    8020384a:	0792                	slli	a5,a5,0x4
+    8020384c:	97ba                	add	a5,a5,a4
+    8020384e:	07a1                	addi	a5,a5,8
+    80203850:	fcf43023          	sd	a5,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:225
-      start_va.addr = elf_program_get_vaddr(&elf, ph);
-    8020380e:	77fd                	lui	a5,0xfffff
-    80203810:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    80203814:	fe040713          	addi	a4,s0,-32
-    80203818:	97ba                	add	a5,a5,a4
-    8020381a:	fc043583          	ld	a1,-64(s0)
-    8020381e:	853e                	mv	a0,a5
-    80203820:	cdafe0ef          	jal	ra,80201cfa <elf_program_get_vaddr>
-    80203824:	872a                	mv	a4,a0
-    80203826:	77fd                	lui	a5,0xfffff
-    80203828:	fe040693          	addi	a3,s0,-32
-    8020382c:	97b6                	add	a5,a5,a3
-    8020382e:	7ae7b023          	sd	a4,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
+    if (elf_program_get_type(&elf, ph) == PT_LOAD) {
+    80203854:	77fd                	lui	a5,0xfffff
+    80203856:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    8020385a:	fe040713          	addi	a4,s0,-32
+    8020385e:	97ba                	add	a5,a5,a4
+    80203860:	fc043583          	ld	a1,-64(s0)
+    80203864:	853e                	mv	a0,a5
+    80203866:	bbcfe0ef          	jal	ra,80201c22 <elf_program_get_type>
+    8020386a:	87aa                	mv	a5,a0
+    8020386c:	2781                	sext.w	a5,a5
+    8020386e:	873e                	mv	a4,a5
+    80203870:	4785                	li	a5,1
+    80203872:	1af71363          	bne	a4,a5,80203a18 <memory_set_from_elf+0x2ca>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:226
-      end_va.addr = (start_va.addr + (uint64_t)elf_program_get_memsz(&elf, ph));
-    80203832:	77fd                	lui	a5,0xfffff
-    80203834:	fe040713          	addi	a4,s0,-32
-    80203838:	97ba                	add	a5,a5,a4
-    8020383a:	7a07b483          	ld	s1,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
-    8020383e:	77fd                	lui	a5,0xfffff
-    80203840:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    80203844:	fe040713          	addi	a4,s0,-32
-    80203848:	97ba                	add	a5,a5,a4
-    8020384a:	fc043583          	ld	a1,-64(s0)
-    8020384e:	853e                	mv	a0,a5
-    80203850:	cf2fe0ef          	jal	ra,80201d42 <elf_program_get_memsz>
-    80203854:	87aa                	mv	a5,a0
-    80203856:	00f48733          	add	a4,s1,a5
-    8020385a:	77fd                	lui	a5,0xfffff
-    8020385c:	fe040693          	addi	a3,s0,-32
-    80203860:	97b6                	add	a5,a5,a3
-    80203862:	78e7bc23          	sd	a4,1944(a5) # fffffffffffff798 <bss_end+0xffffffff7f594798>
+      start_va.addr = elf_program_get_vaddr(&elf, ph);
+    80203876:	77fd                	lui	a5,0xfffff
+    80203878:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    8020387c:	fe040713          	addi	a4,s0,-32
+    80203880:	97ba                	add	a5,a5,a4
+    80203882:	fc043583          	ld	a1,-64(s0)
+    80203886:	853e                	mv	a0,a5
+    80203888:	c72fe0ef          	jal	ra,80201cfa <elf_program_get_vaddr>
+    8020388c:	872a                	mv	a4,a0
+    8020388e:	77fd                	lui	a5,0xfffff
+    80203890:	fe040693          	addi	a3,s0,-32
+    80203894:	97b6                	add	a5,a5,a3
+    80203896:	7ae7b023          	sd	a4,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:227
-      map_perm = MAP_PERM_U;
-    80203866:	47c1                	li	a5,16
-    80203868:	faf42e23          	sw	a5,-68(s0)
+      end_va.addr = (start_va.addr + (uint64_t)elf_program_get_memsz(&elf, ph));
+    8020389a:	77fd                	lui	a5,0xfffff
+    8020389c:	fe040713          	addi	a4,s0,-32
+    802038a0:	97ba                	add	a5,a5,a4
+    802038a2:	7a07b483          	ld	s1,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
+    802038a6:	77fd                	lui	a5,0xfffff
+    802038a8:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    802038ac:	fe040713          	addi	a4,s0,-32
+    802038b0:	97ba                	add	a5,a5,a4
+    802038b2:	fc043583          	ld	a1,-64(s0)
+    802038b6:	853e                	mv	a0,a5
+    802038b8:	c8afe0ef          	jal	ra,80201d42 <elf_program_get_memsz>
+    802038bc:	87aa                	mv	a5,a0
+    802038be:	00f48733          	add	a4,s1,a5
+    802038c2:	77fd                	lui	a5,0xfffff
+    802038c4:	fe040693          	addi	a3,s0,-32
+    802038c8:	97b6                	add	a5,a5,a3
+    802038ca:	78e7bc23          	sd	a4,1944(a5) # fffffffffffff798 <bss_end+0xffffffff7f594798>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:228
+      map_perm = MAP_PERM_U;
+    802038ce:	47c1                	li	a5,16
+    802038d0:	faf42e23          	sw	a5,-68(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:229
       ph_flags = elf_program_get_flags(&elf, ph);
-    8020386c:	77fd                	lui	a5,0xfffff
-    8020386e:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    80203872:	fe040713          	addi	a4,s0,-32
-    80203876:	97ba                	add	a5,a5,a4
-    80203878:	fc043583          	ld	a1,-64(s0)
-    8020387c:	853e                	mv	a0,a5
-    8020387e:	c30fe0ef          	jal	ra,80201cae <elf_program_get_flags>
-    80203882:	faa43823          	sd	a0,-80(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:230
+    802038d4:	77fd                	lui	a5,0xfffff
+    802038d6:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    802038da:	fe040713          	addi	a4,s0,-32
+    802038de:	97ba                	add	a5,a5,a4
+    802038e0:	fc043583          	ld	a1,-64(s0)
+    802038e4:	853e                	mv	a0,a5
+    802038e6:	bc8fe0ef          	jal	ra,80201cae <elf_program_get_flags>
+    802038ea:	faa43823          	sd	a0,-80(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:231
       if (ph_flags | PF_R) {
         map_perm |= MAP_PERM_R;
-    80203886:	fbc42783          	lw	a5,-68(s0)
-    8020388a:	0027e793          	ori	a5,a5,2
-    8020388e:	faf42e23          	sw	a5,-68(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:233
+    802038ee:	fbc42783          	lw	a5,-68(s0)
+    802038f2:	0027e793          	ori	a5,a5,2
+    802038f6:	faf42e23          	sw	a5,-68(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:234
       }
       if (ph_flags | PF_W) {
         map_perm |= MAP_PERM_W;
-    80203892:	fbc42783          	lw	a5,-68(s0)
-    80203896:	0047e793          	ori	a5,a5,4
-    8020389a:	faf42e23          	sw	a5,-68(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:236
+    802038fa:	fbc42783          	lw	a5,-68(s0)
+    802038fe:	0047e793          	ori	a5,a5,4
+    80203902:	faf42e23          	sw	a5,-68(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:237
       }
       if (ph_flags | PF_X) {
         map_perm |= MAP_PERM_X;
-    8020389e:	fbc42783          	lw	a5,-68(s0)
-    802038a2:	0087e793          	ori	a5,a5,8
-    802038a6:	faf42e23          	sw	a5,-68(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:238
+    80203906:	fbc42783          	lw	a5,-68(s0)
+    8020390a:	0087e793          	ori	a5,a5,8
+    8020390e:	faf42e23          	sw	a5,-68(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:239
       }
       map_area.vpn_range.start_vpn = virt_addr_to_page_num(start_va,0);
-    802038aa:	77fd                	lui	a5,0xfffff
-    802038ac:	fe040713          	addi	a4,s0,-32
-    802038b0:	00f704b3          	add	s1,a4,a5
-    802038b4:	77fd                	lui	a5,0xfffff
-    802038b6:	fe040713          	addi	a4,s0,-32
-    802038ba:	97ba                	add	a5,a5,a4
-    802038bc:	4581                	li	a1,0
-    802038be:	7a07b503          	ld	a0,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
-    802038c2:	490000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    802038c6:	78a4b023          	sd	a0,1920(s1)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:239
-      map_area.vpn_range.size = virt_addr_to_page_num(start_va,0).num-virt_addr_to_page_num(end_va,1).num+1;
-    802038ca:	77fd                	lui	a5,0xfffff
-    802038cc:	fe040713          	addi	a4,s0,-32
-    802038d0:	97ba                	add	a5,a5,a4
-    802038d2:	4581                	li	a1,0
-    802038d4:	7a07b503          	ld	a0,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
-    802038d8:	47a000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    802038dc:	87aa                	mv	a5,a0
-    802038de:	84be                	mv	s1,a5
-    802038e0:	77fd                	lui	a5,0xfffff
-    802038e2:	fe040713          	addi	a4,s0,-32
-    802038e6:	97ba                	add	a5,a5,a4
-    802038e8:	4585                	li	a1,1
-    802038ea:	7987b503          	ld	a0,1944(a5) # fffffffffffff798 <bss_end+0xffffffff7f594798>
-    802038ee:	464000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    802038f2:	87aa                	mv	a5,a0
-    802038f4:	40f487b3          	sub	a5,s1,a5
-    802038f8:	00178713          	addi	a4,a5,1
-    802038fc:	77fd                	lui	a5,0xfffff
-    802038fe:	fe040693          	addi	a3,s0,-32
-    80203902:	97b6                	add	a5,a5,a3
-    80203904:	78e7b423          	sd	a4,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
+    80203912:	77fd                	lui	a5,0xfffff
+    80203914:	fe040713          	addi	a4,s0,-32
+    80203918:	00f704b3          	add	s1,a4,a5
+    8020391c:	77fd                	lui	a5,0xfffff
+    8020391e:	fe040713          	addi	a4,s0,-32
+    80203922:	97ba                	add	a5,a5,a4
+    80203924:	4581                	li	a1,0
+    80203926:	7a07b503          	ld	a0,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
+    8020392a:	484000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    8020392e:	78a4b023          	sd	a0,1920(s1)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:240
-      map_area.map_type = MAP_FRAMED;
-    80203908:	77fd                	lui	a5,0xfffff
-    8020390a:	fe040713          	addi	a4,s0,-32
-    8020390e:	97ba                	add	a5,a5,a4
-    80203910:	4705                	li	a4,1
-    80203912:	78e7a823          	sw	a4,1936(a5) # fffffffffffff790 <bss_end+0xffffffff7f594790>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:241
-      map_area.map_premission = map_perm;
-    80203916:	77fd                	lui	a5,0xfffff
-    80203918:	fe040713          	addi	a4,s0,-32
-    8020391c:	97ba                	add	a5,a5,a4
-    8020391e:	fbc42703          	lw	a4,-68(s0)
-    80203922:	78e7aa23          	sw	a4,1940(a5) # fffffffffffff794 <bss_end+0xffffffff7f594794>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:242
-      max_end_vpn.num = map_area.vpn_range.start_vpn.num + map_area.vpn_range.size-1;
-    80203926:	77fd                	lui	a5,0xfffff
-    80203928:	fe040713          	addi	a4,s0,-32
-    8020392c:	97ba                	add	a5,a5,a4
-    8020392e:	7807b703          	ld	a4,1920(a5) # fffffffffffff780 <bss_end+0xffffffff7f594780>
+      map_area.vpn_range.size = virt_addr_to_page_num(start_va,0).num-virt_addr_to_page_num(end_va,1).num+1;
     80203932:	77fd                	lui	a5,0xfffff
-    80203934:	fe040693          	addi	a3,s0,-32
-    80203938:	97b6                	add	a5,a5,a3
-    8020393a:	7887b783          	ld	a5,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
-    8020393e:	97ba                	add	a5,a5,a4
-    80203940:	fff78713          	addi	a4,a5,-1
-    80203944:	77fd                	lui	a5,0xfffff
-    80203946:	fe040693          	addi	a3,s0,-32
-    8020394a:	97b6                	add	a5,a5,a3
-    8020394c:	76e7bc23          	sd	a4,1912(a5) # fffffffffffff778 <bss_end+0xffffffff7f594778>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:244
+    80203934:	fe040713          	addi	a4,s0,-32
+    80203938:	97ba                	add	a5,a5,a4
+    8020393a:	4581                	li	a1,0
+    8020393c:	7a07b503          	ld	a0,1952(a5) # fffffffffffff7a0 <bss_end+0xffffffff7f5947a0>
+    80203940:	46e000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203944:	87aa                	mv	a5,a0
+    80203946:	84be                	mv	s1,a5
+    80203948:	77fd                	lui	a5,0xfffff
+    8020394a:	fe040713          	addi	a4,s0,-32
+    8020394e:	97ba                	add	a5,a5,a4
+    80203950:	4585                	li	a1,1
+    80203952:	7987b503          	ld	a0,1944(a5) # fffffffffffff798 <bss_end+0xffffffff7f594798>
+    80203956:	458000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    8020395a:	87aa                	mv	a5,a0
+    8020395c:	40f487b3          	sub	a5,s1,a5
+    80203960:	00178713          	addi	a4,a5,1
+    80203964:	77fd                	lui	a5,0xfffff
+    80203966:	fe040693          	addi	a3,s0,-32
+    8020396a:	97b6                	add	a5,a5,a3
+    8020396c:	78e7b423          	sd	a4,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:241
+      map_area.map_type = MAP_FRAMED;
+    80203970:	77fd                	lui	a5,0xfffff
+    80203972:	fe040713          	addi	a4,s0,-32
+    80203976:	97ba                	add	a5,a5,a4
+    80203978:	4705                	li	a4,1
+    8020397a:	78e7a823          	sw	a4,1936(a5) # fffffffffffff790 <bss_end+0xffffffff7f594790>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:242
+      map_area.map_premission = map_perm;
+    8020397e:	77fd                	lui	a5,0xfffff
+    80203980:	fe040713          	addi	a4,s0,-32
+    80203984:	97ba                	add	a5,a5,a4
+    80203986:	fbc42703          	lw	a4,-68(s0)
+    8020398a:	78e7aa23          	sw	a4,1940(a5) # fffffffffffff794 <bss_end+0xffffffff7f594794>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:243
+      max_end_vpn.num = map_area.vpn_range.start_vpn.num + map_area.vpn_range.size-1;
+    8020398e:	77fd                	lui	a5,0xfffff
+    80203990:	fe040713          	addi	a4,s0,-32
+    80203994:	97ba                	add	a5,a5,a4
+    80203996:	7807b703          	ld	a4,1920(a5) # fffffffffffff780 <bss_end+0xffffffff7f594780>
+    8020399a:	77fd                	lui	a5,0xfffff
+    8020399c:	fe040693          	addi	a3,s0,-32
+    802039a0:	97b6                	add	a5,a5,a3
+    802039a2:	7887b783          	ld	a5,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
+    802039a6:	97ba                	add	a5,a5,a4
+    802039a8:	fff78713          	addi	a4,a5,-1
+    802039ac:	77fd                	lui	a5,0xfffff
+    802039ae:	fe040693          	addi	a3,s0,-32
+    802039b2:	97b6                	add	a5,a5,a3
+    802039b4:	76e7bc23          	sd	a4,1912(a5) # fffffffffffff778 <bss_end+0xffffffff7f594778>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:245
       memory_set_push_pro(memory_set, &map_area,
                       elf_data + elf_program_get_offset(&elf, ph),
-    80203950:	77fd                	lui	a5,0xfffff
-    80203952:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    80203956:	fe040713          	addi	a4,s0,-32
-    8020395a:	97ba                	add	a5,a5,a4
-    8020395c:	fc043583          	ld	a1,-64(s0)
-    80203960:	853e                	mv	a0,a5
-    80203962:	b04fe0ef          	jal	ra,80201c66 <elf_program_get_offset>
-    80203966:	872a                	mv	a4,a0
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:243
+    802039b8:	77fd                	lui	a5,0xfffff
+    802039ba:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    802039be:	fe040713          	addi	a4,s0,-32
+    802039c2:	97ba                	add	a5,a5,a4
+    802039c4:	fc043583          	ld	a1,-64(s0)
+    802039c8:	853e                	mv	a0,a5
+    802039ca:	a9cfe0ef          	jal	ra,80201c66 <elf_program_get_offset>
+    802039ce:	872a                	mv	a4,a0
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:244
       memory_set_push_pro(memory_set, &map_area,
-    80203968:	77fd                	lui	a5,0xfffff
-    8020396a:	fe040693          	addi	a3,s0,-32
-    8020396e:	97b6                	add	a5,a5,a3
-    80203970:	7407b783          	ld	a5,1856(a5) # fffffffffffff740 <bss_end+0xffffffff7f594740>
-    80203974:	00e784b3          	add	s1,a5,a4
-    80203978:	77fd                	lui	a5,0xfffff
-    8020397a:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    8020397e:	fe040713          	addi	a4,s0,-32
-    80203982:	97ba                	add	a5,a5,a4
-    80203984:	fc043583          	ld	a1,-64(s0)
-    80203988:	853e                	mv	a0,a5
-    8020398a:	c00fe0ef          	jal	ra,80201d8a <elf_program_get_filesz>
-    8020398e:	86aa                	mv	a3,a0
-    80203990:	77fd                	lui	a5,0xfffff
-    80203992:	78078793          	addi	a5,a5,1920 # fffffffffffff780 <bss_end+0xffffffff7f594780>
-    80203996:	fe040713          	addi	a4,s0,-32
-    8020399a:	973e                	add	a4,a4,a5
-    8020399c:	77fd                	lui	a5,0xfffff
-    8020399e:	fe040613          	addi	a2,s0,-32
-    802039a2:	97b2                	add	a5,a5,a2
-    802039a4:	8626                	mv	a2,s1
-    802039a6:	85ba                	mv	a1,a4
-    802039a8:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
-    802039ac:	cddff0ef          	jal	ra,80203688 <memory_set_push_pro>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:222 (discriminator 2)
+    802039d0:	77fd                	lui	a5,0xfffff
+    802039d2:	fe040693          	addi	a3,s0,-32
+    802039d6:	97b6                	add	a5,a5,a3
+    802039d8:	7407b783          	ld	a5,1856(a5) # fffffffffffff740 <bss_end+0xffffffff7f594740>
+    802039dc:	00e784b3          	add	s1,a5,a4
+    802039e0:	77fd                	lui	a5,0xfffff
+    802039e2:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    802039e6:	fe040713          	addi	a4,s0,-32
+    802039ea:	97ba                	add	a5,a5,a4
+    802039ec:	fc043583          	ld	a1,-64(s0)
+    802039f0:	853e                	mv	a0,a5
+    802039f2:	b98fe0ef          	jal	ra,80201d8a <elf_program_get_filesz>
+    802039f6:	86aa                	mv	a3,a0
+    802039f8:	77fd                	lui	a5,0xfffff
+    802039fa:	78078793          	addi	a5,a5,1920 # fffffffffffff780 <bss_end+0xffffffff7f594780>
+    802039fe:	fe040713          	addi	a4,s0,-32
+    80203a02:	973e                	add	a4,a4,a5
+    80203a04:	77fd                	lui	a5,0xfffff
+    80203a06:	fe040613          	addi	a2,s0,-32
+    80203a0a:	97b2                	add	a5,a5,a2
+    80203a0c:	8626                	mv	a2,s1
+    80203a0e:	85ba                	mv	a1,a4
+    80203a10:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
+    80203a14:	cddff0ef          	jal	ra,802036f0 <memory_set_push_pro>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:223 (discriminator 2)
   for (size_t i = 0; i < ph_count; i++) {
-    802039b0:	fd843783          	ld	a5,-40(s0)
-    802039b4:	0785                	addi	a5,a5,1
-    802039b6:	fcf43c23          	sd	a5,-40(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:222 (discriminator 1)
-    802039ba:	fd843703          	ld	a4,-40(s0)
-    802039be:	fc843783          	ld	a5,-56(s0)
-    802039c2:	e0f766e3          	bltu	a4,a5,802037ce <memory_set_from_elf+0xe8>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:250
+    80203a18:	fd843783          	ld	a5,-40(s0)
+    80203a1c:	0785                	addi	a5,a5,1
+    80203a1e:	fcf43c23          	sd	a5,-40(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:223 (discriminator 1)
+    80203a22:	fd843703          	ld	a4,-40(s0)
+    80203a26:	fc843783          	ld	a5,-56(s0)
+    80203a2a:	e0f766e3          	bltu	a4,a5,80203836 <memory_set_from_elf+0xe8>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:251
                       elf_program_get_filesz(&elf, ph));
     }
   }
 
   // map user stack with U flags
   VirtAddr max_end_va = virt_page_num_to_addr(max_end_vpn);
-    802039c6:	77fd                	lui	a5,0xfffff
-    802039c8:	fe040713          	addi	a4,s0,-32
-    802039cc:	97ba                	add	a5,a5,a4
-    802039ce:	7787b503          	ld	a0,1912(a5) # fffffffffffff778 <bss_end+0xffffffff7f594778>
-    802039d2:	3c0000ef          	jal	ra,80203d92 <virt_page_num_to_addr>
-    802039d6:	872a                	mv	a4,a0
-    802039d8:	77fd                	lui	a5,0xfffff
-    802039da:	fe040693          	addi	a3,s0,-32
-    802039de:	97b6                	add	a5,a5,a3
-    802039e0:	76e7b823          	sd	a4,1904(a5) # fffffffffffff770 <bss_end+0xffffffff7f594770>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:251
+    80203a2e:	77fd                	lui	a5,0xfffff
+    80203a30:	fe040713          	addi	a4,s0,-32
+    80203a34:	97ba                	add	a5,a5,a4
+    80203a36:	7787b503          	ld	a0,1912(a5) # fffffffffffff778 <bss_end+0xffffffff7f594778>
+    80203a3a:	3b4000ef          	jal	ra,80203dee <virt_page_num_to_addr>
+    80203a3e:	872a                	mv	a4,a0
+    80203a40:	77fd                	lui	a5,0xfffff
+    80203a42:	fe040693          	addi	a3,s0,-32
+    80203a46:	97b6                	add	a5,a5,a3
+    80203a48:	76e7b823          	sd	a4,1904(a5) # fffffffffffff770 <bss_end+0xffffffff7f594770>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:252
   VirtAddr user_stack_bottom = max_end_va;
-    802039e4:	77fd                	lui	a5,0xfffff
-    802039e6:	fe040713          	addi	a4,s0,-32
-    802039ea:	97ba                	add	a5,a5,a4
-    802039ec:	777d                	lui	a4,0xfffff
-    802039ee:	fe040693          	addi	a3,s0,-32
-    802039f2:	9736                	add	a4,a4,a3
-    802039f4:	77073703          	ld	a4,1904(a4) # fffffffffffff770 <bss_end+0xffffffff7f594770>
-    802039f8:	76e7b423          	sd	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:253
+    80203a4c:	77fd                	lui	a5,0xfffff
+    80203a4e:	fe040713          	addi	a4,s0,-32
+    80203a52:	97ba                	add	a5,a5,a4
+    80203a54:	777d                	lui	a4,0xfffff
+    80203a56:	fe040693          	addi	a3,s0,-32
+    80203a5a:	9736                	add	a4,a4,a3
+    80203a5c:	77073703          	ld	a4,1904(a4) # fffffffffffff770 <bss_end+0xffffffff7f594770>
+    80203a60:	76e7b423          	sd	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:254
   // guard page
   user_stack_bottom.addr += PAGE_SIZE;
-    802039fc:	77fd                	lui	a5,0xfffff
-    802039fe:	fe040713          	addi	a4,s0,-32
-    80203a02:	97ba                	add	a5,a5,a4
-    80203a04:	7687b703          	ld	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
-    80203a08:	6785                	lui	a5,0x1
-    80203a0a:	973e                	add	a4,a4,a5
-    80203a0c:	77fd                	lui	a5,0xfffff
-    80203a0e:	fe040693          	addi	a3,s0,-32
-    80203a12:	97b6                	add	a5,a5,a3
-    80203a14:	76e7b423          	sd	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:255
+    80203a64:	77fd                	lui	a5,0xfffff
+    80203a66:	fe040713          	addi	a4,s0,-32
+    80203a6a:	97ba                	add	a5,a5,a4
+    80203a6c:	7687b703          	ld	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
+    80203a70:	6785                	lui	a5,0x1
+    80203a72:	973e                	add	a4,a4,a5
+    80203a74:	77fd                	lui	a5,0xfffff
+    80203a76:	fe040693          	addi	a3,s0,-32
+    80203a7a:	97b6                	add	a5,a5,a3
+    80203a7c:	76e7b423          	sd	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:256
   VirtAddr user_stack_top;
   user_stack_top.addr = user_stack_bottom.addr + USER_STACK_SIZE;
-    80203a18:	77fd                	lui	a5,0xfffff
-    80203a1a:	fe040713          	addi	a4,s0,-32
-    80203a1e:	97ba                	add	a5,a5,a4
-    80203a20:	7687b703          	ld	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
-    80203a24:	6789                	lui	a5,0x2
-    80203a26:	973e                	add	a4,a4,a5
-    80203a28:	77fd                	lui	a5,0xfffff
-    80203a2a:	fe040693          	addi	a3,s0,-32
-    80203a2e:	97b6                	add	a5,a5,a3
-    80203a30:	76e7b023          	sd	a4,1888(a5) # fffffffffffff760 <bss_end+0xffffffff7f594760>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:256
-  map_area.vpn_range.start_vpn = virt_addr_to_page_num(user_stack_bottom,0);
-    80203a34:	77fd                	lui	a5,0xfffff
-    80203a36:	fe040713          	addi	a4,s0,-32
-    80203a3a:	00f704b3          	add	s1,a4,a5
-    80203a3e:	77fd                	lui	a5,0xfffff
-    80203a40:	fe040713          	addi	a4,s0,-32
-    80203a44:	97ba                	add	a5,a5,a4
-    80203a46:	4581                	li	a1,0
-    80203a48:	7687b503          	ld	a0,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
-    80203a4c:	306000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203a50:	78a4b023          	sd	a0,1920(s1)
+    80203a80:	77fd                	lui	a5,0xfffff
+    80203a82:	fe040713          	addi	a4,s0,-32
+    80203a86:	97ba                	add	a5,a5,a4
+    80203a88:	7687b703          	ld	a4,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
+    80203a8c:	6789                	lui	a5,0x2
+    80203a8e:	973e                	add	a4,a4,a5
+    80203a90:	77fd                	lui	a5,0xfffff
+    80203a92:	fe040693          	addi	a3,s0,-32
+    80203a96:	97b6                	add	a5,a5,a3
+    80203a98:	76e7b023          	sd	a4,1888(a5) # fffffffffffff760 <bss_end+0xffffffff7f594760>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:257
-  map_area.vpn_range.size = virt_addr_to_page_num(user_stack_top,1).num - map_area.vpn_range.start_vpn.num+1;
-    80203a54:	77fd                	lui	a5,0xfffff
-    80203a56:	fe040713          	addi	a4,s0,-32
-    80203a5a:	97ba                	add	a5,a5,a4
-    80203a5c:	4585                	li	a1,1
-    80203a5e:	7607b503          	ld	a0,1888(a5) # fffffffffffff760 <bss_end+0xffffffff7f594760>
-    80203a62:	2f0000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203a66:	87aa                	mv	a5,a0
-    80203a68:	873e                	mv	a4,a5
-    80203a6a:	77fd                	lui	a5,0xfffff
-    80203a6c:	fe040693          	addi	a3,s0,-32
-    80203a70:	97b6                	add	a5,a5,a3
-    80203a72:	7807b783          	ld	a5,1920(a5) # fffffffffffff780 <bss_end+0xffffffff7f594780>
-    80203a76:	40f707b3          	sub	a5,a4,a5
-    80203a7a:	00178713          	addi	a4,a5,1
-    80203a7e:	77fd                	lui	a5,0xfffff
-    80203a80:	fe040693          	addi	a3,s0,-32
-    80203a84:	97b6                	add	a5,a5,a3
-    80203a86:	78e7b423          	sd	a4,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:258
-  map_area.map_type = MAP_FRAMED;
-    80203a8a:	77fd                	lui	a5,0xfffff
-    80203a8c:	fe040713          	addi	a4,s0,-32
-    80203a90:	97ba                	add	a5,a5,a4
-    80203a92:	4705                	li	a4,1
-    80203a94:	78e7a823          	sw	a4,1936(a5) # fffffffffffff790 <bss_end+0xffffffff7f594790>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:259
-  map_area.map_premission = MAP_PERM_R | MAP_PERM_W | MAP_PERM_U;
-    80203a98:	77fd                	lui	a5,0xfffff
-    80203a9a:	fe040713          	addi	a4,s0,-32
-    80203a9e:	97ba                	add	a5,a5,a4
-    80203aa0:	4759                	li	a4,22
-    80203aa2:	78e7aa23          	sw	a4,1940(a5) # fffffffffffff794 <bss_end+0xffffffff7f594794>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:260
-  memory_set_push(memory_set, &map_area);
+  map_area.vpn_range.start_vpn = virt_addr_to_page_num(user_stack_bottom,0);
+    80203a9c:	77fd                	lui	a5,0xfffff
+    80203a9e:	fe040713          	addi	a4,s0,-32
+    80203aa2:	00f704b3          	add	s1,a4,a5
     80203aa6:	77fd                	lui	a5,0xfffff
-    80203aa8:	78078793          	addi	a5,a5,1920 # fffffffffffff780 <bss_end+0xffffffff7f594780>
-    80203aac:	fe040713          	addi	a4,s0,-32
-    80203ab0:	973e                	add	a4,a4,a5
-    80203ab2:	77fd                	lui	a5,0xfffff
-    80203ab4:	fe040693          	addi	a3,s0,-32
-    80203ab8:	97b6                	add	a5,a5,a3
-    80203aba:	85ba                	mv	a1,a4
-    80203abc:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
-    80203ac0:	e64ff0ef          	jal	ra,80203124 <memory_set_push>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:262
+    80203aa8:	fe040713          	addi	a4,s0,-32
+    80203aac:	97ba                	add	a5,a5,a4
+    80203aae:	4581                	li	a1,0
+    80203ab0:	7687b503          	ld	a0,1896(a5) # fffffffffffff768 <bss_end+0xffffffff7f594768>
+    80203ab4:	2fa000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203ab8:	78a4b023          	sd	a0,1920(s1)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:258
+  map_area.vpn_range.size = virt_addr_to_page_num(user_stack_top,1).num - map_area.vpn_range.start_vpn.num+1;
+    80203abc:	77fd                	lui	a5,0xfffff
+    80203abe:	fe040713          	addi	a4,s0,-32
+    80203ac2:	97ba                	add	a5,a5,a4
+    80203ac4:	4585                	li	a1,1
+    80203ac6:	7607b503          	ld	a0,1888(a5) # fffffffffffff760 <bss_end+0xffffffff7f594760>
+    80203aca:	2e4000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203ace:	87aa                	mv	a5,a0
+    80203ad0:	873e                	mv	a4,a5
+    80203ad2:	77fd                	lui	a5,0xfffff
+    80203ad4:	fe040693          	addi	a3,s0,-32
+    80203ad8:	97b6                	add	a5,a5,a3
+    80203ada:	7807b783          	ld	a5,1920(a5) # fffffffffffff780 <bss_end+0xffffffff7f594780>
+    80203ade:	40f707b3          	sub	a5,a4,a5
+    80203ae2:	00178713          	addi	a4,a5,1
+    80203ae6:	77fd                	lui	a5,0xfffff
+    80203ae8:	fe040693          	addi	a3,s0,-32
+    80203aec:	97b6                	add	a5,a5,a3
+    80203aee:	78e7b423          	sd	a4,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:259
+  map_area.map_type = MAP_FRAMED;
+    80203af2:	77fd                	lui	a5,0xfffff
+    80203af4:	fe040713          	addi	a4,s0,-32
+    80203af8:	97ba                	add	a5,a5,a4
+    80203afa:	4705                	li	a4,1
+    80203afc:	78e7a823          	sw	a4,1936(a5) # fffffffffffff790 <bss_end+0xffffffff7f594790>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:260
+  map_area.map_premission = MAP_PERM_R | MAP_PERM_W | MAP_PERM_U;
+    80203b00:	77fd                	lui	a5,0xfffff
+    80203b02:	fe040713          	addi	a4,s0,-32
+    80203b06:	97ba                	add	a5,a5,a4
+    80203b08:	4759                	li	a4,22
+    80203b0a:	78e7aa23          	sw	a4,1940(a5) # fffffffffffff794 <bss_end+0xffffffff7f594794>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:261
+  memory_set_push(memory_set, &map_area);
+    80203b0e:	77fd                	lui	a5,0xfffff
+    80203b10:	78078793          	addi	a5,a5,1920 # fffffffffffff780 <bss_end+0xffffffff7f594780>
+    80203b14:	fe040713          	addi	a4,s0,-32
+    80203b18:	973e                	add	a4,a4,a5
+    80203b1a:	77fd                	lui	a5,0xfffff
+    80203b1c:	fe040693          	addi	a3,s0,-32
+    80203b20:	97b6                	add	a5,a5,a3
+    80203b22:	85ba                	mv	a1,a4
+    80203b24:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
+    80203b28:	e54ff0ef          	jal	ra,8020317c <memory_set_push>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:263
     VirtAddr t2;
     t2.addr = TRAP_CONTEXT;
-    80203ac4:	77fd                	lui	a5,0xfffff
-    80203ac6:	fe040713          	addi	a4,s0,-32
-    80203aca:	97ba                	add	a5,a5,a4
-    80203acc:	04000737          	lui	a4,0x4000
-    80203ad0:	177d                	addi	a4,a4,-1
-    80203ad2:	0736                	slli	a4,a4,0xd
-    80203ad4:	74e7bc23          	sd	a4,1880(a5) # fffffffffffff758 <bss_end+0xffffffff7f594758>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:264
+    80203b2c:	77fd                	lui	a5,0xfffff
+    80203b2e:	fe040713          	addi	a4,s0,-32
+    80203b32:	97ba                	add	a5,a5,a4
+    80203b34:	7779                	lui	a4,0xffffe
+    80203b36:	74e7bc23          	sd	a4,1880(a5) # fffffffffffff758 <bss_end+0xffffffff7f594758>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:265
   // map TrapContext
   map_area.vpn_range.start_vpn = virt_addr_to_page_num(t2,0);
-    80203ad8:	77fd                	lui	a5,0xfffff
-    80203ada:	fe040713          	addi	a4,s0,-32
-    80203ade:	00f704b3          	add	s1,a4,a5
-    80203ae2:	77fd                	lui	a5,0xfffff
-    80203ae4:	fe040713          	addi	a4,s0,-32
-    80203ae8:	97ba                	add	a5,a5,a4
-    80203aea:	4581                	li	a1,0
-    80203aec:	7587b503          	ld	a0,1880(a5) # fffffffffffff758 <bss_end+0xffffffff7f594758>
-    80203af0:	262000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203af4:	78a4b023          	sd	a0,1920(s1)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:266
+    80203b3a:	77fd                	lui	a5,0xfffff
+    80203b3c:	fe040713          	addi	a4,s0,-32
+    80203b40:	00f704b3          	add	s1,a4,a5
+    80203b44:	77fd                	lui	a5,0xfffff
+    80203b46:	fe040713          	addi	a4,s0,-32
+    80203b4a:	97ba                	add	a5,a5,a4
+    80203b4c:	4581                	li	a1,0
+    80203b4e:	7587b503          	ld	a0,1880(a5) # fffffffffffff758 <bss_end+0xffffffff7f594758>
+    80203b52:	25c000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203b56:	78a4b023          	sd	a0,1920(s1)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:267
   VirtAddr t1;
   t1.addr = TRAMPOLINE;
-    80203af8:	77fd                	lui	a5,0xfffff
-    80203afa:	fe040713          	addi	a4,s0,-32
-    80203afe:	97ba                	add	a5,a5,a4
-    80203b00:	08000737          	lui	a4,0x8000
-    80203b04:	177d                	addi	a4,a4,-1
-    80203b06:	0732                	slli	a4,a4,0xc
-    80203b08:	74e7b823          	sd	a4,1872(a5) # fffffffffffff750 <bss_end+0xffffffff7f594750>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:267
-  map_area.vpn_range.size = virt_addr_to_page_num(t1,1).num - map_area.vpn_range.start_vpn.num + 1;
-    80203b0c:	77fd                	lui	a5,0xfffff
-    80203b0e:	fe040713          	addi	a4,s0,-32
-    80203b12:	97ba                	add	a5,a5,a4
-    80203b14:	4585                	li	a1,1
-    80203b16:	7507b503          	ld	a0,1872(a5) # fffffffffffff750 <bss_end+0xffffffff7f594750>
-    80203b1a:	238000ef          	jal	ra,80203d52 <virt_addr_to_page_num>
-    80203b1e:	87aa                	mv	a5,a0
-    80203b20:	873e                	mv	a4,a5
-    80203b22:	77fd                	lui	a5,0xfffff
-    80203b24:	fe040693          	addi	a3,s0,-32
-    80203b28:	97b6                	add	a5,a5,a3
-    80203b2a:	7807b783          	ld	a5,1920(a5) # fffffffffffff780 <bss_end+0xffffffff7f594780>
-    80203b2e:	40f707b3          	sub	a5,a4,a5
-    80203b32:	00178713          	addi	a4,a5,1
-    80203b36:	77fd                	lui	a5,0xfffff
-    80203b38:	fe040693          	addi	a3,s0,-32
-    80203b3c:	97b6                	add	a5,a5,a3
-    80203b3e:	78e7b423          	sd	a4,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
+    80203b5a:	77fd                	lui	a5,0xfffff
+    80203b5c:	fe040713          	addi	a4,s0,-32
+    80203b60:	97ba                	add	a5,a5,a4
+    80203b62:	777d                	lui	a4,0xfffff
+    80203b64:	74e7b823          	sd	a4,1872(a5) # fffffffffffff750 <bss_end+0xffffffff7f594750>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:268
-  map_area.map_type = MAP_FRAMED;
-    80203b42:	77fd                	lui	a5,0xfffff
-    80203b44:	fe040713          	addi	a4,s0,-32
-    80203b48:	97ba                	add	a5,a5,a4
-    80203b4a:	4705                	li	a4,1
-    80203b4c:	78e7a823          	sw	a4,1936(a5) # fffffffffffff790 <bss_end+0xffffffff7f594790>
+  map_area.vpn_range.size = virt_addr_to_page_num(t1,1).num - map_area.vpn_range.start_vpn.num + 1;
+    80203b68:	77fd                	lui	a5,0xfffff
+    80203b6a:	fe040713          	addi	a4,s0,-32
+    80203b6e:	97ba                	add	a5,a5,a4
+    80203b70:	4585                	li	a1,1
+    80203b72:	7507b503          	ld	a0,1872(a5) # fffffffffffff750 <bss_end+0xffffffff7f594750>
+    80203b76:	238000ef          	jal	ra,80203dae <virt_addr_to_page_num>
+    80203b7a:	87aa                	mv	a5,a0
+    80203b7c:	873e                	mv	a4,a5
+    80203b7e:	77fd                	lui	a5,0xfffff
+    80203b80:	fe040693          	addi	a3,s0,-32
+    80203b84:	97b6                	add	a5,a5,a3
+    80203b86:	7807b783          	ld	a5,1920(a5) # fffffffffffff780 <bss_end+0xffffffff7f594780>
+    80203b8a:	40f707b3          	sub	a5,a4,a5
+    80203b8e:	00178713          	addi	a4,a5,1
+    80203b92:	77fd                	lui	a5,0xfffff
+    80203b94:	fe040693          	addi	a3,s0,-32
+    80203b98:	97b6                	add	a5,a5,a3
+    80203b9a:	78e7b423          	sd	a4,1928(a5) # fffffffffffff788 <bss_end+0xffffffff7f594788>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:269
-  map_area.map_premission = MAP_PERM_R | MAP_PERM_W;
-    80203b50:	77fd                	lui	a5,0xfffff
-    80203b52:	fe040713          	addi	a4,s0,-32
-    80203b56:	97ba                	add	a5,a5,a4
-    80203b58:	4719                	li	a4,6
-    80203b5a:	78e7aa23          	sw	a4,1940(a5) # fffffffffffff794 <bss_end+0xffffffff7f594794>
+  map_area.map_type = MAP_FRAMED;
+    80203b9e:	77fd                	lui	a5,0xfffff
+    80203ba0:	fe040713          	addi	a4,s0,-32
+    80203ba4:	97ba                	add	a5,a5,a4
+    80203ba6:	4705                	li	a4,1
+    80203ba8:	78e7a823          	sw	a4,1936(a5) # fffffffffffff790 <bss_end+0xffffffff7f594790>
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:270
+  map_area.map_premission = MAP_PERM_R | MAP_PERM_W;
+    80203bac:	77fd                	lui	a5,0xfffff
+    80203bae:	fe040713          	addi	a4,s0,-32
+    80203bb2:	97ba                	add	a5,a5,a4
+    80203bb4:	4719                	li	a4,6
+    80203bb6:	78e7aa23          	sw	a4,1940(a5) # fffffffffffff794 <bss_end+0xffffffff7f594794>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:271
   memory_set_push(memory_set, &map_area);
-    80203b5e:	77fd                	lui	a5,0xfffff
-    80203b60:	78078793          	addi	a5,a5,1920 # fffffffffffff780 <bss_end+0xffffffff7f594780>
-    80203b64:	fe040713          	addi	a4,s0,-32
-    80203b68:	973e                	add	a4,a4,a5
-    80203b6a:	77fd                	lui	a5,0xfffff
-    80203b6c:	fe040693          	addi	a3,s0,-32
-    80203b70:	97b6                	add	a5,a5,a3
-    80203b72:	85ba                	mv	a1,a4
-    80203b74:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
-    80203b78:	dacff0ef          	jal	ra,80203124 <memory_set_push>
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:273
+    80203bba:	77fd                	lui	a5,0xfffff
+    80203bbc:	78078793          	addi	a5,a5,1920 # fffffffffffff780 <bss_end+0xffffffff7f594780>
+    80203bc0:	fe040713          	addi	a4,s0,-32
+    80203bc4:	973e                	add	a4,a4,a5
+    80203bc6:	77fd                	lui	a5,0xfffff
+    80203bc8:	fe040693          	addi	a3,s0,-32
+    80203bcc:	97b6                	add	a5,a5,a3
+    80203bce:	85ba                	mv	a1,a4
+    80203bd0:	7487b503          	ld	a0,1864(a5) # fffffffffffff748 <bss_end+0xffffffff7f594748>
+    80203bd4:	da8ff0ef          	jal	ra,8020317c <memory_set_push>
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:274
 
   // return
   *user_sp = (uint64_t)user_stack_top.addr;
-    80203b7c:	77fd                	lui	a5,0xfffff
-    80203b7e:	fe040713          	addi	a4,s0,-32
-    80203b82:	97ba                	add	a5,a5,a4
-    80203b84:	7607b703          	ld	a4,1888(a5) # fffffffffffff760 <bss_end+0xffffffff7f594760>
-    80203b88:	77fd                	lui	a5,0xfffff
-    80203b8a:	fe040693          	addi	a3,s0,-32
-    80203b8e:	97b6                	add	a5,a5,a3
-    80203b90:	7307b783          	ld	a5,1840(a5) # fffffffffffff730 <bss_end+0xffffffff7f594730>
-    80203b94:	e398                	sd	a4,0(a5)
-/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:274
-  *entry_point = elf_header_get_entry(&elf);
-    80203b96:	77fd                	lui	a5,0xfffff
-    80203b98:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
-    80203b9c:	fe040713          	addi	a4,s0,-32
-    80203ba0:	97ba                	add	a5,a5,a4
-    80203ba2:	853e                	mv	a0,a5
-    80203ba4:	f6ffd0ef          	jal	ra,80201b12 <elf_header_get_entry>
-    80203ba8:	872a                	mv	a4,a0
-    80203baa:	77fd                	lui	a5,0xfffff
-    80203bac:	fe040693          	addi	a3,s0,-32
-    80203bb0:	97b6                	add	a5,a5,a3
-    80203bb2:	7287b783          	ld	a5,1832(a5) # fffffffffffff728 <bss_end+0xffffffff7f594728>
-    80203bb6:	e398                	sd	a4,0(a5)
+    80203bd8:	77fd                	lui	a5,0xfffff
+    80203bda:	fe040713          	addi	a4,s0,-32
+    80203bde:	97ba                	add	a5,a5,a4
+    80203be0:	7607b703          	ld	a4,1888(a5) # fffffffffffff760 <bss_end+0xffffffff7f594760>
+    80203be4:	77fd                	lui	a5,0xfffff
+    80203be6:	fe040693          	addi	a3,s0,-32
+    80203bea:	97b6                	add	a5,a5,a3
+    80203bec:	7307b783          	ld	a5,1840(a5) # fffffffffffff730 <bss_end+0xffffffff7f594730>
+    80203bf0:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:275
+  *entry_point = elf_header_get_entry(&elf);
+    80203bf2:	77fd                	lui	a5,0xfffff
+    80203bf4:	7a878793          	addi	a5,a5,1960 # fffffffffffff7a8 <bss_end+0xffffffff7f5947a8>
+    80203bf8:	fe040713          	addi	a4,s0,-32
+    80203bfc:	97ba                	add	a5,a5,a4
+    80203bfe:	853e                	mv	a0,a5
+    80203c00:	f13fd0ef          	jal	ra,80201b12 <elf_header_get_entry>
+    80203c04:	872a                	mv	a4,a0
+    80203c06:	77fd                	lui	a5,0xfffff
+    80203c08:	fe040693          	addi	a3,s0,-32
+    80203c0c:	97b6                	add	a5,a5,a3
+    80203c0e:	7287b783          	ld	a5,1832(a5) # fffffffffffff728 <bss_end+0xffffffff7f594728>
+    80203c12:	e398                	sd	a4,0(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/task_memory/task_memory.c:276
 }
-    80203bb8:	0001                	nop
-    80203bba:	7f010113          	addi	sp,sp,2032
-    80203bbe:	60b2                	ld	ra,264(sp)
-    80203bc0:	6412                	ld	s0,256(sp)
-    80203bc2:	74ee                	ld	s1,248(sp)
-    80203bc4:	6151                	addi	sp,sp,272
-    80203bc6:	8082                	ret
+    80203c14:	0001                	nop
+    80203c16:	7f010113          	addi	sp,sp,2032
+    80203c1a:	60b2                	ld	ra,264(sp)
+    80203c1c:	6412                	ld	s0,256(sp)
+    80203c1e:	74ee                	ld	s1,248(sp)
+    80203c20:	6151                	addi	sp,sp,272
+    80203c22:	8082                	ret
 
-0000000080203bc8 <frame_allocator_init>:
+0000000080203c24 <frame_allocator_init>:
 frame_allocator_init():
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:13
 // @param allocator 分配器的指针
@@ -6360,835 +6414,836 @@ frame_allocator_init():
 extern uint8_t ekernel;
 void frame_allocator_init() 
 {
-    80203bc8:	1101                	addi	sp,sp,-32
-    80203bca:	ec06                	sd	ra,24(sp)
-    80203bcc:	e822                	sd	s0,16(sp)
-    80203bce:	1000                	addi	s0,sp,32
+    80203c24:	1101                	addi	sp,sp,-32
+    80203c26:	ec06                	sd	ra,24(sp)
+    80203c28:	e822                	sd	s0,16(sp)
+    80203c2a:	1000                	addi	s0,sp,32
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:15
   PhysAddr start_addr;
-  start_addr.addr =(size_t)&ekernel; // Manually constructing PhysAddr
-    80203bd0:	00867797          	auipc	a5,0x867
-    80203bd4:	43078793          	addi	a5,a5,1072 # 80a6b000 <bss_end>
-    80203bd8:	fef43423          	sd	a5,-24(s0)
+  start_addr.addr = &ekernel; // Manually constructing PhysAddr
+    80203c2c:	00867797          	auipc	a5,0x867
+    80203c30:	3d478793          	addi	a5,a5,980 # 80a6b000 <bss_end>
+    80203c34:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:17
   PhysAddr end_addr;                 // Manually constructing PhysAddr
   end_addr.addr = (size_t)MEMORY_END;
-    80203bdc:	10100793          	li	a5,257
-    80203be0:	07de                	slli	a5,a5,0x17
-    80203be2:	fef43023          	sd	a5,-32(s0)
+    80203c38:	47c5                	li	a5,17
+    80203c3a:	07ee                	slli	a5,a5,0x1b
+    80203c3c:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:18
   fram_allocator.current = phys_addr_to_page_num(start_addr,0).num;
-    80203be6:	4581                	li	a1,0
-    80203be8:	fe843503          	ld	a0,-24(s0)
-    80203bec:	126000ef          	jal	ra,80203d12 <phys_addr_to_page_num>
-    80203bf0:	87aa                	mv	a5,a0
-    80203bf2:	873e                	mv	a4,a5
-    80203bf4:	00816797          	auipc	a5,0x816
-    80203bf8:	44c78793          	addi	a5,a5,1100 # 80a1a040 <fram_allocator>
-    80203bfc:	e398                	sd	a4,0(a5)
+    80203c40:	4581                	li	a1,0
+    80203c42:	fe843503          	ld	a0,-24(s0)
+    80203c46:	128000ef          	jal	ra,80203d6e <phys_addr_to_page_num>
+    80203c4a:	87aa                	mv	a5,a0
+    80203c4c:	873e                	mv	a4,a5
+    80203c4e:	00816797          	auipc	a5,0x816
+    80203c52:	3f278793          	addi	a5,a5,1010 # 80a1a040 <fram_allocator>
+    80203c56:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:19
   fram_allocator.end = phys_addr_to_page_num(end_addr,1).num;
-    80203bfe:	4585                	li	a1,1
-    80203c00:	fe043503          	ld	a0,-32(s0)
-    80203c04:	10e000ef          	jal	ra,80203d12 <phys_addr_to_page_num>
-    80203c08:	87aa                	mv	a5,a0
-    80203c0a:	873e                	mv	a4,a5
-    80203c0c:	00816797          	auipc	a5,0x816
-    80203c10:	43478793          	addi	a5,a5,1076 # 80a1a040 <fram_allocator>
-    80203c14:	e798                	sd	a4,8(a5)
+    80203c58:	4585                	li	a1,1
+    80203c5a:	fe043503          	ld	a0,-32(s0)
+    80203c5e:	110000ef          	jal	ra,80203d6e <phys_addr_to_page_num>
+    80203c62:	87aa                	mv	a5,a0
+    80203c64:	873e                	mv	a4,a5
+    80203c66:	00816797          	auipc	a5,0x816
+    80203c6a:	3da78793          	addi	a5,a5,986 # 80a1a040 <fram_allocator>
+    80203c6e:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:20
   vector_init(&fram_allocator.recycled);
-    80203c16:	00816517          	auipc	a0,0x816
-    80203c1a:	43a50513          	addi	a0,a0,1082 # 80a1a050 <fram_allocator+0x10>
-    80203c1e:	3a2010ef          	jal	ra,80204fc0 <vector_init>
+    80203c70:	00816517          	auipc	a0,0x816
+    80203c74:	3e050513          	addi	a0,a0,992 # 80a1a050 <fram_allocator+0x10>
+    80203c78:	42a010ef          	jal	ra,802050a2 <vector_init>
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:21
 }
-    80203c22:	0001                	nop
-    80203c24:	60e2                	ld	ra,24(sp)
-    80203c26:	6442                	ld	s0,16(sp)
-    80203c28:	6105                	addi	sp,sp,32
-    80203c2a:	8082                	ret
+    80203c7c:	0001                	nop
+    80203c7e:	60e2                	ld	ra,24(sp)
+    80203c80:	6442                	ld	s0,16(sp)
+    80203c82:	6105                	addi	sp,sp,32
+    80203c84:	8082                	ret
 
-0000000080203c2c <StackFrameAllocator_alloc>:
+0000000080203c86 <StackFrameAllocator_alloc>:
 StackFrameAllocator_alloc():
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:26
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:27
 
 // 分配一个物理页帧
 // @param allocator 分配器的指针
 // @return 分配的物理页号，如果内存耗尽则返回特殊值(size_t)-1
-PhysPageNum StackFrameAllocator_alloc(StackFrameAllocator* allocator) {
-    80203c2c:	7139                	addi	sp,sp,-64
-    80203c2e:	fc06                	sd	ra,56(sp)
-    80203c30:	f822                	sd	s0,48(sp)
-    80203c32:	0080                	addi	s0,sp,64
-    80203c34:	fca43423          	sd	a0,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:27
+PhysPageNum StackFrameAllocator_alloc(StackFrameAllocator* allocator) 
+{
+    80203c86:	7139                	addi	sp,sp,-64
+    80203c88:	fc06                	sd	ra,56(sp)
+    80203c8a:	f822                	sd	s0,48(sp)
+    80203c8c:	0080                	addi	s0,sp,64
+    80203c8e:	fca43423          	sd	a0,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:28
     if (vector_total(&allocator->recycled) > 0) {
-    80203c38:	fc843783          	ld	a5,-56(s0)
-    80203c3c:	07c1                	addi	a5,a5,16
-    80203c3e:	853e                	mv	a0,a5
-    80203c40:	3bc010ef          	jal	ra,80204ffc <vector_total>
-    80203c44:	87aa                	mv	a5,a0
-    80203c46:	c7a1                	beqz	a5,80203c8e <StackFrameAllocator_alloc+0x62>
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:29
+    80203c92:	fc843783          	ld	a5,-56(s0)
+    80203c96:	07c1                	addi	a5,a5,16
+    80203c98:	853e                	mv	a0,a5
+    80203c9a:	444010ef          	jal	ra,802050de <vector_total>
+    80203c9e:	87aa                	mv	a5,a0
+    80203ca0:	c7a1                	beqz	a5,80203ce8 <StackFrameAllocator_alloc+0x62>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:30
         // 如果回收向量中有页号，优先从回收向量中分配
         size_t index = vector_total(&allocator->recycled) - 1; // 获取最后一个元素的索引
-    80203c48:	fc843783          	ld	a5,-56(s0)
-    80203c4c:	07c1                	addi	a5,a5,16
-    80203c4e:	853e                	mv	a0,a5
-    80203c50:	3ac010ef          	jal	ra,80204ffc <vector_total>
-    80203c54:	87aa                	mv	a5,a0
-    80203c56:	17fd                	addi	a5,a5,-1
-    80203c58:	fef43423          	sd	a5,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:30
-        void* item = vector_get(&allocator->recycled, index); // 获取并移除最后一个元素
-    80203c5c:	fc843783          	ld	a5,-56(s0)
-    80203c60:	07c1                	addi	a5,a5,16
-    80203c62:	fe843583          	ld	a1,-24(s0)
-    80203c66:	853e                	mv	a0,a5
-    80203c68:	454010ef          	jal	ra,802050bc <vector_get>
-    80203c6c:	fea43023          	sd	a0,-32(s0)
+    80203ca2:	fc843783          	ld	a5,-56(s0)
+    80203ca6:	07c1                	addi	a5,a5,16
+    80203ca8:	853e                	mv	a0,a5
+    80203caa:	434010ef          	jal	ra,802050de <vector_total>
+    80203cae:	87aa                	mv	a5,a0
+    80203cb0:	17fd                	addi	a5,a5,-1
+    80203cb2:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:31
-        PhysPageNum ppn = { (size_t)item }; // 将void*转换回物理页号
-    80203c70:	fe043783          	ld	a5,-32(s0)
-    80203c74:	fcf43c23          	sd	a5,-40(s0)
+        void* item = vector_get(&allocator->recycled, index); // 获取并移除最后一个元素
+    80203cb6:	fc843783          	ld	a5,-56(s0)
+    80203cba:	07c1                	addi	a5,a5,16
+    80203cbc:	fe843583          	ld	a1,-24(s0)
+    80203cc0:	853e                	mv	a0,a5
+    80203cc2:	4dc010ef          	jal	ra,8020519e <vector_get>
+    80203cc6:	fea43023          	sd	a0,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:32
-        vector_delete(&allocator->recycled, index); // 从向量中删除该元素
-    80203c78:	fc843783          	ld	a5,-56(s0)
-    80203c7c:	07c1                	addi	a5,a5,16
-    80203c7e:	fe843583          	ld	a1,-24(s0)
-    80203c82:	853e                	mv	a0,a5
-    80203c84:	470010ef          	jal	ra,802050f4 <vector_delete>
+        PhysPageNum ppn = { (size_t)item }; // 将void*转换回物理页号
+    80203cca:	fe043783          	ld	a5,-32(s0)
+    80203cce:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:33
-        return ppn;
-    80203c88:	fd843783          	ld	a5,-40(s0)
-    80203c8c:	a03d                	j	80203cba <StackFrameAllocator_alloc+0x8e>
+        vector_delete(&allocator->recycled, index); // 从向量中删除该元素
+    80203cd2:	fc843783          	ld	a5,-56(s0)
+    80203cd6:	07c1                	addi	a5,a5,16
+    80203cd8:	fe843583          	ld	a1,-24(s0)
+    80203cdc:	853e                	mv	a0,a5
+    80203cde:	4f8010ef          	jal	ra,802051d6 <vector_delete>
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:34
+        return ppn;
+    80203ce2:	fd843783          	ld	a5,-40(s0)
+    80203ce6:	a805                	j	80203d16 <StackFrameAllocator_alloc+0x90>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:35
     } else if (allocator->current < allocator->end) {
-    80203c8e:	fc843783          	ld	a5,-56(s0)
-    80203c92:	6398                	ld	a4,0(a5)
-    80203c94:	fc843783          	ld	a5,-56(s0)
-    80203c98:	679c                	ld	a5,8(a5)
-    80203c9a:	00f77f63          	bgeu	a4,a5,80203cb8 <StackFrameAllocator_alloc+0x8c>
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:36
+    80203ce8:	fc843783          	ld	a5,-56(s0)
+    80203cec:	6398                	ld	a4,0(a5)
+    80203cee:	fc843783          	ld	a5,-56(s0)
+    80203cf2:	679c                	ld	a5,8(a5)
+    80203cf4:	00f77f63          	bgeu	a4,a5,80203d12 <StackFrameAllocator_alloc+0x8c>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:37
         // 如果回收向量为空，且当前还有未分配的页，则从当前可用的页号中分配
         PhysPageNum ppn = { allocator->current++ }; // 分配当前页号，并将current指向下一个页号
-    80203c9e:	fc843783          	ld	a5,-56(s0)
-    80203ca2:	639c                	ld	a5,0(a5)
-    80203ca4:	00178693          	addi	a3,a5,1
-    80203ca8:	fc843703          	ld	a4,-56(s0)
-    80203cac:	e314                	sd	a3,0(a4)
-    80203cae:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:37
+    80203cf8:	fc843783          	ld	a5,-56(s0)
+    80203cfc:	639c                	ld	a5,0(a5)
+    80203cfe:	00178693          	addi	a3,a5,1
+    80203d02:	fc843703          	ld	a4,-56(s0)
+    80203d06:	e314                	sd	a3,0(a4)
+    80203d08:	fcf43823          	sd	a5,-48(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:38
         return ppn;
-    80203cb2:	fd043783          	ld	a5,-48(s0)
-    80203cb6:	a011                	j	80203cba <StackFrameAllocator_alloc+0x8e>
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:40
+    80203d0c:	fd043783          	ld	a5,-48(s0)
+    80203d10:	a019                	j	80203d16 <StackFrameAllocator_alloc+0x90>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:41
     } else {
         // 如果没有可分配的页号，则返回一个特殊值表示内存耗尽
-        return (PhysPageNum){ (size_t)-1 };
-    80203cb8:	57fd                	li	a5,-1
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:42 (discriminator 1)
+        return (PhysPageNum){ 0x80000000 };
+    80203d12:	4785                	li	a5,1
+    80203d14:	07fe                	slli	a5,a5,0x1f
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:43 (discriminator 1)
     }
 }
-    80203cba:	853e                	mv	a0,a5
-    80203cbc:	70e2                	ld	ra,56(sp)
-    80203cbe:	7442                	ld	s0,48(sp)
-    80203cc0:	6121                	addi	sp,sp,64
-    80203cc2:	8082                	ret
+    80203d16:	853e                	mv	a0,a5
+    80203d18:	70e2                	ld	ra,56(sp)
+    80203d1a:	7442                	ld	s0,48(sp)
+    80203d1c:	6121                	addi	sp,sp,64
+    80203d1e:	8082                	ret
 
-0000000080203cc4 <StackFrameAllocator_dealloc>:
+0000000080203d20 <StackFrameAllocator_dealloc>:
 StackFrameAllocator_dealloc():
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:47
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:48
 
 // 回收一个物理页帧
 // @param allocator 分配器的指针
 // @param ppn 要回收的物理页号
 void StackFrameAllocator_dealloc(StackFrameAllocator* allocator, PhysPageNum ppn) {
-    80203cc4:	1101                	addi	sp,sp,-32
-    80203cc6:	ec06                	sd	ra,24(sp)
-    80203cc8:	e822                	sd	s0,16(sp)
-    80203cca:	1000                	addi	s0,sp,32
-    80203ccc:	fea43423          	sd	a0,-24(s0)
-    80203cd0:	feb43023          	sd	a1,-32(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:49
+    80203d20:	1101                	addi	sp,sp,-32
+    80203d22:	ec06                	sd	ra,24(sp)
+    80203d24:	e822                	sd	s0,16(sp)
+    80203d26:	1000                	addi	s0,sp,32
+    80203d28:	fea43423          	sd	a0,-24(s0)
+    80203d2c:	feb43023          	sd	a1,-32(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:50
     // 将回收的物理页号添加到回收向量中，将物理页号转换为void*进行存储
     vector_add(&allocator->recycled, (void*)(uintptr_t)ppn.num);
-    80203cd4:	fe843783          	ld	a5,-24(s0)
-    80203cd8:	07c1                	addi	a5,a5,16
-    80203cda:	fe043703          	ld	a4,-32(s0)
-    80203cde:	85ba                	mv	a1,a4
-    80203ce0:	853e                	mv	a0,a5
-    80203ce2:	37e010ef          	jal	ra,80205060 <vector_add>
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:50
+    80203d30:	fe843783          	ld	a5,-24(s0)
+    80203d34:	07c1                	addi	a5,a5,16
+    80203d36:	fe043703          	ld	a4,-32(s0)
+    80203d3a:	85ba                	mv	a1,a4
+    80203d3c:	853e                	mv	a0,a5
+    80203d3e:	404010ef          	jal	ra,80205142 <vector_add>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:51
 }
-    80203ce6:	0001                	nop
-    80203ce8:	60e2                	ld	ra,24(sp)
-    80203cea:	6442                	ld	s0,16(sp)
-    80203cec:	6105                	addi	sp,sp,32
-    80203cee:	8082                	ret
+    80203d42:	0001                	nop
+    80203d44:	60e2                	ld	ra,24(sp)
+    80203d46:	6442                	ld	s0,16(sp)
+    80203d48:	6105                	addi	sp,sp,32
+    80203d4a:	8082                	ret
 
-0000000080203cf0 <StackFrameAllocator_free>:
+0000000080203d4c <StackFrameAllocator_free>:
 StackFrameAllocator_free():
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:54
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:55
 
 // 释放栈式物理页帧分配器使用的资源
 // @param allocator 分配器的指针
 void StackFrameAllocator_free(StackFrameAllocator* allocator) {
-    80203cf0:	1101                	addi	sp,sp,-32
-    80203cf2:	ec06                	sd	ra,24(sp)
-    80203cf4:	e822                	sd	s0,16(sp)
-    80203cf6:	1000                	addi	s0,sp,32
-    80203cf8:	fea43423          	sd	a0,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:56
+    80203d4c:	1101                	addi	sp,sp,-32
+    80203d4e:	ec06                	sd	ra,24(sp)
+    80203d50:	e822                	sd	s0,16(sp)
+    80203d52:	1000                	addi	s0,sp,32
+    80203d54:	fea43423          	sd	a0,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:57
     // 释放存储回收页号的向量占用的内存
     vector_free(&allocator->recycled);
-    80203cfc:	fe843783          	ld	a5,-24(s0)
-    80203d00:	07c1                	addi	a5,a5,16
-    80203d02:	853e                	mv	a0,a5
-    80203d04:	4c0010ef          	jal	ra,802051c4 <vector_free>
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:57
+    80203d58:	fe843783          	ld	a5,-24(s0)
+    80203d5c:	07c1                	addi	a5,a5,16
+    80203d5e:	853e                	mv	a0,a5
+    80203d60:	546010ef          	jal	ra,802052a6 <vector_free>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/fram_allocator/fram_allocator.c:58
 }
-    80203d08:	0001                	nop
-    80203d0a:	60e2                	ld	ra,24(sp)
-    80203d0c:	6442                	ld	s0,16(sp)
-    80203d0e:	6105                	addi	sp,sp,32
-    80203d10:	8082                	ret
+    80203d64:	0001                	nop
+    80203d66:	60e2                	ld	ra,24(sp)
+    80203d68:	6442                	ld	s0,16(sp)
+    80203d6a:	6105                	addi	sp,sp,32
+    80203d6c:	8082                	ret
 
-0000000080203d12 <phys_addr_to_page_num>:
+0000000080203d6e <phys_addr_to_page_num>:
 phys_addr_to_page_num():
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:4
 #include "address.h"
 
 // 将物理地址转换为物理页号
 PhysPageNum phys_addr_to_page_num(PhysAddr addr, AlignDirection direction) {
-    80203d12:	7179                	addi	sp,sp,-48
-    80203d14:	f422                	sd	s0,40(sp)
-    80203d16:	1800                	addi	s0,sp,48
-    80203d18:	fca43c23          	sd	a0,-40(s0)
-    80203d1c:	87ae                	mv	a5,a1
-    80203d1e:	fcf42a23          	sw	a5,-44(s0)
+    80203d6e:	7179                	addi	sp,sp,-48
+    80203d70:	f422                	sd	s0,40(sp)
+    80203d72:	1800                	addi	s0,sp,48
+    80203d74:	fca43c23          	sd	a0,-40(s0)
+    80203d78:	87ae                	mv	a5,a1
+    80203d7a:	fcf42a23          	sw	a5,-44(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:6
     size_t num;
     if (direction == ALIGN_DOWN) {
-    80203d22:	fd442783          	lw	a5,-44(s0)
-    80203d26:	2781                	sext.w	a5,a5
-    80203d28:	e799                	bnez	a5,80203d36 <phys_addr_to_page_num+0x24>
+    80203d7e:	fd442783          	lw	a5,-44(s0)
+    80203d82:	2781                	sext.w	a5,a5
+    80203d84:	e799                	bnez	a5,80203d92 <phys_addr_to_page_num+0x24>
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:8
         // 向下对齐到页边界
         num = addr.addr >> PAGE_SIZE_BITS;
-    80203d2a:	fd843783          	ld	a5,-40(s0)
-    80203d2e:	83b1                	srli	a5,a5,0xc
-    80203d30:	fef43423          	sd	a5,-24(s0)
-    80203d34:	a809                	j	80203d46 <phys_addr_to_page_num+0x34>
+    80203d86:	fd843783          	ld	a5,-40(s0)
+    80203d8a:	83b1                	srli	a5,a5,0xc
+    80203d8c:	fef43423          	sd	a5,-24(s0)
+    80203d90:	a809                	j	80203da2 <phys_addr_to_page_num+0x34>
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:11
     } else {
         // 向上对齐到下一个页边界
         num = (addr.addr + PAGE_SIZE - 1) >> PAGE_SIZE_BITS;
-    80203d36:	fd843703          	ld	a4,-40(s0)
-    80203d3a:	6785                	lui	a5,0x1
-    80203d3c:	17fd                	addi	a5,a5,-1
-    80203d3e:	97ba                	add	a5,a5,a4
-    80203d40:	83b1                	srli	a5,a5,0xc
-    80203d42:	fef43423          	sd	a5,-24(s0)
+    80203d92:	fd843703          	ld	a4,-40(s0)
+    80203d96:	6785                	lui	a5,0x1
+    80203d98:	17fd                	addi	a5,a5,-1
+    80203d9a:	97ba                	add	a5,a5,a4
+    80203d9c:	83b1                	srli	a5,a5,0xc
+    80203d9e:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:13
     }
     return (PhysPageNum){.num = num};
-    80203d46:	fe843783          	ld	a5,-24(s0)
+    80203da2:	fe843783          	ld	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:14
 }
-    80203d4a:	853e                	mv	a0,a5
-    80203d4c:	7422                	ld	s0,40(sp)
-    80203d4e:	6145                	addi	sp,sp,48
-    80203d50:	8082                	ret
+    80203da6:	853e                	mv	a0,a5
+    80203da8:	7422                	ld	s0,40(sp)
+    80203daa:	6145                	addi	sp,sp,48
+    80203dac:	8082                	ret
 
-0000000080203d52 <virt_addr_to_page_num>:
+0000000080203dae <virt_addr_to_page_num>:
 virt_addr_to_page_num():
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:17
 
 // 将虚拟地址转换为虚拟页号
 VirtPageNum virt_addr_to_page_num(VirtAddr addr, AlignDirection direction) {
-    80203d52:	7179                	addi	sp,sp,-48
-    80203d54:	f422                	sd	s0,40(sp)
-    80203d56:	1800                	addi	s0,sp,48
-    80203d58:	fca43c23          	sd	a0,-40(s0)
-    80203d5c:	87ae                	mv	a5,a1
-    80203d5e:	fcf42a23          	sw	a5,-44(s0)
+    80203dae:	7179                	addi	sp,sp,-48
+    80203db0:	f422                	sd	s0,40(sp)
+    80203db2:	1800                	addi	s0,sp,48
+    80203db4:	fca43c23          	sd	a0,-40(s0)
+    80203db8:	87ae                	mv	a5,a1
+    80203dba:	fcf42a23          	sw	a5,-44(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:19
     size_t num;
     if (direction == ALIGN_DOWN) {
-    80203d62:	fd442783          	lw	a5,-44(s0)
-    80203d66:	2781                	sext.w	a5,a5
-    80203d68:	e799                	bnez	a5,80203d76 <virt_addr_to_page_num+0x24>
+    80203dbe:	fd442783          	lw	a5,-44(s0)
+    80203dc2:	2781                	sext.w	a5,a5
+    80203dc4:	e799                	bnez	a5,80203dd2 <virt_addr_to_page_num+0x24>
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:21
         // 向下对齐到页边界
         num = addr.addr >> PAGE_SIZE_BITS;
-    80203d6a:	fd843783          	ld	a5,-40(s0)
-    80203d6e:	83b1                	srli	a5,a5,0xc
-    80203d70:	fef43423          	sd	a5,-24(s0)
-    80203d74:	a809                	j	80203d86 <virt_addr_to_page_num+0x34>
+    80203dc6:	fd843783          	ld	a5,-40(s0)
+    80203dca:	83b1                	srli	a5,a5,0xc
+    80203dcc:	fef43423          	sd	a5,-24(s0)
+    80203dd0:	a809                	j	80203de2 <virt_addr_to_page_num+0x34>
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:24
     } else { // ALIGN_UP
         // 向上对齐到下一个页边界
         num = (addr.addr + PAGE_SIZE - 1) >> PAGE_SIZE_BITS;
-    80203d76:	fd843703          	ld	a4,-40(s0)
-    80203d7a:	6785                	lui	a5,0x1
-    80203d7c:	17fd                	addi	a5,a5,-1
-    80203d7e:	97ba                	add	a5,a5,a4
-    80203d80:	83b1                	srli	a5,a5,0xc
-    80203d82:	fef43423          	sd	a5,-24(s0)
+    80203dd2:	fd843703          	ld	a4,-40(s0)
+    80203dd6:	6785                	lui	a5,0x1
+    80203dd8:	17fd                	addi	a5,a5,-1
+    80203dda:	97ba                	add	a5,a5,a4
+    80203ddc:	83b1                	srli	a5,a5,0xc
+    80203dde:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:26
     }
     return (VirtPageNum){.num = num};
-    80203d86:	fe843783          	ld	a5,-24(s0)
+    80203de2:	fe843783          	ld	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:27
 }
-    80203d8a:	853e                	mv	a0,a5
-    80203d8c:	7422                	ld	s0,40(sp)
-    80203d8e:	6145                	addi	sp,sp,48
-    80203d90:	8082                	ret
+    80203de6:	853e                	mv	a0,a5
+    80203de8:	7422                	ld	s0,40(sp)
+    80203dea:	6145                	addi	sp,sp,48
+    80203dec:	8082                	ret
 
-0000000080203d92 <virt_page_num_to_addr>:
+0000000080203dee <virt_page_num_to_addr>:
 virt_page_num_to_addr():
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:30
 
 // 将虚拟页号转换为虚拟地址
 VirtAddr virt_page_num_to_addr(VirtPageNum vpn) {
-    80203d92:	1101                	addi	sp,sp,-32
-    80203d94:	ec22                	sd	s0,24(sp)
-    80203d96:	1000                	addi	s0,sp,32
-    80203d98:	fea43423          	sd	a0,-24(s0)
+    80203dee:	1101                	addi	sp,sp,-32
+    80203df0:	ec22                	sd	s0,24(sp)
+    80203df2:	1000                	addi	s0,sp,32
+    80203df4:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:32
     // 计算页号对应的虚拟地址起始位置
     return (VirtAddr){.addr = vpn.num << PAGE_SIZE_BITS};
-    80203d9c:	fe843783          	ld	a5,-24(s0)
-    80203da0:	07b2                	slli	a5,a5,0xc
+    80203df8:	fe843783          	ld	a5,-24(s0)
+    80203dfc:	07b2                	slli	a5,a5,0xc
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:33
 }
-    80203da2:	853e                	mv	a0,a5
-    80203da4:	6462                	ld	s0,24(sp)
-    80203da6:	6105                	addi	sp,sp,32
-    80203da8:	8082                	ret
+    80203dfe:	853e                	mv	a0,a5
+    80203e00:	6462                	ld	s0,24(sp)
+    80203e02:	6105                	addi	sp,sp,32
+    80203e04:	8082                	ret
 
-0000000080203daa <phys_page_num_to_addr>:
+0000000080203e06 <phys_page_num_to_addr>:
 phys_page_num_to_addr():
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:36
 
 // 将物理页号转换为物理地址
 PhysAddr phys_page_num_to_addr(PhysPageNum ppn) {
-    80203daa:	1101                	addi	sp,sp,-32
-    80203dac:	ec22                	sd	s0,24(sp)
-    80203dae:	1000                	addi	s0,sp,32
-    80203db0:	fea43423          	sd	a0,-24(s0)
+    80203e06:	1101                	addi	sp,sp,-32
+    80203e08:	ec22                	sd	s0,24(sp)
+    80203e0a:	1000                	addi	s0,sp,32
+    80203e0c:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:38
     // 计算页号对应的物理地址起始位置
     return (PhysAddr){.addr = ppn.num << PAGE_SIZE_BITS};
-    80203db4:	fe843783          	ld	a5,-24(s0)
-    80203db8:	07b2                	slli	a5,a5,0xc
+    80203e10:	fe843783          	ld	a5,-24(s0)
+    80203e14:	07b2                	slli	a5,a5,0xc
 /home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:39
 }
-    80203dba:	853e                	mv	a0,a5
-    80203dbc:	6462                	ld	s0,24(sp)
-    80203dbe:	6105                	addi	sp,sp,32
-    80203dc0:	8082                	ret
+    80203e16:	853e                	mv	a0,a5
+    80203e18:	6462                	ld	s0,24(sp)
+    80203e1a:	6105                	addi	sp,sp,32
+    80203e1c:	8082                	ret
 
-0000000080203dc2 <decompose_vpn>:
+0000000080203e1e <decompose_vpn>:
 decompose_vpn():
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:43
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:42
 
 // 解析虚拟页号，获取页内偏移及三级页表中各级的索引
-uint64_t* decompose_vpn(uint64_t vpn) 
-{
-    80203dc2:	7139                	addi	sp,sp,-64
-    80203dc4:	fc22                	sd	s0,56(sp)
-    80203dc6:	0080                	addi	s0,sp,64
-    80203dc8:	fca43423          	sd	a0,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:46
+uint64_t* decompose_vpn(uint64_t vpn) {
+    80203e1e:	7139                	addi	sp,sp,-64
+    80203e20:	fc22                	sd	s0,56(sp)
+    80203e22:	0080                	addi	s0,sp,64
+    80203e24:	fca43423          	sd	a0,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:45
     static uint64_t result[4];
     // 获取页内偏移
     uint64_t page_offset = vpn & OFFSET_MASK;
-    80203dcc:	fc843703          	ld	a4,-56(s0)
-    80203dd0:	6785                	lui	a5,0x1
-    80203dd2:	17fd                	addi	a5,a5,-1
-    80203dd4:	8ff9                	and	a5,a5,a4
-    80203dd6:	fef43423          	sd	a5,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:48
+    80203e28:	fc843703          	ld	a4,-56(s0)
+    80203e2c:	6785                	lui	a5,0x1
+    80203e2e:	17fd                	addi	a5,a5,-1
+    80203e30:	8ff9                	and	a5,a5,a4
+    80203e32:	fef43423          	sd	a5,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:47
     // 移除偏移位，准备解析索引
     vpn >>= PAGE_SIZE_BITS;
-    80203dda:	fc843783          	ld	a5,-56(s0)
-    80203dde:	83b1                	srli	a5,a5,0xc
-    80203de0:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:50
+    80203e36:	fc843783          	ld	a5,-56(s0)
+    80203e3a:	83b1                	srli	a5,a5,0xc
+    80203e3c:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:49
     // 解析L3索引
     uint64_t l3 = vpn & INDEX_MASK;
-    80203de4:	fc843783          	ld	a5,-56(s0)
-    80203de8:	1ff7f793          	andi	a5,a5,511
-    80203dec:	fef43023          	sd	a5,-32(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:51
+    80203e40:	fc843783          	ld	a5,-56(s0)
+    80203e44:	1ff7f793          	andi	a5,a5,511
+    80203e48:	fef43023          	sd	a5,-32(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:50
     vpn >>= INDEX_BITS;
-    80203df0:	fc843783          	ld	a5,-56(s0)
-    80203df4:	83a5                	srli	a5,a5,0x9
-    80203df6:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:53
+    80203e4c:	fc843783          	ld	a5,-56(s0)
+    80203e50:	83a5                	srli	a5,a5,0x9
+    80203e52:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:52
     // 解析L2索引
     uint64_t l2 = vpn & INDEX_MASK;
-    80203dfa:	fc843783          	ld	a5,-56(s0)
-    80203dfe:	1ff7f793          	andi	a5,a5,511
-    80203e02:	fcf43c23          	sd	a5,-40(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:54
+    80203e56:	fc843783          	ld	a5,-56(s0)
+    80203e5a:	1ff7f793          	andi	a5,a5,511
+    80203e5e:	fcf43c23          	sd	a5,-40(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:53
     vpn >>= INDEX_BITS;
-    80203e06:	fc843783          	ld	a5,-56(s0)
-    80203e0a:	83a5                	srli	a5,a5,0x9
-    80203e0c:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:56
+    80203e62:	fc843783          	ld	a5,-56(s0)
+    80203e66:	83a5                	srli	a5,a5,0x9
+    80203e68:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:55
     // 解析L1索引
     uint64_t l1 = vpn & INDEX_MASK;
-    80203e10:	fc843783          	ld	a5,-56(s0)
-    80203e14:	1ff7f793          	andi	a5,a5,511
-    80203e18:	fcf43823          	sd	a5,-48(s0)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:57
+    80203e6c:	fc843783          	ld	a5,-56(s0)
+    80203e70:	1ff7f793          	andi	a5,a5,511
+    80203e74:	fcf43823          	sd	a5,-48(s0)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:56
     result[0] = l1;
-    80203e1c:	00816797          	auipc	a5,0x816
-    80203e20:	24c78793          	addi	a5,a5,588 # 80a1a068 <result.0>
-    80203e24:	fd043703          	ld	a4,-48(s0)
-    80203e28:	e398                	sd	a4,0(a5)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:58
+    80203e78:	00816797          	auipc	a5,0x816
+    80203e7c:	1f078793          	addi	a5,a5,496 # 80a1a068 <result.0>
+    80203e80:	fd043703          	ld	a4,-48(s0)
+    80203e84:	e398                	sd	a4,0(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:57
     result[1] = l2;
-    80203e2a:	00816797          	auipc	a5,0x816
-    80203e2e:	23e78793          	addi	a5,a5,574 # 80a1a068 <result.0>
-    80203e32:	fd843703          	ld	a4,-40(s0)
-    80203e36:	e798                	sd	a4,8(a5)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:59
+    80203e86:	00816797          	auipc	a5,0x816
+    80203e8a:	1e278793          	addi	a5,a5,482 # 80a1a068 <result.0>
+    80203e8e:	fd843703          	ld	a4,-40(s0)
+    80203e92:	e798                	sd	a4,8(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:58
     result[2] = l3;
-    80203e38:	00816797          	auipc	a5,0x816
-    80203e3c:	23078793          	addi	a5,a5,560 # 80a1a068 <result.0>
-    80203e40:	fe043703          	ld	a4,-32(s0)
-    80203e44:	eb98                	sd	a4,16(a5)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:60
+    80203e94:	00816797          	auipc	a5,0x816
+    80203e98:	1d478793          	addi	a5,a5,468 # 80a1a068 <result.0>
+    80203e9c:	fe043703          	ld	a4,-32(s0)
+    80203ea0:	eb98                	sd	a4,16(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:59
     result[3] = page_offset;
-    80203e46:	00816797          	auipc	a5,0x816
-    80203e4a:	22278793          	addi	a5,a5,546 # 80a1a068 <result.0>
-    80203e4e:	fe843703          	ld	a4,-24(s0)
-    80203e52:	ef98                	sd	a4,24(a5)
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:61
+    80203ea2:	00816797          	auipc	a5,0x816
+    80203ea6:	1c678793          	addi	a5,a5,454 # 80a1a068 <result.0>
+    80203eaa:	fe843703          	ld	a4,-24(s0)
+    80203eae:	ef98                	sd	a4,24(a5)
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:60
     return result;
-    80203e54:	00816797          	auipc	a5,0x816
-    80203e58:	21478793          	addi	a5,a5,532 # 80a1a068 <result.0>
-/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:62
+    80203eb0:	00816797          	auipc	a5,0x816
+    80203eb4:	1b878793          	addi	a5,a5,440 # 80a1a068 <result.0>
+/home/caigoubencai/Desktop/os_c/kernel/memory/address/address.c:61
 }
-    80203e5c:	853e                	mv	a0,a5
-    80203e5e:	7462                	ld	s0,56(sp)
-    80203e60:	6121                	addi	sp,sp,64
-    80203e62:	8082                	ret
+    80203eb8:	853e                	mv	a0,a5
+    80203eba:	7462                	ld	s0,56(sp)
+    80203ebc:	6121                	addi	sp,sp,64
+    80203ebe:	8082                	ret
 
-0000000080203e64 <print_str>:
+0000000080203ec0 <print_str>:
 print_str():
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:3
 #include "console.h"
 #include "sbi.h"
 void print_str(const char* str) {
-    80203e64:	1101                	addi	sp,sp,-32
-    80203e66:	ec06                	sd	ra,24(sp)
-    80203e68:	e822                	sd	s0,16(sp)
-    80203e6a:	1000                	addi	s0,sp,32
-    80203e6c:	fea43423          	sd	a0,-24(s0)
+    80203ec0:	1101                	addi	sp,sp,-32
+    80203ec2:	ec06                	sd	ra,24(sp)
+    80203ec4:	e822                	sd	s0,16(sp)
+    80203ec6:	1000                	addi	s0,sp,32
+    80203ec8:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:4
     while (*str) {
-    80203e70:	a829                	j	80203e8a <print_str+0x26>
+    80203ecc:	a829                	j	80203ee6 <print_str+0x26>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:5
         console_putchar((uint64_t)(*str));
-    80203e72:	fe843783          	ld	a5,-24(s0)
-    80203e76:	0007c783          	lbu	a5,0(a5)
-    80203e7a:	853e                	mv	a0,a5
-    80203e7c:	c18fe0ef          	jal	ra,80202294 <console_putchar>
+    80203ece:	fe843783          	ld	a5,-24(s0)
+    80203ed2:	0007c783          	lbu	a5,0(a5)
+    80203ed6:	853e                	mv	a0,a5
+    80203ed8:	bbcfe0ef          	jal	ra,80202294 <console_putchar>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:6
         str++;
-    80203e80:	fe843783          	ld	a5,-24(s0)
-    80203e84:	0785                	addi	a5,a5,1
-    80203e86:	fef43423          	sd	a5,-24(s0)
+    80203edc:	fe843783          	ld	a5,-24(s0)
+    80203ee0:	0785                	addi	a5,a5,1
+    80203ee2:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:4
     while (*str) {
-    80203e8a:	fe843783          	ld	a5,-24(s0)
-    80203e8e:	0007c783          	lbu	a5,0(a5)
-    80203e92:	f3e5                	bnez	a5,80203e72 <print_str+0xe>
+    80203ee6:	fe843783          	ld	a5,-24(s0)
+    80203eea:	0007c783          	lbu	a5,0(a5)
+    80203eee:	f3e5                	bnez	a5,80203ece <print_str+0xe>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:8
     }
 }
-    80203e94:	0001                	nop
-    80203e96:	0001                	nop
-    80203e98:	60e2                	ld	ra,24(sp)
-    80203e9a:	6442                	ld	s0,16(sp)
-    80203e9c:	6105                	addi	sp,sp,32
-    80203e9e:	8082                	ret
+    80203ef0:	0001                	nop
+    80203ef2:	0001                	nop
+    80203ef4:	60e2                	ld	ra,24(sp)
+    80203ef6:	6442                	ld	s0,16(sp)
+    80203ef8:	6105                	addi	sp,sp,32
+    80203efa:	8082                	ret
 
-0000000080203ea0 <reverse_str>:
+0000000080203efc <reverse_str>:
 reverse_str():
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:10
 
 void reverse_str(char* str, int length) {
-    80203ea0:	7179                	addi	sp,sp,-48
-    80203ea2:	f422                	sd	s0,40(sp)
-    80203ea4:	1800                	addi	s0,sp,48
-    80203ea6:	fca43c23          	sd	a0,-40(s0)
-    80203eaa:	87ae                	mv	a5,a1
-    80203eac:	fcf42a23          	sw	a5,-44(s0)
+    80203efc:	7179                	addi	sp,sp,-48
+    80203efe:	f422                	sd	s0,40(sp)
+    80203f00:	1800                	addi	s0,sp,48
+    80203f02:	fca43c23          	sd	a0,-40(s0)
+    80203f06:	87ae                	mv	a5,a1
+    80203f08:	fcf42a23          	sw	a5,-44(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:11
     int start = 0;
-    80203eb0:	fe042623          	sw	zero,-20(s0)
+    80203f0c:	fe042623          	sw	zero,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:12
     int end = length - 1;
-    80203eb4:	fd442783          	lw	a5,-44(s0)
-    80203eb8:	37fd                	addiw	a5,a5,-1
-    80203eba:	fef42423          	sw	a5,-24(s0)
+    80203f10:	fd442783          	lw	a5,-44(s0)
+    80203f14:	37fd                	addiw	a5,a5,-1
+    80203f16:	fef42423          	sw	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:13
     while (start < end) {
-    80203ebe:	a899                	j	80203f14 <reverse_str+0x74>
+    80203f1a:	a899                	j	80203f70 <reverse_str+0x74>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:14
         char temp = str[start];
-    80203ec0:	fec42783          	lw	a5,-20(s0)
-    80203ec4:	fd843703          	ld	a4,-40(s0)
-    80203ec8:	97ba                	add	a5,a5,a4
-    80203eca:	0007c783          	lbu	a5,0(a5)
-    80203ece:	fef403a3          	sb	a5,-25(s0)
+    80203f1c:	fec42783          	lw	a5,-20(s0)
+    80203f20:	fd843703          	ld	a4,-40(s0)
+    80203f24:	97ba                	add	a5,a5,a4
+    80203f26:	0007c783          	lbu	a5,0(a5)
+    80203f2a:	fef403a3          	sb	a5,-25(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:15
         str[start] = str[end];
-    80203ed2:	fe842783          	lw	a5,-24(s0)
-    80203ed6:	fd843703          	ld	a4,-40(s0)
-    80203eda:	973e                	add	a4,a4,a5
-    80203edc:	fec42783          	lw	a5,-20(s0)
-    80203ee0:	fd843683          	ld	a3,-40(s0)
-    80203ee4:	97b6                	add	a5,a5,a3
-    80203ee6:	00074703          	lbu	a4,0(a4) # 8000000 <n+0x7ffffe0>
-    80203eea:	00e78023          	sb	a4,0(a5)
+    80203f2e:	fe842783          	lw	a5,-24(s0)
+    80203f32:	fd843703          	ld	a4,-40(s0)
+    80203f36:	973e                	add	a4,a4,a5
+    80203f38:	fec42783          	lw	a5,-20(s0)
+    80203f3c:	fd843683          	ld	a3,-40(s0)
+    80203f40:	97b6                	add	a5,a5,a3
+    80203f42:	00074703          	lbu	a4,0(a4) # fffffffffffff000 <bss_end+0xffffffff7f594000>
+    80203f46:	00e78023          	sb	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:16
         str[end] = temp;
-    80203eee:	fe842783          	lw	a5,-24(s0)
-    80203ef2:	fd843703          	ld	a4,-40(s0)
-    80203ef6:	97ba                	add	a5,a5,a4
-    80203ef8:	fe744703          	lbu	a4,-25(s0)
-    80203efc:	00e78023          	sb	a4,0(a5)
+    80203f4a:	fe842783          	lw	a5,-24(s0)
+    80203f4e:	fd843703          	ld	a4,-40(s0)
+    80203f52:	97ba                	add	a5,a5,a4
+    80203f54:	fe744703          	lbu	a4,-25(s0)
+    80203f58:	00e78023          	sb	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:17
         start++;
-    80203f00:	fec42783          	lw	a5,-20(s0)
-    80203f04:	2785                	addiw	a5,a5,1
-    80203f06:	fef42623          	sw	a5,-20(s0)
+    80203f5c:	fec42783          	lw	a5,-20(s0)
+    80203f60:	2785                	addiw	a5,a5,1
+    80203f62:	fef42623          	sw	a5,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:18
         end--;
-    80203f0a:	fe842783          	lw	a5,-24(s0)
-    80203f0e:	37fd                	addiw	a5,a5,-1
-    80203f10:	fef42423          	sw	a5,-24(s0)
+    80203f66:	fe842783          	lw	a5,-24(s0)
+    80203f6a:	37fd                	addiw	a5,a5,-1
+    80203f6c:	fef42423          	sw	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:13
     while (start < end) {
-    80203f14:	fec42703          	lw	a4,-20(s0)
-    80203f18:	fe842783          	lw	a5,-24(s0)
-    80203f1c:	2701                	sext.w	a4,a4
-    80203f1e:	2781                	sext.w	a5,a5
-    80203f20:	faf740e3          	blt	a4,a5,80203ec0 <reverse_str+0x20>
+    80203f70:	fec42703          	lw	a4,-20(s0)
+    80203f74:	fe842783          	lw	a5,-24(s0)
+    80203f78:	2701                	sext.w	a4,a4
+    80203f7a:	2781                	sext.w	a5,a5
+    80203f7c:	faf740e3          	blt	a4,a5,80203f1c <reverse_str+0x20>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:20
     }
 }
-    80203f24:	0001                	nop
-    80203f26:	0001                	nop
-    80203f28:	7422                	ld	s0,40(sp)
-    80203f2a:	6145                	addi	sp,sp,48
-    80203f2c:	8082                	ret
+    80203f80:	0001                	nop
+    80203f82:	0001                	nop
+    80203f84:	7422                	ld	s0,40(sp)
+    80203f86:	6145                	addi	sp,sp,48
+    80203f88:	8082                	ret
 
-0000000080203f2e <print_uint32>:
+0000000080203f8a <print_uint32>:
 print_uint32():
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:22
 
 void print_uint32(uint32_t value) {
-    80203f2e:	7139                	addi	sp,sp,-64
-    80203f30:	fc06                	sd	ra,56(sp)
-    80203f32:	f822                	sd	s0,48(sp)
-    80203f34:	0080                	addi	s0,sp,64
-    80203f36:	87aa                	mv	a5,a0
-    80203f38:	fcf42623          	sw	a5,-52(s0)
+    80203f8a:	7139                	addi	sp,sp,-64
+    80203f8c:	fc06                	sd	ra,56(sp)
+    80203f8e:	f822                	sd	s0,48(sp)
+    80203f90:	0080                	addi	s0,sp,64
+    80203f92:	87aa                	mv	a5,a0
+    80203f94:	fcf42623          	sw	a5,-52(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:24
     char buffer[12];
     int i = 0;
-    80203f3c:	fe042623          	sw	zero,-20(s0)
+    80203f98:	fe042623          	sw	zero,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:25
     if (value == 0) {
-    80203f40:	fcc42783          	lw	a5,-52(s0)
-    80203f44:	2781                	sext.w	a5,a5
-    80203f46:	e3ad                	bnez	a5,80203fa8 <print_uint32+0x7a>
+    80203f9c:	fcc42783          	lw	a5,-52(s0)
+    80203fa0:	2781                	sext.w	a5,a5
+    80203fa2:	e3ad                	bnez	a5,80204004 <print_uint32+0x7a>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:26
         buffer[i++] = '0';
-    80203f48:	fec42783          	lw	a5,-20(s0)
-    80203f4c:	0017871b          	addiw	a4,a5,1
-    80203f50:	fee42623          	sw	a4,-20(s0)
-    80203f54:	ff040713          	addi	a4,s0,-16
-    80203f58:	97ba                	add	a5,a5,a4
-    80203f5a:	03000713          	li	a4,48
-    80203f5e:	fee78423          	sb	a4,-24(a5)
+    80203fa4:	fec42783          	lw	a5,-20(s0)
+    80203fa8:	0017871b          	addiw	a4,a5,1
+    80203fac:	fee42623          	sw	a4,-20(s0)
+    80203fb0:	ff040713          	addi	a4,s0,-16
+    80203fb4:	97ba                	add	a5,a5,a4
+    80203fb6:	03000713          	li	a4,48
+    80203fba:	fee78423          	sb	a4,-24(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:28
     }
     while (value != 0) {
-    80203f62:	a099                	j	80203fa8 <print_uint32+0x7a>
+    80203fbe:	a099                	j	80204004 <print_uint32+0x7a>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:29
         int digit = value % 10;
-    80203f64:	fcc42703          	lw	a4,-52(s0)
-    80203f68:	47a9                	li	a5,10
-    80203f6a:	02f777bb          	remuw	a5,a4,a5
-    80203f6e:	2781                	sext.w	a5,a5
-    80203f70:	fef42423          	sw	a5,-24(s0)
+    80203fc0:	fcc42703          	lw	a4,-52(s0)
+    80203fc4:	47a9                	li	a5,10
+    80203fc6:	02f777bb          	remuw	a5,a4,a5
+    80203fca:	2781                	sext.w	a5,a5
+    80203fcc:	fef42423          	sw	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:30
         buffer[i++] = digit + '0';
-    80203f74:	fe842783          	lw	a5,-24(s0)
-    80203f78:	0ff7f713          	andi	a4,a5,255
-    80203f7c:	fec42783          	lw	a5,-20(s0)
-    80203f80:	0017869b          	addiw	a3,a5,1
-    80203f84:	fed42623          	sw	a3,-20(s0)
-    80203f88:	0307071b          	addiw	a4,a4,48
-    80203f8c:	0ff77713          	andi	a4,a4,255
-    80203f90:	ff040693          	addi	a3,s0,-16
-    80203f94:	97b6                	add	a5,a5,a3
-    80203f96:	fee78423          	sb	a4,-24(a5)
+    80203fd0:	fe842783          	lw	a5,-24(s0)
+    80203fd4:	0ff7f713          	andi	a4,a5,255
+    80203fd8:	fec42783          	lw	a5,-20(s0)
+    80203fdc:	0017869b          	addiw	a3,a5,1
+    80203fe0:	fed42623          	sw	a3,-20(s0)
+    80203fe4:	0307071b          	addiw	a4,a4,48
+    80203fe8:	0ff77713          	andi	a4,a4,255
+    80203fec:	ff040693          	addi	a3,s0,-16
+    80203ff0:	97b6                	add	a5,a5,a3
+    80203ff2:	fee78423          	sb	a4,-24(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:31
         value /= 10;
-    80203f9a:	fcc42703          	lw	a4,-52(s0)
-    80203f9e:	47a9                	li	a5,10
-    80203fa0:	02f757bb          	divuw	a5,a4,a5
-    80203fa4:	fcf42623          	sw	a5,-52(s0)
+    80203ff6:	fcc42703          	lw	a4,-52(s0)
+    80203ffa:	47a9                	li	a5,10
+    80203ffc:	02f757bb          	divuw	a5,a4,a5
+    80204000:	fcf42623          	sw	a5,-52(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:28
     while (value != 0) {
-    80203fa8:	fcc42783          	lw	a5,-52(s0)
-    80203fac:	2781                	sext.w	a5,a5
-    80203fae:	fbdd                	bnez	a5,80203f64 <print_uint32+0x36>
+    80204004:	fcc42783          	lw	a5,-52(s0)
+    80204008:	2781                	sext.w	a5,a5
+    8020400a:	fbdd                	bnez	a5,80203fc0 <print_uint32+0x36>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:33
     }
     buffer[i] = '\0';
-    80203fb0:	fec42783          	lw	a5,-20(s0)
-    80203fb4:	ff040713          	addi	a4,s0,-16
-    80203fb8:	97ba                	add	a5,a5,a4
-    80203fba:	fe078423          	sb	zero,-24(a5)
+    8020400c:	fec42783          	lw	a5,-20(s0)
+    80204010:	ff040713          	addi	a4,s0,-16
+    80204014:	97ba                	add	a5,a5,a4
+    80204016:	fe078423          	sb	zero,-24(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:34
     reverse_str(buffer, i);
-    80203fbe:	fec42703          	lw	a4,-20(s0)
-    80203fc2:	fd840793          	addi	a5,s0,-40
-    80203fc6:	85ba                	mv	a1,a4
-    80203fc8:	853e                	mv	a0,a5
-    80203fca:	ed7ff0ef          	jal	ra,80203ea0 <reverse_str>
+    8020401a:	fec42703          	lw	a4,-20(s0)
+    8020401e:	fd840793          	addi	a5,s0,-40
+    80204022:	85ba                	mv	a1,a4
+    80204024:	853e                	mv	a0,a5
+    80204026:	ed7ff0ef          	jal	ra,80203efc <reverse_str>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:35
     print_str(buffer);
-    80203fce:	fd840793          	addi	a5,s0,-40
-    80203fd2:	853e                	mv	a0,a5
-    80203fd4:	e91ff0ef          	jal	ra,80203e64 <print_str>
+    8020402a:	fd840793          	addi	a5,s0,-40
+    8020402e:	853e                	mv	a0,a5
+    80204030:	e91ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:36
 }
-    80203fd8:	0001                	nop
-    80203fda:	70e2                	ld	ra,56(sp)
-    80203fdc:	7442                	ld	s0,48(sp)
-    80203fde:	6121                	addi	sp,sp,64
-    80203fe0:	8082                	ret
+    80204034:	0001                	nop
+    80204036:	70e2                	ld	ra,56(sp)
+    80204038:	7442                	ld	s0,48(sp)
+    8020403a:	6121                	addi	sp,sp,64
+    8020403c:	8082                	ret
 
-0000000080203fe2 <print_uint64>:
+000000008020403e <print_uint64>:
 print_uint64():
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:38
 
 void print_uint64(uint64_t value) {
-    80203fe2:	7139                	addi	sp,sp,-64
-    80203fe4:	fc06                	sd	ra,56(sp)
-    80203fe6:	f822                	sd	s0,48(sp)
-    80203fe8:	0080                	addi	s0,sp,64
-    80203fea:	fca43423          	sd	a0,-56(s0)
+    8020403e:	7139                	addi	sp,sp,-64
+    80204040:	fc06                	sd	ra,56(sp)
+    80204042:	f822                	sd	s0,48(sp)
+    80204044:	0080                	addi	s0,sp,64
+    80204046:	fca43423          	sd	a0,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:40
     char buffer[21]; // uint64_t的最大值需要20个字符加上一个终止符
     int i = 0;
-    80203fee:	fe042623          	sw	zero,-20(s0)
+    8020404a:	fe042623          	sw	zero,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:41
     if (value == 0) {
-    80203ff2:	fc843783          	ld	a5,-56(s0)
-    80203ff6:	e3a5                	bnez	a5,80204056 <print_uint64+0x74>
+    8020404e:	fc843783          	ld	a5,-56(s0)
+    80204052:	e3a5                	bnez	a5,802040b2 <print_uint64+0x74>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:42
         buffer[i++] = '0';
-    80203ff8:	fec42783          	lw	a5,-20(s0)
-    80203ffc:	0017871b          	addiw	a4,a5,1
-    80204000:	fee42623          	sw	a4,-20(s0)
-    80204004:	ff040713          	addi	a4,s0,-16
-    80204008:	97ba                	add	a5,a5,a4
-    8020400a:	03000713          	li	a4,48
-    8020400e:	fee78023          	sb	a4,-32(a5)
+    80204054:	fec42783          	lw	a5,-20(s0)
+    80204058:	0017871b          	addiw	a4,a5,1
+    8020405c:	fee42623          	sw	a4,-20(s0)
+    80204060:	ff040713          	addi	a4,s0,-16
+    80204064:	97ba                	add	a5,a5,a4
+    80204066:	03000713          	li	a4,48
+    8020406a:	fee78023          	sb	a4,-32(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:44
     }
     while (value != 0) {
-    80204012:	a091                	j	80204056 <print_uint64+0x74>
+    8020406e:	a091                	j	802040b2 <print_uint64+0x74>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:45
         int digit = value % 10;
-    80204014:	fc843703          	ld	a4,-56(s0)
-    80204018:	47a9                	li	a5,10
-    8020401a:	02f777b3          	remu	a5,a4,a5
-    8020401e:	fef42423          	sw	a5,-24(s0)
+    80204070:	fc843703          	ld	a4,-56(s0)
+    80204074:	47a9                	li	a5,10
+    80204076:	02f777b3          	remu	a5,a4,a5
+    8020407a:	fef42423          	sw	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:46
         buffer[i++] = digit + '0';
-    80204022:	fe842783          	lw	a5,-24(s0)
-    80204026:	0ff7f713          	andi	a4,a5,255
-    8020402a:	fec42783          	lw	a5,-20(s0)
-    8020402e:	0017869b          	addiw	a3,a5,1
-    80204032:	fed42623          	sw	a3,-20(s0)
-    80204036:	0307071b          	addiw	a4,a4,48
-    8020403a:	0ff77713          	andi	a4,a4,255
-    8020403e:	ff040693          	addi	a3,s0,-16
-    80204042:	97b6                	add	a5,a5,a3
-    80204044:	fee78023          	sb	a4,-32(a5)
+    8020407e:	fe842783          	lw	a5,-24(s0)
+    80204082:	0ff7f713          	andi	a4,a5,255
+    80204086:	fec42783          	lw	a5,-20(s0)
+    8020408a:	0017869b          	addiw	a3,a5,1
+    8020408e:	fed42623          	sw	a3,-20(s0)
+    80204092:	0307071b          	addiw	a4,a4,48
+    80204096:	0ff77713          	andi	a4,a4,255
+    8020409a:	ff040693          	addi	a3,s0,-16
+    8020409e:	97b6                	add	a5,a5,a3
+    802040a0:	fee78023          	sb	a4,-32(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:47
         value /= 10;
-    80204048:	fc843703          	ld	a4,-56(s0)
-    8020404c:	47a9                	li	a5,10
-    8020404e:	02f757b3          	divu	a5,a4,a5
-    80204052:	fcf43423          	sd	a5,-56(s0)
+    802040a4:	fc843703          	ld	a4,-56(s0)
+    802040a8:	47a9                	li	a5,10
+    802040aa:	02f757b3          	divu	a5,a4,a5
+    802040ae:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:44
     while (value != 0) {
-    80204056:	fc843783          	ld	a5,-56(s0)
-    8020405a:	ffcd                	bnez	a5,80204014 <print_uint64+0x32>
+    802040b2:	fc843783          	ld	a5,-56(s0)
+    802040b6:	ffcd                	bnez	a5,80204070 <print_uint64+0x32>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:49
     }
     buffer[i] = '\0';
-    8020405c:	fec42783          	lw	a5,-20(s0)
-    80204060:	ff040713          	addi	a4,s0,-16
-    80204064:	97ba                	add	a5,a5,a4
-    80204066:	fe078023          	sb	zero,-32(a5)
+    802040b8:	fec42783          	lw	a5,-20(s0)
+    802040bc:	ff040713          	addi	a4,s0,-16
+    802040c0:	97ba                	add	a5,a5,a4
+    802040c2:	fe078023          	sb	zero,-32(a5)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:50
     reverse_str(buffer, i); // 假设reverse_str函数已经实现
-    8020406a:	fec42703          	lw	a4,-20(s0)
-    8020406e:	fd040793          	addi	a5,s0,-48
-    80204072:	85ba                	mv	a1,a4
-    80204074:	853e                	mv	a0,a5
-    80204076:	e2bff0ef          	jal	ra,80203ea0 <reverse_str>
+    802040c6:	fec42703          	lw	a4,-20(s0)
+    802040ca:	fd040793          	addi	a5,s0,-48
+    802040ce:	85ba                	mv	a1,a4
+    802040d0:	853e                	mv	a0,a5
+    802040d2:	e2bff0ef          	jal	ra,80203efc <reverse_str>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:51
     print_str(buffer); // 假设print_str函数已经实现，用于打印字符串
-    8020407a:	fd040793          	addi	a5,s0,-48
-    8020407e:	853e                	mv	a0,a5
-    80204080:	de5ff0ef          	jal	ra,80203e64 <print_str>
+    802040d6:	fd040793          	addi	a5,s0,-48
+    802040da:	853e                	mv	a0,a5
+    802040dc:	de5ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:52
 }
-    80204084:	0001                	nop
-    80204086:	70e2                	ld	ra,56(sp)
-    80204088:	7442                	ld	s0,48(sp)
-    8020408a:	6121                	addi	sp,sp,64
-    8020408c:	8082                	ret
+    802040e0:	0001                	nop
+    802040e2:	70e2                	ld	ra,56(sp)
+    802040e4:	7442                	ld	s0,48(sp)
+    802040e6:	6121                	addi	sp,sp,64
+    802040e8:	8082                	ret
 
-000000008020408e <print_uint64_hex>:
+00000000802040ea <print_uint64_hex>:
 print_uint64_hex():
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:55
 
 void print_uint64_hex(uint64_t value) 
 {
-    8020408e:	7179                	addi	sp,sp,-48
-    80204090:	f406                	sd	ra,40(sp)
-    80204092:	f022                	sd	s0,32(sp)
-    80204094:	1800                	addi	s0,sp,48
-    80204096:	fca43c23          	sd	a0,-40(s0)
+    802040ea:	7179                	addi	sp,sp,-48
+    802040ec:	f406                	sd	ra,40(sp)
+    802040ee:	f022                	sd	s0,32(sp)
+    802040f0:	1800                	addi	s0,sp,48
+    802040f2:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:56
     print_str("0x"); // 打印十六进制前缀
-    8020409a:	00002517          	auipc	a0,0x2
-    8020409e:	16650513          	addi	a0,a0,358 # 80206200 <rodata_start+0x200>
-    802040a2:	dc3ff0ef          	jal	ra,80203e64 <print_str>
+    802040f6:	00002517          	auipc	a0,0x2
+    802040fa:	10a50513          	addi	a0,a0,266 # 80206200 <rodata_start+0x200>
+    802040fe:	dc3ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:57
     for (int i = 15; i >= 0; i--) 
-    802040a6:	47bd                	li	a5,15
-    802040a8:	fef42623          	sw	a5,-20(s0)
-    802040ac:	a09d                	j	80204112 <print_uint64_hex+0x84>
+    80204102:	47bd                	li	a5,15
+    80204104:	fef42623          	sw	a5,-20(s0)
+    80204108:	a09d                	j	8020416e <print_uint64_hex+0x84>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:59
     {
         int digit = (value >> (i * 4)) & 0xF; // 获取每个十六进制位
-    802040ae:	fec42783          	lw	a5,-20(s0)
-    802040b2:	0027979b          	slliw	a5,a5,0x2
-    802040b6:	2781                	sext.w	a5,a5
-    802040b8:	873e                	mv	a4,a5
-    802040ba:	fd843783          	ld	a5,-40(s0)
-    802040be:	00e7d7b3          	srl	a5,a5,a4
-    802040c2:	2781                	sext.w	a5,a5
-    802040c4:	8bbd                	andi	a5,a5,15
-    802040c6:	fef42423          	sw	a5,-24(s0)
+    8020410a:	fec42783          	lw	a5,-20(s0)
+    8020410e:	0027979b          	slliw	a5,a5,0x2
+    80204112:	2781                	sext.w	a5,a5
+    80204114:	873e                	mv	a4,a5
+    80204116:	fd843783          	ld	a5,-40(s0)
+    8020411a:	00e7d7b3          	srl	a5,a5,a4
+    8020411e:	2781                	sext.w	a5,a5
+    80204120:	8bbd                	andi	a5,a5,15
+    80204122:	fef42423          	sw	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:60
         char hex = digit < 10 ? '0' + digit : 'A' + digit - 10; // 转换为字符
-    802040ca:	fe842783          	lw	a5,-24(s0)
-    802040ce:	0007871b          	sext.w	a4,a5
-    802040d2:	47a5                	li	a5,9
-    802040d4:	00e7cb63          	blt	a5,a4,802040ea <print_uint64_hex+0x5c>
+    80204126:	fe842783          	lw	a5,-24(s0)
+    8020412a:	0007871b          	sext.w	a4,a5
+    8020412e:	47a5                	li	a5,9
+    80204130:	00e7cb63          	blt	a5,a4,80204146 <print_uint64_hex+0x5c>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:60 (discriminator 1)
-    802040d8:	fe842783          	lw	a5,-24(s0)
-    802040dc:	0ff7f793          	andi	a5,a5,255
-    802040e0:	0307879b          	addiw	a5,a5,48
-    802040e4:	0ff7f793          	andi	a5,a5,255
-    802040e8:	a809                	j	802040fa <print_uint64_hex+0x6c>
+    80204134:	fe842783          	lw	a5,-24(s0)
+    80204138:	0ff7f793          	andi	a5,a5,255
+    8020413c:	0307879b          	addiw	a5,a5,48
+    80204140:	0ff7f793          	andi	a5,a5,255
+    80204144:	a809                	j	80204156 <print_uint64_hex+0x6c>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:60 (discriminator 2)
-    802040ea:	fe842783          	lw	a5,-24(s0)
-    802040ee:	0ff7f793          	andi	a5,a5,255
-    802040f2:	0377879b          	addiw	a5,a5,55
-    802040f6:	0ff7f793          	andi	a5,a5,255
+    80204146:	fe842783          	lw	a5,-24(s0)
+    8020414a:	0ff7f793          	andi	a5,a5,255
+    8020414e:	0377879b          	addiw	a5,a5,55
+    80204152:	0ff7f793          	andi	a5,a5,255
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:60 (discriminator 4)
-    802040fa:	fef403a3          	sb	a5,-25(s0)
+    80204156:	fef403a3          	sb	a5,-25(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:61 (discriminator 4)
         console_putchar((uint64_t)hex); // 输出字符
-    802040fe:	fe744783          	lbu	a5,-25(s0)
-    80204102:	853e                	mv	a0,a5
-    80204104:	990fe0ef          	jal	ra,80202294 <console_putchar>
+    8020415a:	fe744783          	lbu	a5,-25(s0)
+    8020415e:	853e                	mv	a0,a5
+    80204160:	934fe0ef          	jal	ra,80202294 <console_putchar>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:57 (discriminator 4)
     for (int i = 15; i >= 0; i--) 
-    80204108:	fec42783          	lw	a5,-20(s0)
-    8020410c:	37fd                	addiw	a5,a5,-1
-    8020410e:	fef42623          	sw	a5,-20(s0)
+    80204164:	fec42783          	lw	a5,-20(s0)
+    80204168:	37fd                	addiw	a5,a5,-1
+    8020416a:	fef42623          	sw	a5,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:57 (discriminator 2)
-    80204112:	fec42783          	lw	a5,-20(s0)
-    80204116:	2781                	sext.w	a5,a5
-    80204118:	f807dbe3          	bgez	a5,802040ae <print_uint64_hex+0x20>
+    8020416e:	fec42783          	lw	a5,-20(s0)
+    80204172:	2781                	sext.w	a5,a5
+    80204174:	f807dbe3          	bgez	a5,8020410a <print_uint64_hex+0x20>
 /home/caigoubencai/Desktop/os_c/kernel/console/console.c:63
     }
-    8020411c:	0001                	nop
-    8020411e:	0001                	nop
-    80204120:	70a2                	ld	ra,40(sp)
-    80204122:	7402                	ld	s0,32(sp)
-    80204124:	6145                	addi	sp,sp,48
-    80204126:	8082                	ret
+    80204178:	0001                	nop
+    8020417a:	0001                	nop
+    8020417c:	70a2                	ld	ra,40(sp)
+    8020417e:	7402                	ld	s0,32(sp)
+    80204180:	6145                	addi	sp,sp,48
+    80204182:	8082                	ret
 
-0000000080204128 <panic>:
+0000000080204184 <panic>:
 panic():
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:3
 #include "console.h"
 #include "sbi.h"
 void panic(const char *file, int line) {
-    80204128:	1101                	addi	sp,sp,-32
-    8020412a:	ec06                	sd	ra,24(sp)
-    8020412c:	e822                	sd	s0,16(sp)
-    8020412e:	1000                	addi	s0,sp,32
-    80204130:	fea43423          	sd	a0,-24(s0)
-    80204134:	87ae                	mv	a5,a1
-    80204136:	fef42223          	sw	a5,-28(s0)
+    80204184:	1101                	addi	sp,sp,-32
+    80204186:	ec06                	sd	ra,24(sp)
+    80204188:	e822                	sd	s0,16(sp)
+    8020418a:	1000                	addi	s0,sp,32
+    8020418c:	fea43423          	sd	a0,-24(s0)
+    80204190:	87ae                	mv	a5,a1
+    80204192:	fef42223          	sw	a5,-28(s0)
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:4
     print_str("Panic! File: ");
-    8020413a:	00002517          	auipc	a0,0x2
-    8020413e:	0ce50513          	addi	a0,a0,206 # 80206208 <rodata_start+0x208>
-    80204142:	d23ff0ef          	jal	ra,80203e64 <print_str>
+    80204196:	00002517          	auipc	a0,0x2
+    8020419a:	07250513          	addi	a0,a0,114 # 80206208 <rodata_start+0x208>
+    8020419e:	d23ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:5
     print_str(file);
-    80204146:	fe843503          	ld	a0,-24(s0)
-    8020414a:	d1bff0ef          	jal	ra,80203e64 <print_str>
+    802041a2:	fe843503          	ld	a0,-24(s0)
+    802041a6:	d1bff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:6
     print_str(", Line: ");
-    8020414e:	00002517          	auipc	a0,0x2
-    80204152:	0ca50513          	addi	a0,a0,202 # 80206218 <rodata_start+0x218>
-    80204156:	d0fff0ef          	jal	ra,80203e64 <print_str>
+    802041aa:	00002517          	auipc	a0,0x2
+    802041ae:	06e50513          	addi	a0,a0,110 # 80206218 <rodata_start+0x218>
+    802041b2:	d0fff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:7
     print_uint32(line);
-    8020415a:	fe442783          	lw	a5,-28(s0)
-    8020415e:	853e                	mv	a0,a5
-    80204160:	dcfff0ef          	jal	ra,80203f2e <print_uint32>
+    802041b6:	fe442783          	lw	a5,-28(s0)
+    802041ba:	853e                	mv	a0,a5
+    802041bc:	dcfff0ef          	jal	ra,80203f8a <print_uint32>
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:8
     print_str("\n");
-    80204164:	00002517          	auipc	a0,0x2
-    80204168:	0c450513          	addi	a0,a0,196 # 80206228 <rodata_start+0x228>
-    8020416c:	cf9ff0ef          	jal	ra,80203e64 <print_str>
+    802041c0:	00002517          	auipc	a0,0x2
+    802041c4:	06850513          	addi	a0,a0,104 # 80206228 <rodata_start+0x228>
+    802041c8:	cf9ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:9
     sbi_shutdown();
-    80204170:	96afe0ef          	jal	ra,802022da <sbi_shutdown>
+    802041cc:	90efe0ef          	jal	ra,802022da <sbi_shutdown>
 /home/caigoubencai/Desktop/os_c/kernel/debug/debug.c:10 (discriminator 1)
     while(1);
-    80204174:	a001                	j	80204174 <panic+0x4c>
+    802041d0:	a001                	j	802041d0 <panic+0x4c>
 
-0000000080204176 <task_manager_init>:
+00000000802041d2 <task_manager_init>:
 task_manager_init():
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:13
 struct TaskManager task_manager;
@@ -7197,225 +7252,185 @@ extern uint64_t _num_app[];
 
 void task_manager_init( void )
 {
-    80204176:	7129                	addi	sp,sp,-320
-    80204178:	fe06                	sd	ra,312(sp)
-    8020417a:	fa22                	sd	s0,304(sp)
-    8020417c:	0280                	addi	s0,sp,320
+    802041d2:	7129                	addi	sp,sp,-320
+    802041d4:	fe06                	sd	ra,312(sp)
+    802041d6:	fa22                	sd	s0,304(sp)
+    802041d8:	0280                	addi	s0,sp,320
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:16
 
     extern void __restore(uint64_t);
     print_str("[Test] __restore: ");
-    8020417e:	00002517          	auipc	a0,0x2
-    80204182:	0b250513          	addi	a0,a0,178 # 80206230 <rodata_start+0x230>
-    80204186:	cdfff0ef          	jal	ra,80203e64 <print_str>
+    802041da:	00002517          	auipc	a0,0x2
+    802041de:	05650513          	addi	a0,a0,86 # 80206230 <rodata_start+0x230>
+    802041e2:	cdfff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:17
     print_uint64((uint64_t)__restore);
-    8020418a:	00001797          	auipc	a5,0x1
-    8020418e:	12e78793          	addi	a5,a5,302 # 802052b8 <__restore>
-    80204192:	853e                	mv	a0,a5
-    80204194:	e4fff0ef          	jal	ra,80203fe2 <print_uint64>
+    802041e6:	00001797          	auipc	a5,0x1
+    802041ea:	1b678793          	addi	a5,a5,438 # 8020539c <__restore>
+    802041ee:	853e                	mv	a0,a5
+    802041f0:	e4fff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:18
     print_str("\n");
-    80204198:	00002517          	auipc	a0,0x2
-    8020419c:	0b050513          	addi	a0,a0,176 # 80206248 <rodata_start+0x248>
-    802041a0:	cc5ff0ef          	jal	ra,80203e64 <print_str>
+    802041f4:	00002517          	auipc	a0,0x2
+    802041f8:	05450513          	addi	a0,a0,84 # 80206248 <rodata_start+0x248>
+    802041fc:	cc5ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:19
     task_manager.num_task = MAX_APP_NUM;
-    802041a4:	00816797          	auipc	a5,0x816
-    802041a8:	ee478793          	addi	a5,a5,-284 # 80a1a088 <task_manager>
-    802041ac:	4751                	li	a4,20
-    802041ae:	e398                	sd	a4,0(a5)
+    80204200:	00816797          	auipc	a5,0x816
+    80204204:	e8878793          	addi	a5,a5,-376 # 80a1a088 <task_manager>
+    80204208:	4751                	li	a4,20
+    8020420a:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:20
     task_manager.current_task = 0;
-    802041b0:	00816797          	auipc	a5,0x816
-    802041b4:	ed878793          	addi	a5,a5,-296 # 80a1a088 <task_manager>
-    802041b8:	0007b423          	sd	zero,8(a5)
+    8020420c:	00816797          	auipc	a5,0x816
+    80204210:	e7c78793          	addi	a5,a5,-388 # 80a1a088 <task_manager>
+    80204214:	0007b423          	sd	zero,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:23
 
     // 初始化TCB
     for(uint64_t i = 0; i < app_manager.app_num; i ++)
-    802041bc:	fe043423          	sd	zero,-24(s0)
-    802041c0:	a8d1                	j	80204294 <task_manager_init+0x11e>
+    80204218:	fe043423          	sd	zero,-24(s0)
+    8020421c:	a8d1                	j	802042f0 <task_manager_init+0x11e>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:27 (discriminator 3)
     {
 
         // 获取kernel_stack压入TrapContext后的地址
         uint64_t target_sp = get_kernel_stack_top(i) - sizeof(struct TrapContext);
-    802041c2:	fe843503          	ld	a0,-24(s0)
-    802041c6:	6c2000ef          	jal	ra,80204888 <get_kernel_stack_top>
-    802041ca:	87aa                	mv	a5,a0
-    802041cc:	ef078793          	addi	a5,a5,-272
-    802041d0:	fef43023          	sd	a5,-32(s0)
+    8020421e:	fe843503          	ld	a0,-24(s0)
+    80204222:	6c2000ef          	jal	ra,802048e4 <get_kernel_stack_top>
+    80204226:	87aa                	mv	a5,a0
+    80204228:	ef078793          	addi	a5,a5,-272
+    8020422c:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:28 (discriminator 3)
         task_manager.tasks[i].task_status = Ready; // 设置app状态
-    802041d4:	00816697          	auipc	a3,0x816
-    802041d8:	eb468693          	addi	a3,a3,-332 # 80a1a088 <task_manager>
-    802041dc:	fe843703          	ld	a4,-24(s0)
-    802041e0:	87ba                	mv	a5,a4
-    802041e2:	0792                	slli	a5,a5,0x4
-    802041e4:	8f99                	sub	a5,a5,a4
-    802041e6:	078e                	slli	a5,a5,0x3
-    802041e8:	97b6                	add	a5,a5,a3
-    802041ea:	4705                	li	a4,1
-    802041ec:	08e7a023          	sw	a4,128(a5)
+    80204230:	00816697          	auipc	a3,0x816
+    80204234:	e5868693          	addi	a3,a3,-424 # 80a1a088 <task_manager>
+    80204238:	fe843703          	ld	a4,-24(s0)
+    8020423c:	87ba                	mv	a5,a4
+    8020423e:	0792                	slli	a5,a5,0x4
+    80204240:	8f99                	sub	a5,a5,a4
+    80204242:	078e                	slli	a5,a5,0x3
+    80204244:	97b6                	add	a5,a5,a3
+    80204246:	4705                	li	a4,1
+    80204248:	08e7a023          	sw	a4,128(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:29 (discriminator 3)
         task_manager.tasks[i].task_cx.ra = (uint64_t)__restore; // 设置switch函数返回地址
-    802041f0:	00001697          	auipc	a3,0x1
-    802041f4:	0c868693          	addi	a3,a3,200 # 802052b8 <__restore>
-    802041f8:	00816617          	auipc	a2,0x816
-    802041fc:	e9060613          	addi	a2,a2,-368 # 80a1a088 <task_manager>
-    80204200:	fe843703          	ld	a4,-24(s0)
-    80204204:	87ba                	mv	a5,a4
-    80204206:	0792                	slli	a5,a5,0x4
-    80204208:	8f99                	sub	a5,a5,a4
-    8020420a:	078e                	slli	a5,a5,0x3
-    8020420c:	97b2                	add	a5,a5,a2
-    8020420e:	eb94                	sd	a3,16(a5)
+    8020424c:	00001697          	auipc	a3,0x1
+    80204250:	15068693          	addi	a3,a3,336 # 8020539c <__restore>
+    80204254:	00816617          	auipc	a2,0x816
+    80204258:	e3460613          	addi	a2,a2,-460 # 80a1a088 <task_manager>
+    8020425c:	fe843703          	ld	a4,-24(s0)
+    80204260:	87ba                	mv	a5,a4
+    80204262:	0792                	slli	a5,a5,0x4
+    80204264:	8f99                	sub	a5,a5,a4
+    80204266:	078e                	slli	a5,a5,0x3
+    80204268:	97b2                	add	a5,a5,a2
+    8020426a:	eb94                	sd	a3,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:30 (discriminator 3)
         task_manager.tasks[i].task_cx.sp = target_sp; // 设置各自kernel_stack位置
-    80204210:	00816697          	auipc	a3,0x816
-    80204214:	e7868693          	addi	a3,a3,-392 # 80a1a088 <task_manager>
-    80204218:	fe843703          	ld	a4,-24(s0)
-    8020421c:	87ba                	mv	a5,a4
-    8020421e:	0792                	slli	a5,a5,0x4
-    80204220:	8f99                	sub	a5,a5,a4
-    80204222:	078e                	slli	a5,a5,0x3
-    80204224:	97b6                	add	a5,a5,a3
-    80204226:	fe043703          	ld	a4,-32(s0)
-    8020422a:	ef98                	sd	a4,24(a5)
+    8020426c:	00816697          	auipc	a3,0x816
+    80204270:	e1c68693          	addi	a3,a3,-484 # 80a1a088 <task_manager>
+    80204274:	fe843703          	ld	a4,-24(s0)
+    80204278:	87ba                	mv	a5,a4
+    8020427a:	0792                	slli	a5,a5,0x4
+    8020427c:	8f99                	sub	a5,a5,a4
+    8020427e:	078e                	slli	a5,a5,0x3
+    80204280:	97b6                	add	a5,a5,a3
+    80204282:	fe043703          	ld	a4,-32(s0)
+    80204286:	ef98                	sd	a4,24(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:33 (discriminator 3)
 
         /* 初始化kernel_stack */
         struct TrapContext tc = {
-    8020422c:	ec840793          	addi	a5,s0,-312
-    80204230:	11000713          	li	a4,272
-    80204234:	863a                	mv	a2,a4
-    80204236:	4581                	li	a1,0
-    80204238:	853e                	mv	a0,a5
-    8020423a:	cfefe0ef          	jal	ra,80202738 <memset>
+    80204288:	ec840793          	addi	a5,s0,-312
+    8020428c:	11000713          	li	a4,272
+    80204290:	863a                	mv	a2,a4
+    80204292:	4581                	li	a1,0
+    80204294:	853e                	mv	a0,a5
+    80204296:	ca2fe0ef          	jal	ra,80202738 <memset>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:38 (discriminator 3)
             {0},
             0,
             0
         };
         tc.sepc = APP_BASE_ADDRESS + (APP_SIZE_LIMIT * i); // 设置app首次进入的地址
-    8020423e:	fe843703          	ld	a4,-24(s0)
-    80204242:	6791                	lui	a5,0x4
-    80204244:	02078793          	addi	a5,a5,32 # 4020 <n+0x4000>
-    80204248:	97ba                	add	a5,a5,a4
-    8020424a:	07c6                	slli	a5,a5,0x11
-    8020424c:	fcf43823          	sd	a5,-48(s0)
+    8020429a:	fe843703          	ld	a4,-24(s0)
+    8020429e:	6791                	lui	a5,0x4
+    802042a0:	02078793          	addi	a5,a5,32 # 4020 <n+0x4000>
+    802042a4:	97ba                	add	a5,a5,a4
+    802042a6:	07c6                	slli	a5,a5,0x11
+    802042a8:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:39 (discriminator 3)
         tc.sstatus = READ_CSR(sstatus) & (~SSTATUS_SPP); // 设置sstatus寄存器为内核状态
-    80204250:	100027f3          	csrr	a5,sstatus
-    80204254:	fcf43c23          	sd	a5,-40(s0)
-    80204258:	fd843783          	ld	a5,-40(s0)
-    8020425c:	eff7f793          	andi	a5,a5,-257
-    80204260:	fcf43423          	sd	a5,-56(s0)
+    802042ac:	100027f3          	csrr	a5,sstatus
+    802042b0:	fcf43c23          	sd	a5,-40(s0)
+    802042b4:	fd843783          	ld	a5,-40(s0)
+    802042b8:	eff7f793          	andi	a5,a5,-257
+    802042bc:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:40 (discriminator 3)
         tc.x[2] = (uint64_t)get_user_stack_top(i); // 保证sscratch指向user_stack
-    80204264:	fe843503          	ld	a0,-24(s0)
-    80204268:	64a000ef          	jal	ra,802048b2 <get_user_stack_top>
-    8020426c:	87aa                	mv	a5,a0
-    8020426e:	ecf43c23          	sd	a5,-296(s0)
+    802042c0:	fe843503          	ld	a0,-24(s0)
+    802042c4:	64a000ef          	jal	ra,8020490e <get_user_stack_top>
+    802042c8:	87aa                	mv	a5,a0
+    802042ca:	ecf43c23          	sd	a5,-296(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:42 (discriminator 3)
         // 将TrapContext压入kernel_stack
         *(struct TrapContext *)target_sp = tc;
-    80204272:	fe043783          	ld	a5,-32(s0)
-    80204276:	86be                	mv	a3,a5
-    80204278:	ec840793          	addi	a5,s0,-312
-    8020427c:	11000713          	li	a4,272
-    80204280:	863a                	mv	a2,a4
-    80204282:	85be                	mv	a1,a5
-    80204284:	8536                	mv	a0,a3
-    80204286:	c64fe0ef          	jal	ra,802026ea <memcpy>
+    802042ce:	fe043783          	ld	a5,-32(s0)
+    802042d2:	86be                	mv	a3,a5
+    802042d4:	ec840793          	addi	a5,s0,-312
+    802042d8:	11000713          	li	a4,272
+    802042dc:	863a                	mv	a2,a4
+    802042de:	85be                	mv	a1,a5
+    802042e0:	8536                	mv	a0,a3
+    802042e2:	c08fe0ef          	jal	ra,802026ea <memcpy>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:23 (discriminator 3)
     for(uint64_t i = 0; i < app_manager.app_num; i ++)
-    8020428a:	fe843783          	ld	a5,-24(s0)
-    8020428e:	0785                	addi	a5,a5,1
-    80204290:	fef43423          	sd	a5,-24(s0)
+    802042e6:	fe843783          	ld	a5,-24(s0)
+    802042ea:	0785                	addi	a5,a5,1
+    802042ec:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:23 (discriminator 1)
-    80204294:	00816797          	auipc	a5,0x816
-    80204298:	7d478793          	addi	a5,a5,2004 # 80a1aa68 <app_manager>
-    8020429c:	639c                	ld	a5,0(a5)
-    8020429e:	fe843703          	ld	a4,-24(s0)
-    802042a2:	f2f760e3          	bltu	a4,a5,802041c2 <task_manager_init+0x4c>
+    802042f0:	00816797          	auipc	a5,0x816
+    802042f4:	77878793          	addi	a5,a5,1912 # 80a1aa68 <app_manager>
+    802042f8:	639c                	ld	a5,0(a5)
+    802042fa:	fe843703          	ld	a4,-24(s0)
+    802042fe:	f2f760e3          	bltu	a4,a5,8020421e <task_manager_init+0x4c>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:44
     }
 }
-    802042a6:	0001                	nop
-    802042a8:	0001                	nop
-    802042aa:	70f2                	ld	ra,312(sp)
-    802042ac:	7452                	ld	s0,304(sp)
-    802042ae:	6131                	addi	sp,sp,320
-    802042b0:	8082                	ret
+    80204302:	0001                	nop
+    80204304:	0001                	nop
+    80204306:	70f2                	ld	ra,312(sp)
+    80204308:	7452                	ld	s0,304(sp)
+    8020430a:	6131                	addi	sp,sp,320
+    8020430c:	8082                	ret
 
-00000000802042b2 <run_next_task>:
+000000008020430e <run_next_task>:
 run_next_task():
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:48
 
 
 void run_next_task(uint64_t status) 
 {
-    802042b2:	7139                	addi	sp,sp,-64
-    802042b4:	fc06                	sd	ra,56(sp)
-    802042b6:	f822                	sd	s0,48(sp)
-    802042b8:	0080                	addi	s0,sp,64
-    802042ba:	fca43423          	sd	a0,-56(s0)
+    8020430e:	7139                	addi	sp,sp,-64
+    80204310:	fc06                	sd	ra,56(sp)
+    80204312:	f822                	sd	s0,48(sp)
+    80204314:	0080                	addi	s0,sp,64
+    80204316:	fca43423          	sd	a0,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:51
     /* 寻找ready的task */
     uint64_t target_task_num;
     for (target_task_num = (task_manager.current_task + 1) % MAX_APP_NUM; target_task_num != task_manager.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
-    802042be:	00816797          	auipc	a5,0x816
-    802042c2:	dca78793          	addi	a5,a5,-566 # 80a1a088 <task_manager>
-    802042c6:	679c                	ld	a5,8(a5)
-    802042c8:	00178713          	addi	a4,a5,1
-    802042cc:	47d1                	li	a5,20
-    802042ce:	02f777b3          	remu	a5,a4,a5
-    802042d2:	fef43423          	sd	a5,-24(s0)
-    802042d6:	a81d                	j	8020430c <run_next_task+0x5a>
+    8020431a:	00816797          	auipc	a5,0x816
+    8020431e:	d6e78793          	addi	a5,a5,-658 # 80a1a088 <task_manager>
+    80204322:	679c                	ld	a5,8(a5)
+    80204324:	00178713          	addi	a4,a5,1
+    80204328:	47d1                	li	a5,20
+    8020432a:	02f777b3          	remu	a5,a4,a5
+    8020432e:	fef43423          	sd	a5,-24(s0)
+    80204332:	a81d                	j	80204368 <run_next_task+0x5a>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:52
         if (task_manager.tasks[target_task_num].task_status == Ready) {
-    802042d8:	00816697          	auipc	a3,0x816
-    802042dc:	db068693          	addi	a3,a3,-592 # 80a1a088 <task_manager>
-    802042e0:	fe843703          	ld	a4,-24(s0)
-    802042e4:	87ba                	mv	a5,a4
-    802042e6:	0792                	slli	a5,a5,0x4
-    802042e8:	8f99                	sub	a5,a5,a4
-    802042ea:	078e                	slli	a5,a5,0x3
-    802042ec:	97b6                	add	a5,a5,a3
-    802042ee:	0807a783          	lw	a5,128(a5)
-    802042f2:	873e                	mv	a4,a5
-    802042f4:	4785                	li	a5,1
-    802042f6:	02f70563          	beq	a4,a5,80204320 <run_next_task+0x6e>
-/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:51 (discriminator 2)
-    for (target_task_num = (task_manager.current_task + 1) % MAX_APP_NUM; target_task_num != task_manager.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
-    802042fa:	fe843783          	ld	a5,-24(s0)
-    802042fe:	00178713          	addi	a4,a5,1
-    80204302:	47d1                	li	a5,20
-    80204304:	02f777b3          	remu	a5,a4,a5
-    80204308:	fef43423          	sd	a5,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:51 (discriminator 1)
-    8020430c:	00816797          	auipc	a5,0x816
-    80204310:	d7c78793          	addi	a5,a5,-644 # 80a1a088 <task_manager>
-    80204314:	679c                	ld	a5,8(a5)
-    80204316:	fe843703          	ld	a4,-24(s0)
-    8020431a:	faf71fe3          	bne	a4,a5,802042d8 <run_next_task+0x26>
-    8020431e:	a011                	j	80204322 <run_next_task+0x70>
-/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:53
-            break;
-    80204320:	0001                	nop
-/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:57
-        }
-    }
-    // 没有ready的任务
-    if ((target_task_num == task_manager.current_task) && (task_manager.tasks[target_task_num].task_status != Ready)) {
-    80204322:	00816797          	auipc	a5,0x816
-    80204326:	d6678793          	addi	a5,a5,-666 # 80a1a088 <task_manager>
-    8020432a:	679c                	ld	a5,8(a5)
-    8020432c:	fe843703          	ld	a4,-24(s0)
-    80204330:	02f71b63          	bne	a4,a5,80204366 <run_next_task+0xb4>
-/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:57 (discriminator 1)
     80204334:	00816697          	auipc	a3,0x816
     80204338:	d5468693          	addi	a3,a3,-684 # 80a1a088 <task_manager>
     8020433c:	fe843703          	ld	a4,-24(s0)
@@ -7427,139 +7442,179 @@ void run_next_task(uint64_t status)
     8020434a:	0807a783          	lw	a5,128(a5)
     8020434e:	873e                	mv	a4,a5
     80204350:	4785                	li	a5,1
-    80204352:	00f70a63          	beq	a4,a5,80204366 <run_next_task+0xb4>
+    80204352:	02f70563          	beq	a4,a5,8020437c <run_next_task+0x6e>
+/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:51 (discriminator 2)
+    for (target_task_num = (task_manager.current_task + 1) % MAX_APP_NUM; target_task_num != task_manager.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
+    80204356:	fe843783          	ld	a5,-24(s0)
+    8020435a:	00178713          	addi	a4,a5,1
+    8020435e:	47d1                	li	a5,20
+    80204360:	02f777b3          	remu	a5,a4,a5
+    80204364:	fef43423          	sd	a5,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:51 (discriminator 1)
+    80204368:	00816797          	auipc	a5,0x816
+    8020436c:	d2078793          	addi	a5,a5,-736 # 80a1a088 <task_manager>
+    80204370:	679c                	ld	a5,8(a5)
+    80204372:	fe843703          	ld	a4,-24(s0)
+    80204376:	faf71fe3          	bne	a4,a5,80204334 <run_next_task+0x26>
+    8020437a:	a011                	j	8020437e <run_next_task+0x70>
+/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:53
+            break;
+    8020437c:	0001                	nop
+/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:57
+        }
+    }
+    // 没有ready的任务
+    if ((target_task_num == task_manager.current_task) && (task_manager.tasks[target_task_num].task_status != Ready)) {
+    8020437e:	00816797          	auipc	a5,0x816
+    80204382:	d0a78793          	addi	a5,a5,-758 # 80a1a088 <task_manager>
+    80204386:	679c                	ld	a5,8(a5)
+    80204388:	fe843703          	ld	a4,-24(s0)
+    8020438c:	02f71b63          	bne	a4,a5,802043c2 <run_next_task+0xb4>
+/home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:57 (discriminator 1)
+    80204390:	00816697          	auipc	a3,0x816
+    80204394:	cf868693          	addi	a3,a3,-776 # 80a1a088 <task_manager>
+    80204398:	fe843703          	ld	a4,-24(s0)
+    8020439c:	87ba                	mv	a5,a4
+    8020439e:	0792                	slli	a5,a5,0x4
+    802043a0:	8f99                	sub	a5,a5,a4
+    802043a2:	078e                	slli	a5,a5,0x3
+    802043a4:	97b6                	add	a5,a5,a3
+    802043a6:	0807a783          	lw	a5,128(a5)
+    802043aa:	873e                	mv	a4,a5
+    802043ac:	4785                	li	a5,1
+    802043ae:	00f70a63          	beq	a4,a5,802043c2 <run_next_task+0xb4>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:58 (discriminator 1)
         ASSERT(0);
-    80204356:	03a00593          	li	a1,58
-    8020435a:	00002517          	auipc	a0,0x2
-    8020435e:	ef650513          	addi	a0,a0,-266 # 80206250 <rodata_start+0x250>
-    80204362:	dc7ff0ef          	jal	ra,80204128 <panic>
+    802043b2:	03a00593          	li	a1,58
+    802043b6:	00002517          	auipc	a0,0x2
+    802043ba:	e9a50513          	addi	a0,a0,-358 # 80206250 <rodata_start+0x250>
+    802043be:	dc7ff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:61
     }
 
     struct TaskControlBlock* target_task_tcb = &task_manager.tasks[target_task_num];
-    80204366:	fe843703          	ld	a4,-24(s0)
-    8020436a:	87ba                	mv	a5,a4
-    8020436c:	0792                	slli	a5,a5,0x4
-    8020436e:	8f99                	sub	a5,a5,a4
-    80204370:	078e                	slli	a5,a5,0x3
-    80204372:	01078713          	addi	a4,a5,16
-    80204376:	00816797          	auipc	a5,0x816
-    8020437a:	d1278793          	addi	a5,a5,-750 # 80a1a088 <task_manager>
-    8020437e:	97ba                	add	a5,a5,a4
-    80204380:	fef43023          	sd	a5,-32(s0)
+    802043c2:	fe843703          	ld	a4,-24(s0)
+    802043c6:	87ba                	mv	a5,a4
+    802043c8:	0792                	slli	a5,a5,0x4
+    802043ca:	8f99                	sub	a5,a5,a4
+    802043cc:	078e                	slli	a5,a5,0x3
+    802043ce:	01078713          	addi	a4,a5,16
+    802043d2:	00816797          	auipc	a5,0x816
+    802043d6:	cb678793          	addi	a5,a5,-842 # 80a1a088 <task_manager>
+    802043da:	97ba                	add	a5,a5,a4
+    802043dc:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:62
     struct TaskControlBlock* current_task_tcb = &task_manager.tasks[task_manager.current_task];
-    80204384:	00816797          	auipc	a5,0x816
-    80204388:	d0478793          	addi	a5,a5,-764 # 80a1a088 <task_manager>
-    8020438c:	6798                	ld	a4,8(a5)
-    8020438e:	87ba                	mv	a5,a4
-    80204390:	0792                	slli	a5,a5,0x4
-    80204392:	8f99                	sub	a5,a5,a4
-    80204394:	078e                	slli	a5,a5,0x3
-    80204396:	01078713          	addi	a4,a5,16
-    8020439a:	00816797          	auipc	a5,0x816
-    8020439e:	cee78793          	addi	a5,a5,-786 # 80a1a088 <task_manager>
-    802043a2:	97ba                	add	a5,a5,a4
-    802043a4:	fcf43c23          	sd	a5,-40(s0)
+    802043e0:	00816797          	auipc	a5,0x816
+    802043e4:	ca878793          	addi	a5,a5,-856 # 80a1a088 <task_manager>
+    802043e8:	6798                	ld	a4,8(a5)
+    802043ea:	87ba                	mv	a5,a4
+    802043ec:	0792                	slli	a5,a5,0x4
+    802043ee:	8f99                	sub	a5,a5,a4
+    802043f0:	078e                	slli	a5,a5,0x3
+    802043f2:	01078713          	addi	a4,a5,16
+    802043f6:	00816797          	auipc	a5,0x816
+    802043fa:	c9278793          	addi	a5,a5,-878 # 80a1a088 <task_manager>
+    802043fe:	97ba                	add	a5,a5,a4
+    80204400:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:65
 
     /* 改变状态 */
     current_task_tcb->task_status = status;
-    802043a8:	fc843783          	ld	a5,-56(s0)
-    802043ac:	0007871b          	sext.w	a4,a5
-    802043b0:	fd843783          	ld	a5,-40(s0)
-    802043b4:	dbb8                	sw	a4,112(a5)
+    80204404:	fc843783          	ld	a5,-56(s0)
+    80204408:	0007871b          	sext.w	a4,a5
+    8020440c:	fd843783          	ld	a5,-40(s0)
+    80204410:	dbb8                	sw	a4,112(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:66
     target_task_tcb->task_status = Running;
-    802043b6:	fe043783          	ld	a5,-32(s0)
-    802043ba:	4709                	li	a4,2
-    802043bc:	dbb8                	sw	a4,112(a5)
+    80204412:	fe043783          	ld	a5,-32(s0)
+    80204416:	4709                	li	a4,2
+    80204418:	dbb8                	sw	a4,112(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:67
     task_manager.current_task = target_task_num;
-    802043be:	00816797          	auipc	a5,0x816
-    802043c2:	cca78793          	addi	a5,a5,-822 # 80a1a088 <task_manager>
-    802043c6:	fe843703          	ld	a4,-24(s0)
-    802043ca:	e798                	sd	a4,8(a5)
+    8020441a:	00816797          	auipc	a5,0x816
+    8020441e:	c6e78793          	addi	a5,a5,-914 # 80a1a088 <task_manager>
+    80204422:	fe843703          	ld	a4,-24(s0)
+    80204426:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:70
 
     /* 交换TaskContext */
     __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
-    802043cc:	fd843783          	ld	a5,-40(s0)
-    802043d0:	fe043703          	ld	a4,-32(s0)
-    802043d4:	85ba                	mv	a1,a4
-    802043d6:	853e                	mv	a0,a5
-    802043d8:	73b000ef          	jal	ra,80205312 <__switch>
+    80204428:	fd843783          	ld	a5,-40(s0)
+    8020442c:	fe043703          	ld	a4,-32(s0)
+    80204430:	85ba                	mv	a1,a4
+    80204432:	853e                	mv	a0,a5
+    80204434:	7c7000ef          	jal	ra,802053fa <__switch>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:71
 }
-    802043dc:	0001                	nop
-    802043de:	70e2                	ld	ra,56(sp)
-    802043e0:	7442                	ld	s0,48(sp)
-    802043e2:	6121                	addi	sp,sp,64
-    802043e4:	8082                	ret
+    80204438:	0001                	nop
+    8020443a:	70e2                	ld	ra,56(sp)
+    8020443c:	7442                	ld	s0,48(sp)
+    8020443e:	6121                	addi	sp,sp,64
+    80204440:	8082                	ret
 
-00000000802043e6 <run_first_task>:
+0000000080204442 <run_first_task>:
 run_first_task():
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:75
 
 
 void run_first_task(void) 
 {
-    802043e6:	1141                	addi	sp,sp,-16
-    802043e8:	e406                	sd	ra,8(sp)
-    802043ea:	e022                	sd	s0,0(sp)
-    802043ec:	0800                	addi	s0,sp,16
+    80204442:	1141                	addi	sp,sp,-16
+    80204444:	e406                	sd	ra,8(sp)
+    80204446:	e022                	sd	s0,0(sp)
+    80204448:	0800                	addi	s0,sp,16
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:77
     static struct TaskContext temp;
     task_manager.tasks[task_manager.current_task].task_status = Running;
-    802043ee:	00816797          	auipc	a5,0x816
-    802043f2:	c9a78793          	addi	a5,a5,-870 # 80a1a088 <task_manager>
-    802043f6:	6798                	ld	a4,8(a5)
-    802043f8:	00816697          	auipc	a3,0x816
-    802043fc:	c9068693          	addi	a3,a3,-880 # 80a1a088 <task_manager>
-    80204400:	87ba                	mv	a5,a4
-    80204402:	0792                	slli	a5,a5,0x4
-    80204404:	8f99                	sub	a5,a5,a4
-    80204406:	078e                	slli	a5,a5,0x3
-    80204408:	97b6                	add	a5,a5,a3
-    8020440a:	4709                	li	a4,2
-    8020440c:	08e7a023          	sw	a4,128(a5)
+    8020444a:	00816797          	auipc	a5,0x816
+    8020444e:	c3e78793          	addi	a5,a5,-962 # 80a1a088 <task_manager>
+    80204452:	6798                	ld	a4,8(a5)
+    80204454:	00816697          	auipc	a3,0x816
+    80204458:	c3468693          	addi	a3,a3,-972 # 80a1a088 <task_manager>
+    8020445c:	87ba                	mv	a5,a4
+    8020445e:	0792                	slli	a5,a5,0x4
+    80204460:	8f99                	sub	a5,a5,a4
+    80204462:	078e                	slli	a5,a5,0x3
+    80204464:	97b6                	add	a5,a5,a3
+    80204466:	4709                	li	a4,2
+    80204468:	08e7a023          	sw	a4,128(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:78
     print_str("[kernel] ready to run first app\n");
-    80204410:	00002517          	auipc	a0,0x2
-    80204414:	e6050513          	addi	a0,a0,-416 # 80206270 <rodata_start+0x270>
-    80204418:	a4dff0ef          	jal	ra,80203e64 <print_str>
+    8020446c:	00002517          	auipc	a0,0x2
+    80204470:	e0450513          	addi	a0,a0,-508 # 80206270 <rodata_start+0x270>
+    80204474:	a4dff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:79
     __switch(&temp, &task_manager.tasks[task_manager.current_task].task_cx);
-    8020441c:	00816797          	auipc	a5,0x816
-    80204420:	c6c78793          	addi	a5,a5,-916 # 80a1a088 <task_manager>
-    80204424:	6798                	ld	a4,8(a5)
-    80204426:	87ba                	mv	a5,a4
-    80204428:	0792                	slli	a5,a5,0x4
-    8020442a:	8f99                	sub	a5,a5,a4
-    8020442c:	078e                	slli	a5,a5,0x3
-    8020442e:	01078713          	addi	a4,a5,16
-    80204432:	00816797          	auipc	a5,0x816
-    80204436:	c5678793          	addi	a5,a5,-938 # 80a1a088 <task_manager>
-    8020443a:	97ba                	add	a5,a5,a4
-    8020443c:	85be                	mv	a1,a5
-    8020443e:	00816517          	auipc	a0,0x816
-    80204442:	5ba50513          	addi	a0,a0,1466 # 80a1a9f8 <temp.0>
-    80204446:	6cd000ef          	jal	ra,80205312 <__switch>
+    80204478:	00816797          	auipc	a5,0x816
+    8020447c:	c1078793          	addi	a5,a5,-1008 # 80a1a088 <task_manager>
+    80204480:	6798                	ld	a4,8(a5)
+    80204482:	87ba                	mv	a5,a4
+    80204484:	0792                	slli	a5,a5,0x4
+    80204486:	8f99                	sub	a5,a5,a4
+    80204488:	078e                	slli	a5,a5,0x3
+    8020448a:	01078713          	addi	a4,a5,16
+    8020448e:	00816797          	auipc	a5,0x816
+    80204492:	bfa78793          	addi	a5,a5,-1030 # 80a1a088 <task_manager>
+    80204496:	97ba                	add	a5,a5,a4
+    80204498:	85be                	mv	a1,a5
+    8020449a:	00816517          	auipc	a0,0x816
+    8020449e:	55e50513          	addi	a0,a0,1374 # 80a1a9f8 <temp.0>
+    802044a2:	759000ef          	jal	ra,802053fa <__switch>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:80
     ASSERT(0);
-    8020444a:	05000593          	li	a1,80
-    8020444e:	00002517          	auipc	a0,0x2
-    80204452:	e0250513          	addi	a0,a0,-510 # 80206250 <rodata_start+0x250>
-    80204456:	cd3ff0ef          	jal	ra,80204128 <panic>
+    802044a6:	05000593          	li	a1,80
+    802044aa:	00002517          	auipc	a0,0x2
+    802044ae:	da650513          	addi	a0,a0,-602 # 80206250 <rodata_start+0x250>
+    802044b2:	cd3ff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/batch/task/task.c:81
-    8020445a:	0001                	nop
-    8020445c:	60a2                	ld	ra,8(sp)
-    8020445e:	6402                	ld	s0,0(sp)
-    80204460:	0141                	addi	sp,sp,16
-    80204462:	8082                	ret
+    802044b6:	0001                	nop
+    802044b8:	60a2                	ld	ra,8(sp)
+    802044ba:	6402                	ld	s0,0(sp)
+    802044bc:	0141                	addi	sp,sp,16
+    802044be:	8082                	ret
 
-0000000080204464 <init_appmanager>:
+00000000802044c0 <init_appmanager>:
 init_appmanager():
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:13
 
@@ -7568,500 +7623,500 @@ struct AppManager app_manager;
 
 void init_appmanager()
 {
-    80204464:	1101                	addi	sp,sp,-32
-    80204466:	ec06                	sd	ra,24(sp)
-    80204468:	e822                	sd	s0,16(sp)
-    8020446a:	1000                	addi	s0,sp,32
+    802044c0:	1101                	addi	sp,sp,-32
+    802044c2:	ec06                	sd	ra,24(sp)
+    802044c4:	e822                	sd	s0,16(sp)
+    802044c6:	1000                	addi	s0,sp,32
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:14
     app_manager.app_num = _num_app[0];
-    8020446c:	00003797          	auipc	a5,0x3
-    80204470:	b9478793          	addi	a5,a5,-1132 # 80207000 <_num_app>
-    80204474:	6398                	ld	a4,0(a5)
-    80204476:	00816797          	auipc	a5,0x816
-    8020447a:	5f278793          	addi	a5,a5,1522 # 80a1aa68 <app_manager>
-    8020447e:	e398                	sd	a4,0(a5)
+    802044c8:	00003797          	auipc	a5,0x3
+    802044cc:	b3878793          	addi	a5,a5,-1224 # 80207000 <_num_app>
+    802044d0:	6398                	ld	a4,0(a5)
+    802044d2:	00816797          	auipc	a5,0x816
+    802044d6:	59678793          	addi	a5,a5,1430 # 80a1aa68 <app_manager>
+    802044da:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:15
     for (uint64_t i = 0; i < app_manager.app_num; i++) 
-    80204480:	fe043423          	sd	zero,-24(s0)
-    80204484:	a085                	j	802044e4 <init_appmanager+0x80>
+    802044dc:	fe043423          	sd	zero,-24(s0)
+    802044e0:	a085                	j	80204540 <init_appmanager+0x80>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:17 (discriminator 3)
     {
         app_manager.app_start[i] = _num_app[1 + i * 2];
-    80204486:	fe843783          	ld	a5,-24(s0)
-    8020448a:	0786                	slli	a5,a5,0x1
-    8020448c:	0785                	addi	a5,a5,1
-    8020448e:	00003717          	auipc	a4,0x3
-    80204492:	b7270713          	addi	a4,a4,-1166 # 80207000 <_num_app>
-    80204496:	078e                	slli	a5,a5,0x3
-    80204498:	97ba                	add	a5,a5,a4
-    8020449a:	6398                	ld	a4,0(a5)
-    8020449c:	00816697          	auipc	a3,0x816
-    802044a0:	5cc68693          	addi	a3,a3,1484 # 80a1aa68 <app_manager>
-    802044a4:	fe843783          	ld	a5,-24(s0)
-    802044a8:	0789                	addi	a5,a5,2
-    802044aa:	078e                	slli	a5,a5,0x3
-    802044ac:	97b6                	add	a5,a5,a3
-    802044ae:	e398                	sd	a4,0(a5)
+    802044e2:	fe843783          	ld	a5,-24(s0)
+    802044e6:	0786                	slli	a5,a5,0x1
+    802044e8:	0785                	addi	a5,a5,1
+    802044ea:	00003717          	auipc	a4,0x3
+    802044ee:	b1670713          	addi	a4,a4,-1258 # 80207000 <_num_app>
+    802044f2:	078e                	slli	a5,a5,0x3
+    802044f4:	97ba                	add	a5,a5,a4
+    802044f6:	6398                	ld	a4,0(a5)
+    802044f8:	00816697          	auipc	a3,0x816
+    802044fc:	57068693          	addi	a3,a3,1392 # 80a1aa68 <app_manager>
+    80204500:	fe843783          	ld	a5,-24(s0)
+    80204504:	0789                	addi	a5,a5,2
+    80204506:	078e                	slli	a5,a5,0x3
+    80204508:	97b6                	add	a5,a5,a3
+    8020450a:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:18 (discriminator 3)
         app_manager.app_end[i] = _num_app[2 + i * 2];
-    802044b0:	fe843783          	ld	a5,-24(s0)
-    802044b4:	0785                	addi	a5,a5,1
-    802044b6:	0786                	slli	a5,a5,0x1
-    802044b8:	00003717          	auipc	a4,0x3
-    802044bc:	b4870713          	addi	a4,a4,-1208 # 80207000 <_num_app>
-    802044c0:	078e                	slli	a5,a5,0x3
-    802044c2:	97ba                	add	a5,a5,a4
-    802044c4:	6398                	ld	a4,0(a5)
-    802044c6:	00816697          	auipc	a3,0x816
-    802044ca:	5a268693          	addi	a3,a3,1442 # 80a1aa68 <app_manager>
-    802044ce:	fe843783          	ld	a5,-24(s0)
-    802044d2:	07d9                	addi	a5,a5,22
-    802044d4:	078e                	slli	a5,a5,0x3
-    802044d6:	97b6                	add	a5,a5,a3
-    802044d8:	e398                	sd	a4,0(a5)
+    8020450c:	fe843783          	ld	a5,-24(s0)
+    80204510:	0785                	addi	a5,a5,1
+    80204512:	0786                	slli	a5,a5,0x1
+    80204514:	00003717          	auipc	a4,0x3
+    80204518:	aec70713          	addi	a4,a4,-1300 # 80207000 <_num_app>
+    8020451c:	078e                	slli	a5,a5,0x3
+    8020451e:	97ba                	add	a5,a5,a4
+    80204520:	6398                	ld	a4,0(a5)
+    80204522:	00816697          	auipc	a3,0x816
+    80204526:	54668693          	addi	a3,a3,1350 # 80a1aa68 <app_manager>
+    8020452a:	fe843783          	ld	a5,-24(s0)
+    8020452e:	07d9                	addi	a5,a5,22
+    80204530:	078e                	slli	a5,a5,0x3
+    80204532:	97b6                	add	a5,a5,a3
+    80204534:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:15 (discriminator 3)
     for (uint64_t i = 0; i < app_manager.app_num; i++) 
-    802044da:	fe843783          	ld	a5,-24(s0)
-    802044de:	0785                	addi	a5,a5,1
-    802044e0:	fef43423          	sd	a5,-24(s0)
+    80204536:	fe843783          	ld	a5,-24(s0)
+    8020453a:	0785                	addi	a5,a5,1
+    8020453c:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:15 (discriminator 1)
-    802044e4:	00816797          	auipc	a5,0x816
-    802044e8:	58478793          	addi	a5,a5,1412 # 80a1aa68 <app_manager>
-    802044ec:	639c                	ld	a5,0(a5)
-    802044ee:	fe843703          	ld	a4,-24(s0)
-    802044f2:	f8f76ae3          	bltu	a4,a5,80204486 <init_appmanager+0x22>
+    80204540:	00816797          	auipc	a5,0x816
+    80204544:	52878793          	addi	a5,a5,1320 # 80a1aa68 <app_manager>
+    80204548:	639c                	ld	a5,0(a5)
+    8020454a:	fe843703          	ld	a4,-24(s0)
+    8020454e:	f8f76ae3          	bltu	a4,a5,802044e2 <init_appmanager+0x22>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:20
     }
     app_manager.current_app = 0;
-    802044f6:	00816797          	auipc	a5,0x816
-    802044fa:	57278793          	addi	a5,a5,1394 # 80a1aa68 <app_manager>
-    802044fe:	0007b423          	sd	zero,8(a5)
+    80204552:	00816797          	auipc	a5,0x816
+    80204556:	51678793          	addi	a5,a5,1302 # 80a1aa68 <app_manager>
+    8020455a:	0007b423          	sd	zero,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:21
     print_app_info(&app_manager);
-    80204502:	00816517          	auipc	a0,0x816
-    80204506:	56650513          	addi	a0,a0,1382 # 80a1aa68 <app_manager>
-    8020450a:	00e000ef          	jal	ra,80204518 <print_app_info>
+    8020455e:	00816517          	auipc	a0,0x816
+    80204562:	50a50513          	addi	a0,a0,1290 # 80a1aa68 <app_manager>
+    80204566:	00e000ef          	jal	ra,80204574 <print_app_info>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:22
 }
-    8020450e:	0001                	nop
-    80204510:	60e2                	ld	ra,24(sp)
-    80204512:	6442                	ld	s0,16(sp)
-    80204514:	6105                	addi	sp,sp,32
-    80204516:	8082                	ret
+    8020456a:	0001                	nop
+    8020456c:	60e2                	ld	ra,24(sp)
+    8020456e:	6442                	ld	s0,16(sp)
+    80204570:	6105                	addi	sp,sp,32
+    80204572:	8082                	ret
 
-0000000080204518 <print_app_info>:
+0000000080204574 <print_app_info>:
 print_app_info():
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:25
 
 
 void print_app_info(struct AppManager *manager) {
-    80204518:	7179                	addi	sp,sp,-48
-    8020451a:	f406                	sd	ra,40(sp)
-    8020451c:	f022                	sd	s0,32(sp)
-    8020451e:	1800                	addi	s0,sp,48
-    80204520:	fca43c23          	sd	a0,-40(s0)
+    80204574:	7179                	addi	sp,sp,-48
+    80204576:	f406                	sd	ra,40(sp)
+    80204578:	f022                	sd	s0,32(sp)
+    8020457a:	1800                	addi	s0,sp,48
+    8020457c:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:26
     print_str("Total applications: ");
-    80204524:	00002517          	auipc	a0,0x2
-    80204528:	d7450513          	addi	a0,a0,-652 # 80206298 <rodata_start+0x298>
-    8020452c:	939ff0ef          	jal	ra,80203e64 <print_str>
+    80204580:	00002517          	auipc	a0,0x2
+    80204584:	d1850513          	addi	a0,a0,-744 # 80206298 <rodata_start+0x298>
+    80204588:	939ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:27
     print_uint64(manager->app_num);
-    80204530:	fd843783          	ld	a5,-40(s0)
-    80204534:	639c                	ld	a5,0(a5)
-    80204536:	853e                	mv	a0,a5
-    80204538:	aabff0ef          	jal	ra,80203fe2 <print_uint64>
+    8020458c:	fd843783          	ld	a5,-40(s0)
+    80204590:	639c                	ld	a5,0(a5)
+    80204592:	853e                	mv	a0,a5
+    80204594:	aabff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:28
     print_str("\n");
-    8020453c:	00002517          	auipc	a0,0x2
-    80204540:	d7450513          	addi	a0,a0,-652 # 802062b0 <rodata_start+0x2b0>
-    80204544:	921ff0ef          	jal	ra,80203e64 <print_str>
+    80204598:	00002517          	auipc	a0,0x2
+    8020459c:	d1850513          	addi	a0,a0,-744 # 802062b0 <rodata_start+0x2b0>
+    802045a0:	921ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:30
 
     for (uint64_t i = 0; i < manager->app_num; ++i) {
-    80204548:	fe043423          	sd	zero,-24(s0)
-    8020454c:	a885                	j	802045bc <print_app_info+0xa4>
+    802045a4:	fe043423          	sd	zero,-24(s0)
+    802045a8:	a885                	j	80204618 <print_app_info+0xa4>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:31 (discriminator 3)
         print_str("App ");
-    8020454e:	00002517          	auipc	a0,0x2
-    80204552:	d6a50513          	addi	a0,a0,-662 # 802062b8 <rodata_start+0x2b8>
-    80204556:	90fff0ef          	jal	ra,80203e64 <print_str>
+    802045aa:	00002517          	auipc	a0,0x2
+    802045ae:	d0e50513          	addi	a0,a0,-754 # 802062b8 <rodata_start+0x2b8>
+    802045b2:	90fff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:32 (discriminator 3)
         print_uint64(i);
-    8020455a:	fe843503          	ld	a0,-24(s0)
-    8020455e:	a85ff0ef          	jal	ra,80203fe2 <print_uint64>
+    802045b6:	fe843503          	ld	a0,-24(s0)
+    802045ba:	a85ff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:33 (discriminator 3)
         print_str(":\n  Start Address: ");
-    80204562:	00002517          	auipc	a0,0x2
-    80204566:	d5e50513          	addi	a0,a0,-674 # 802062c0 <rodata_start+0x2c0>
-    8020456a:	8fbff0ef          	jal	ra,80203e64 <print_str>
+    802045be:	00002517          	auipc	a0,0x2
+    802045c2:	d0250513          	addi	a0,a0,-766 # 802062c0 <rodata_start+0x2c0>
+    802045c6:	8fbff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:34 (discriminator 3)
         print_uint64(manager->app_start[i]);
-    8020456e:	fd843703          	ld	a4,-40(s0)
-    80204572:	fe843783          	ld	a5,-24(s0)
-    80204576:	0789                	addi	a5,a5,2
-    80204578:	078e                	slli	a5,a5,0x3
-    8020457a:	97ba                	add	a5,a5,a4
-    8020457c:	639c                	ld	a5,0(a5)
-    8020457e:	853e                	mv	a0,a5
-    80204580:	a63ff0ef          	jal	ra,80203fe2 <print_uint64>
+    802045ca:	fd843703          	ld	a4,-40(s0)
+    802045ce:	fe843783          	ld	a5,-24(s0)
+    802045d2:	0789                	addi	a5,a5,2
+    802045d4:	078e                	slli	a5,a5,0x3
+    802045d6:	97ba                	add	a5,a5,a4
+    802045d8:	639c                	ld	a5,0(a5)
+    802045da:	853e                	mv	a0,a5
+    802045dc:	a63ff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:35 (discriminator 3)
         print_str("\n  End Address:   ");
-    80204584:	00002517          	auipc	a0,0x2
-    80204588:	d5450513          	addi	a0,a0,-684 # 802062d8 <rodata_start+0x2d8>
-    8020458c:	8d9ff0ef          	jal	ra,80203e64 <print_str>
+    802045e0:	00002517          	auipc	a0,0x2
+    802045e4:	cf850513          	addi	a0,a0,-776 # 802062d8 <rodata_start+0x2d8>
+    802045e8:	8d9ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:36 (discriminator 3)
         print_uint64(manager->app_end[i]);
-    80204590:	fd843703          	ld	a4,-40(s0)
-    80204594:	fe843783          	ld	a5,-24(s0)
-    80204598:	07d9                	addi	a5,a5,22
-    8020459a:	078e                	slli	a5,a5,0x3
-    8020459c:	97ba                	add	a5,a5,a4
-    8020459e:	639c                	ld	a5,0(a5)
-    802045a0:	853e                	mv	a0,a5
-    802045a2:	a41ff0ef          	jal	ra,80203fe2 <print_uint64>
+    802045ec:	fd843703          	ld	a4,-40(s0)
+    802045f0:	fe843783          	ld	a5,-24(s0)
+    802045f4:	07d9                	addi	a5,a5,22
+    802045f6:	078e                	slli	a5,a5,0x3
+    802045f8:	97ba                	add	a5,a5,a4
+    802045fa:	639c                	ld	a5,0(a5)
+    802045fc:	853e                	mv	a0,a5
+    802045fe:	a41ff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:37 (discriminator 3)
         print_str("\n");
-    802045a6:	00002517          	auipc	a0,0x2
-    802045aa:	d0a50513          	addi	a0,a0,-758 # 802062b0 <rodata_start+0x2b0>
-    802045ae:	8b7ff0ef          	jal	ra,80203e64 <print_str>
+    80204602:	00002517          	auipc	a0,0x2
+    80204606:	cae50513          	addi	a0,a0,-850 # 802062b0 <rodata_start+0x2b0>
+    8020460a:	8b7ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:30 (discriminator 3)
     for (uint64_t i = 0; i < manager->app_num; ++i) {
-    802045b2:	fe843783          	ld	a5,-24(s0)
-    802045b6:	0785                	addi	a5,a5,1
-    802045b8:	fef43423          	sd	a5,-24(s0)
+    8020460e:	fe843783          	ld	a5,-24(s0)
+    80204612:	0785                	addi	a5,a5,1
+    80204614:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:30 (discriminator 1)
-    802045bc:	fd843783          	ld	a5,-40(s0)
-    802045c0:	639c                	ld	a5,0(a5)
-    802045c2:	fe843703          	ld	a4,-24(s0)
-    802045c6:	f8f764e3          	bltu	a4,a5,8020454e <print_app_info+0x36>
+    80204618:	fd843783          	ld	a5,-40(s0)
+    8020461c:	639c                	ld	a5,0(a5)
+    8020461e:	fe843703          	ld	a4,-24(s0)
+    80204622:	f8f764e3          	bltu	a4,a5,802045aa <print_app_info+0x36>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:39
     }
 }
-    802045ca:	0001                	nop
-    802045cc:	0001                	nop
-    802045ce:	70a2                	ld	ra,40(sp)
-    802045d0:	7402                	ld	s0,32(sp)
-    802045d2:	6145                	addi	sp,sp,48
-    802045d4:	8082                	ret
+    80204626:	0001                	nop
+    80204628:	0001                	nop
+    8020462a:	70a2                	ld	ra,40(sp)
+    8020462c:	7402                	ld	s0,32(sp)
+    8020462e:	6145                	addi	sp,sp,48
+    80204630:	8082                	ret
 
-00000000802045d6 <run_next_app>:
+0000000080204632 <run_next_app>:
 run_next_app():
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:42
 
 void run_next_app()
 {
-    802045d6:	db010113          	addi	sp,sp,-592
-    802045da:	24113423          	sd	ra,584(sp)
-    802045de:	24813023          	sd	s0,576(sp)
-    802045e2:	22913c23          	sd	s1,568(sp)
-    802045e6:	0c80                	addi	s0,sp,592
+    80204632:	db010113          	addi	sp,sp,-592
+    80204636:	24113423          	sd	ra,584(sp)
+    8020463a:	24813023          	sd	s0,576(sp)
+    8020463e:	22913c23          	sd	s1,568(sp)
+    80204642:	0c80                	addi	s0,sp,592
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:44
     //print_str("run_next_app");
     print_str("run_next_app : ");
-    802045e8:	00002517          	auipc	a0,0x2
-    802045ec:	d0850513          	addi	a0,a0,-760 # 802062f0 <rodata_start+0x2f0>
-    802045f0:	875ff0ef          	jal	ra,80203e64 <print_str>
+    80204644:	00002517          	auipc	a0,0x2
+    80204648:	cac50513          	addi	a0,a0,-852 # 802062f0 <rodata_start+0x2f0>
+    8020464c:	875ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:45
     print_uint64(app_manager.current_app);
-    802045f4:	00816797          	auipc	a5,0x816
-    802045f8:	47478793          	addi	a5,a5,1140 # 80a1aa68 <app_manager>
-    802045fc:	679c                	ld	a5,8(a5)
-    802045fe:	853e                	mv	a0,a5
-    80204600:	9e3ff0ef          	jal	ra,80203fe2 <print_uint64>
+    80204650:	00816797          	auipc	a5,0x816
+    80204654:	41878793          	addi	a5,a5,1048 # 80a1aa68 <app_manager>
+    80204658:	679c                	ld	a5,8(a5)
+    8020465a:	853e                	mv	a0,a5
+    8020465c:	9e3ff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:46
     print_str("\n");
-    80204604:	00002517          	auipc	a0,0x2
-    80204608:	cac50513          	addi	a0,a0,-852 # 802062b0 <rodata_start+0x2b0>
-    8020460c:	859ff0ef          	jal	ra,80203e64 <print_str>
+    80204660:	00002517          	auipc	a0,0x2
+    80204664:	c5050513          	addi	a0,a0,-944 # 802062b0 <rodata_start+0x2b0>
+    80204668:	859ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:47
     app_manager.current_app++;
-    80204610:	00816797          	auipc	a5,0x816
-    80204614:	45878793          	addi	a5,a5,1112 # 80a1aa68 <app_manager>
-    80204618:	679c                	ld	a5,8(a5)
-    8020461a:	00178713          	addi	a4,a5,1
-    8020461e:	00816797          	auipc	a5,0x816
-    80204622:	44a78793          	addi	a5,a5,1098 # 80a1aa68 <app_manager>
-    80204626:	e798                	sd	a4,8(a5)
+    8020466c:	00816797          	auipc	a5,0x816
+    80204670:	3fc78793          	addi	a5,a5,1020 # 80a1aa68 <app_manager>
+    80204674:	679c                	ld	a5,8(a5)
+    80204676:	00178713          	addi	a4,a5,1
+    8020467a:	00816797          	auipc	a5,0x816
+    8020467e:	3ee78793          	addi	a5,a5,1006 # 80a1aa68 <app_manager>
+    80204682:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:48
     if(app_manager.current_app>=app_manager.app_num)
-    80204628:	00816797          	auipc	a5,0x816
-    8020462c:	44078793          	addi	a5,a5,1088 # 80a1aa68 <app_manager>
-    80204630:	6798                	ld	a4,8(a5)
-    80204632:	00816797          	auipc	a5,0x816
-    80204636:	43678793          	addi	a5,a5,1078 # 80a1aa68 <app_manager>
-    8020463a:	639c                	ld	a5,0(a5)
-    8020463c:	02f76063          	bltu	a4,a5,8020465c <run_next_app+0x86>
+    80204684:	00816797          	auipc	a5,0x816
+    80204688:	3e478793          	addi	a5,a5,996 # 80a1aa68 <app_manager>
+    8020468c:	6798                	ld	a4,8(a5)
+    8020468e:	00816797          	auipc	a5,0x816
+    80204692:	3da78793          	addi	a5,a5,986 # 80a1aa68 <app_manager>
+    80204696:	639c                	ld	a5,0(a5)
+    80204698:	02f76063          	bltu	a4,a5,802046b8 <run_next_app+0x86>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:50
     {
         print_str("app execute over\n");
-    80204640:	00002517          	auipc	a0,0x2
-    80204644:	cc050513          	addi	a0,a0,-832 # 80206300 <rodata_start+0x300>
-    80204648:	81dff0ef          	jal	ra,80203e64 <print_str>
+    8020469c:	00002517          	auipc	a0,0x2
+    802046a0:	c6450513          	addi	a0,a0,-924 # 80206300 <rodata_start+0x300>
+    802046a4:	81dff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:51
         ASSERT(0);
-    8020464c:	03300593          	li	a1,51
-    80204650:	00002517          	auipc	a0,0x2
-    80204654:	cc850513          	addi	a0,a0,-824 # 80206318 <rodata_start+0x318>
-    80204658:	ad1ff0ef          	jal	ra,80204128 <panic>
+    802046a8:	03300593          	li	a1,51
+    802046ac:	00002517          	auipc	a0,0x2
+    802046b0:	c6c50513          	addi	a0,a0,-916 # 80206318 <rodata_start+0x318>
+    802046b4:	ad1ff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:53
     }
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
-    8020465c:	00816797          	auipc	a5,0x816
-    80204660:	40c78793          	addi	a5,a5,1036 # 80a1aa68 <app_manager>
-    80204664:	679c                	ld	a5,8(a5)
-    80204666:	00816717          	auipc	a4,0x816
-    8020466a:	40270713          	addi	a4,a4,1026 # 80a1aa68 <app_manager>
-    8020466e:	0789                	addi	a5,a5,2
-    80204670:	078e                	slli	a5,a5,0x3
-    80204672:	97ba                	add	a5,a5,a4
-    80204674:	639c                	ld	a5,0(a5)
-    80204676:	fcf43c23          	sd	a5,-40(s0)
+    802046b8:	00816797          	auipc	a5,0x816
+    802046bc:	3b078793          	addi	a5,a5,944 # 80a1aa68 <app_manager>
+    802046c0:	679c                	ld	a5,8(a5)
+    802046c2:	00816717          	auipc	a4,0x816
+    802046c6:	3a670713          	addi	a4,a4,934 # 80a1aa68 <app_manager>
+    802046ca:	0789                	addi	a5,a5,2
+    802046cc:	078e                	slli	a5,a5,0x3
+    802046ce:	97ba                	add	a5,a5,a4
+    802046d0:	639c                	ld	a5,0(a5)
+    802046d2:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:54
     asm volatile ("fence.i");
-    8020467a:	0000100f          	fence.i
+    802046d6:	0000100f          	fence.i
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:55
     struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_stack_top(app_manager.current_app));
-    8020467e:	00816797          	auipc	a5,0x816
-    80204682:	3ea78793          	addi	a5,a5,1002 # 80a1aa68 <app_manager>
-    80204686:	679c                	ld	a5,8(a5)
-    80204688:	853e                	mv	a0,a5
-    8020468a:	228000ef          	jal	ra,802048b2 <get_user_stack_top>
-    8020468e:	872a                	mv	a4,a0
-    80204690:	ec040793          	addi	a5,s0,-320
-    80204694:	863a                	mv	a2,a4
-    80204696:	fd843583          	ld	a1,-40(s0)
-    8020469a:	853e                	mv	a0,a5
-    8020469c:	302000ef          	jal	ra,8020499e <app_init_context>
+    802046da:	00816797          	auipc	a5,0x816
+    802046de:	38e78793          	addi	a5,a5,910 # 80a1aa68 <app_manager>
+    802046e2:	679c                	ld	a5,8(a5)
+    802046e4:	853e                	mv	a0,a5
+    802046e6:	228000ef          	jal	ra,8020490e <get_user_stack_top>
+    802046ea:	872a                	mv	a4,a0
+    802046ec:	ec040793          	addi	a5,s0,-320
+    802046f0:	863a                	mv	a2,a4
+    802046f2:	fd843583          	ld	a1,-40(s0)
+    802046f6:	853e                	mv	a0,a5
+    802046f8:	302000ef          	jal	ra,802049fa <app_init_context>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:56
     uint8_t* cx = Kernelstack_push_TrapContext(trapcontext,app_manager.current_app);
-    802046a0:	00816797          	auipc	a5,0x816
-    802046a4:	3c878793          	addi	a5,a5,968 # 80a1aa68 <app_manager>
-    802046a8:	6784                	ld	s1,8(a5)
-    802046aa:	db040793          	addi	a5,s0,-592
-    802046ae:	ec040713          	addi	a4,s0,-320
-    802046b2:	11000693          	li	a3,272
-    802046b6:	8636                	mv	a2,a3
-    802046b8:	85ba                	mv	a1,a4
-    802046ba:	853e                	mv	a0,a5
-    802046bc:	82efe0ef          	jal	ra,802026ea <memcpy>
-    802046c0:	db040793          	addi	a5,s0,-592
-    802046c4:	85a6                	mv	a1,s1
-    802046c6:	853e                	mv	a0,a5
-    802046c8:	214000ef          	jal	ra,802048dc <Kernelstack_push_TrapContext>
-    802046cc:	fca43823          	sd	a0,-48(s0)
+    802046fc:	00816797          	auipc	a5,0x816
+    80204700:	36c78793          	addi	a5,a5,876 # 80a1aa68 <app_manager>
+    80204704:	6784                	ld	s1,8(a5)
+    80204706:	db040793          	addi	a5,s0,-592
+    8020470a:	ec040713          	addi	a4,s0,-320
+    8020470e:	11000693          	li	a3,272
+    80204712:	8636                	mv	a2,a3
+    80204714:	85ba                	mv	a1,a4
+    80204716:	853e                	mv	a0,a5
+    80204718:	fd3fd0ef          	jal	ra,802026ea <memcpy>
+    8020471c:	db040793          	addi	a5,s0,-592
+    80204720:	85a6                	mv	a1,s1
+    80204722:	853e                	mv	a0,a5
+    80204724:	214000ef          	jal	ra,80204938 <Kernelstack_push_TrapContext>
+    80204728:	fca43823          	sd	a0,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:58
     //__restore(trapcontext);
     __restore((uint64_t)cx);
-    802046d0:	fd043783          	ld	a5,-48(s0)
-    802046d4:	853e                	mv	a0,a5
-    802046d6:	3e3000ef          	jal	ra,802052b8 <__restore>
+    8020472c:	fd043783          	ld	a5,-48(s0)
+    80204730:	853e                	mv	a0,a5
+    80204732:	46b000ef          	jal	ra,8020539c <__restore>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:59
 }
-    802046da:	0001                	nop
-    802046dc:	24813083          	ld	ra,584(sp)
-    802046e0:	24013403          	ld	s0,576(sp)
-    802046e4:	23813483          	ld	s1,568(sp)
-    802046e8:	25010113          	addi	sp,sp,592
-    802046ec:	8082                	ret
+    80204736:	0001                	nop
+    80204738:	24813083          	ld	ra,584(sp)
+    8020473c:	24013403          	ld	s0,576(sp)
+    80204740:	23813483          	ld	s1,568(sp)
+    80204744:	25010113          	addi	sp,sp,592
+    80204748:	8082                	ret
 
-00000000802046ee <run_first_app>:
+000000008020474a <run_first_app>:
 run_first_app():
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:62
 
 void run_first_app()
 {
-    802046ee:	db010113          	addi	sp,sp,-592
-    802046f2:	24113423          	sd	ra,584(sp)
-    802046f6:	24813023          	sd	s0,576(sp)
-    802046fa:	22913c23          	sd	s1,568(sp)
-    802046fe:	0c80                	addi	s0,sp,592
+    8020474a:	db010113          	addi	sp,sp,-592
+    8020474e:	24113423          	sd	ra,584(sp)
+    80204752:	24813023          	sd	s0,576(sp)
+    80204756:	22913c23          	sd	s1,568(sp)
+    8020475a:	0c80                	addi	s0,sp,592
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:63
     uintptr_t start_addr=app_manager.app_start[app_manager.current_app];
-    80204700:	00816797          	auipc	a5,0x816
-    80204704:	36878793          	addi	a5,a5,872 # 80a1aa68 <app_manager>
-    80204708:	679c                	ld	a5,8(a5)
-    8020470a:	00816717          	auipc	a4,0x816
-    8020470e:	35e70713          	addi	a4,a4,862 # 80a1aa68 <app_manager>
-    80204712:	0789                	addi	a5,a5,2
-    80204714:	078e                	slli	a5,a5,0x3
-    80204716:	97ba                	add	a5,a5,a4
-    80204718:	639c                	ld	a5,0(a5)
-    8020471a:	fcf43c23          	sd	a5,-40(s0)
+    8020475c:	00816797          	auipc	a5,0x816
+    80204760:	30c78793          	addi	a5,a5,780 # 80a1aa68 <app_manager>
+    80204764:	679c                	ld	a5,8(a5)
+    80204766:	00816717          	auipc	a4,0x816
+    8020476a:	30270713          	addi	a4,a4,770 # 80a1aa68 <app_manager>
+    8020476e:	0789                	addi	a5,a5,2
+    80204770:	078e                	slli	a5,a5,0x3
+    80204772:	97ba                	add	a5,a5,a4
+    80204774:	639c                	ld	a5,0(a5)
+    80204776:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:64
     struct TrapContext trapcontext = app_init_context(start_addr,(uint64_t)get_user_stack_top(app_manager.current_app));
-    8020471e:	00816797          	auipc	a5,0x816
-    80204722:	34a78793          	addi	a5,a5,842 # 80a1aa68 <app_manager>
-    80204726:	679c                	ld	a5,8(a5)
-    80204728:	853e                	mv	a0,a5
-    8020472a:	188000ef          	jal	ra,802048b2 <get_user_stack_top>
-    8020472e:	872a                	mv	a4,a0
-    80204730:	ec040793          	addi	a5,s0,-320
-    80204734:	863a                	mv	a2,a4
-    80204736:	fd843583          	ld	a1,-40(s0)
-    8020473a:	853e                	mv	a0,a5
-    8020473c:	262000ef          	jal	ra,8020499e <app_init_context>
+    8020477a:	00816797          	auipc	a5,0x816
+    8020477e:	2ee78793          	addi	a5,a5,750 # 80a1aa68 <app_manager>
+    80204782:	679c                	ld	a5,8(a5)
+    80204784:	853e                	mv	a0,a5
+    80204786:	188000ef          	jal	ra,8020490e <get_user_stack_top>
+    8020478a:	872a                	mv	a4,a0
+    8020478c:	ec040793          	addi	a5,s0,-320
+    80204790:	863a                	mv	a2,a4
+    80204792:	fd843583          	ld	a1,-40(s0)
+    80204796:	853e                	mv	a0,a5
+    80204798:	262000ef          	jal	ra,802049fa <app_init_context>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:65
     uint8_t* cx = Kernelstack_push_TrapContext(trapcontext,app_manager.current_app);
-    80204740:	00816797          	auipc	a5,0x816
-    80204744:	32878793          	addi	a5,a5,808 # 80a1aa68 <app_manager>
-    80204748:	6784                	ld	s1,8(a5)
-    8020474a:	db040793          	addi	a5,s0,-592
-    8020474e:	ec040713          	addi	a4,s0,-320
-    80204752:	11000693          	li	a3,272
-    80204756:	8636                	mv	a2,a3
-    80204758:	85ba                	mv	a1,a4
-    8020475a:	853e                	mv	a0,a5
-    8020475c:	f8ffd0ef          	jal	ra,802026ea <memcpy>
-    80204760:	db040793          	addi	a5,s0,-592
-    80204764:	85a6                	mv	a1,s1
-    80204766:	853e                	mv	a0,a5
-    80204768:	174000ef          	jal	ra,802048dc <Kernelstack_push_TrapContext>
-    8020476c:	fca43823          	sd	a0,-48(s0)
+    8020479c:	00816797          	auipc	a5,0x816
+    802047a0:	2cc78793          	addi	a5,a5,716 # 80a1aa68 <app_manager>
+    802047a4:	6784                	ld	s1,8(a5)
+    802047a6:	db040793          	addi	a5,s0,-592
+    802047aa:	ec040713          	addi	a4,s0,-320
+    802047ae:	11000693          	li	a3,272
+    802047b2:	8636                	mv	a2,a3
+    802047b4:	85ba                	mv	a1,a4
+    802047b6:	853e                	mv	a0,a5
+    802047b8:	f33fd0ef          	jal	ra,802026ea <memcpy>
+    802047bc:	db040793          	addi	a5,s0,-592
+    802047c0:	85a6                	mv	a1,s1
+    802047c2:	853e                	mv	a0,a5
+    802047c4:	174000ef          	jal	ra,80204938 <Kernelstack_push_TrapContext>
+    802047c8:	fca43823          	sd	a0,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:66
     __restore((uint64_t)cx);
-    80204770:	fd043783          	ld	a5,-48(s0)
-    80204774:	853e                	mv	a0,a5
-    80204776:	343000ef          	jal	ra,802052b8 <__restore>
+    802047cc:	fd043783          	ld	a5,-48(s0)
+    802047d0:	853e                	mv	a0,a5
+    802047d2:	3cb000ef          	jal	ra,8020539c <__restore>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:67
 }
-    8020477a:	0001                	nop
-    8020477c:	24813083          	ld	ra,584(sp)
-    80204780:	24013403          	ld	s0,576(sp)
-    80204784:	23813483          	ld	s1,568(sp)
-    80204788:	25010113          	addi	sp,sp,592
-    8020478c:	8082                	ret
+    802047d6:	0001                	nop
+    802047d8:	24813083          	ld	ra,584(sp)
+    802047dc:	24013403          	ld	s0,576(sp)
+    802047e0:	23813483          	ld	s1,568(sp)
+    802047e4:	25010113          	addi	sp,sp,592
+    802047e8:	8082                	ret
 
-000000008020478e <load_app_test>:
+00000000802047ea <load_app_test>:
 load_app_test():
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:71
 
 
 void load_app_test()
 {
-    8020478e:	715d                	addi	sp,sp,-80
-    80204790:	e486                	sd	ra,72(sp)
-    80204792:	e0a2                	sd	s0,64(sp)
-    80204794:	0880                	addi	s0,sp,80
+    802047ea:	715d                	addi	sp,sp,-80
+    802047ec:	e486                	sd	ra,72(sp)
+    802047ee:	e0a2                	sd	s0,64(sp)
+    802047f0:	0880                	addi	s0,sp,80
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:74
       // Assume _num_app and related variables are defined elsewhere in your project
     extern uint64_t _num_app[]; // Assuming this is an array holding app info
     uint64_t num_app = _num_app[0]; // First element holds the number of apps
-    80204796:	00003797          	auipc	a5,0x3
-    8020479a:	86a78793          	addi	a5,a5,-1942 # 80207000 <_num_app>
-    8020479e:	639c                	ld	a5,0(a5)
-    802047a0:	fef43023          	sd	a5,-32(s0)
+    802047f2:	00003797          	auipc	a5,0x3
+    802047f6:	80e78793          	addi	a5,a5,-2034 # 80207000 <_num_app>
+    802047fa:	639c                	ld	a5,0(a5)
+    802047fc:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:75
     asm volatile("fence.i");
-    802047a4:	0000100f          	fence.i
+    80204800:	0000100f          	fence.i
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:76
     for (uint64_t i = 0; i < num_app; i++) {
-    802047a8:	fe043423          	sd	zero,-24(s0)
-    802047ac:	a0d1                	j	80204870 <load_app_test+0xe2>
+    80204804:	fe043423          	sd	zero,-24(s0)
+    80204808:	a0d1                	j	802048cc <load_app_test+0xe2>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:78 (discriminator 3)
         // Calculate the start and end addresses of the app in memory
         uint64_t app_start = _num_app[1 + i * 2];
-    802047ae:	fe843783          	ld	a5,-24(s0)
-    802047b2:	0786                	slli	a5,a5,0x1
-    802047b4:	0785                	addi	a5,a5,1
-    802047b6:	00003717          	auipc	a4,0x3
-    802047ba:	84a70713          	addi	a4,a4,-1974 # 80207000 <_num_app>
-    802047be:	078e                	slli	a5,a5,0x3
-    802047c0:	97ba                	add	a5,a5,a4
-    802047c2:	639c                	ld	a5,0(a5)
-    802047c4:	fcf43c23          	sd	a5,-40(s0)
+    8020480a:	fe843783          	ld	a5,-24(s0)
+    8020480e:	0786                	slli	a5,a5,0x1
+    80204810:	0785                	addi	a5,a5,1
+    80204812:	00002717          	auipc	a4,0x2
+    80204816:	7ee70713          	addi	a4,a4,2030 # 80207000 <_num_app>
+    8020481a:	078e                	slli	a5,a5,0x3
+    8020481c:	97ba                	add	a5,a5,a4
+    8020481e:	639c                	ld	a5,0(a5)
+    80204820:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:79 (discriminator 3)
         uint64_t app_end = _num_app[2 + i * 2];
-    802047c8:	fe843783          	ld	a5,-24(s0)
-    802047cc:	0785                	addi	a5,a5,1
-    802047ce:	0786                	slli	a5,a5,0x1
-    802047d0:	00003717          	auipc	a4,0x3
-    802047d4:	83070713          	addi	a4,a4,-2000 # 80207000 <_num_app>
-    802047d8:	078e                	slli	a5,a5,0x3
-    802047da:	97ba                	add	a5,a5,a4
-    802047dc:	639c                	ld	a5,0(a5)
-    802047de:	fcf43823          	sd	a5,-48(s0)
+    80204824:	fe843783          	ld	a5,-24(s0)
+    80204828:	0785                	addi	a5,a5,1
+    8020482a:	0786                	slli	a5,a5,0x1
+    8020482c:	00002717          	auipc	a4,0x2
+    80204830:	7d470713          	addi	a4,a4,2004 # 80207000 <_num_app>
+    80204834:	078e                	slli	a5,a5,0x3
+    80204836:	97ba                	add	a5,a5,a4
+    80204838:	639c                	ld	a5,0(a5)
+    8020483a:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:80 (discriminator 3)
         uint64_t app_size = app_end - app_start;
-    802047e2:	fd043703          	ld	a4,-48(s0)
-    802047e6:	fd843783          	ld	a5,-40(s0)
-    802047ea:	40f707b3          	sub	a5,a4,a5
-    802047ee:	fcf43423          	sd	a5,-56(s0)
+    8020483e:	fd043703          	ld	a4,-48(s0)
+    80204842:	fd843783          	ld	a5,-40(s0)
+    80204846:	40f707b3          	sub	a5,a4,a5
+    8020484a:	fcf43423          	sd	a5,-56(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:81 (discriminator 3)
         const void* src = (const void*)app_start;
-    802047f2:	fd843783          	ld	a5,-40(s0)
-    802047f6:	fcf43023          	sd	a5,-64(s0)
+    8020484e:	fd843783          	ld	a5,-40(s0)
+    80204852:	fcf43023          	sd	a5,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:82 (discriminator 3)
         void* dst = (void*)(APP_BASE_ADDRESS + 0x20000 * i);
-    802047fa:	fe843703          	ld	a4,-24(s0)
-    802047fe:	6791                	lui	a5,0x4
-    80204800:	02078793          	addi	a5,a5,32 # 4020 <n+0x4000>
-    80204804:	97ba                	add	a5,a5,a4
-    80204806:	07c6                	slli	a5,a5,0x11
-    80204808:	faf43c23          	sd	a5,-72(s0)
+    80204856:	fe843703          	ld	a4,-24(s0)
+    8020485a:	6791                	lui	a5,0x4
+    8020485c:	02078793          	addi	a5,a5,32 # 4020 <n+0x4000>
+    80204860:	97ba                	add	a5,a5,a4
+    80204862:	07c6                	slli	a5,a5,0x11
+    80204864:	faf43c23          	sd	a5,-72(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:84 (discriminator 3)
 
         print_str("[Test] Loading app from ");
-    8020480c:	00002517          	auipc	a0,0x2
-    80204810:	b2450513          	addi	a0,a0,-1244 # 80206330 <rodata_start+0x330>
-    80204814:	e50ff0ef          	jal	ra,80203e64 <print_str>
+    80204868:	00002517          	auipc	a0,0x2
+    8020486c:	ac850513          	addi	a0,a0,-1336 # 80206330 <rodata_start+0x330>
+    80204870:	e50ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:85 (discriminator 3)
         print_uint64(app_start);
-    80204818:	fd843503          	ld	a0,-40(s0)
-    8020481c:	fc6ff0ef          	jal	ra,80203fe2 <print_uint64>
+    80204874:	fd843503          	ld	a0,-40(s0)
+    80204878:	fc6ff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:86 (discriminator 3)
         print_str(" to ");
-    80204820:	00002517          	auipc	a0,0x2
-    80204824:	b3050513          	addi	a0,a0,-1232 # 80206350 <rodata_start+0x350>
-    80204828:	e3cff0ef          	jal	ra,80203e64 <print_str>
+    8020487c:	00002517          	auipc	a0,0x2
+    80204880:	ad450513          	addi	a0,a0,-1324 # 80206350 <rodata_start+0x350>
+    80204884:	e3cff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:87 (discriminator 3)
         print_uint64(app_end);
-    8020482c:	fd043503          	ld	a0,-48(s0)
-    80204830:	fb2ff0ef          	jal	ra,80203fe2 <print_uint64>
+    80204888:	fd043503          	ld	a0,-48(s0)
+    8020488c:	fb2ff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:88 (discriminator 3)
         print_str("\n");
-    80204834:	00002517          	auipc	a0,0x2
-    80204838:	a7c50513          	addi	a0,a0,-1412 # 802062b0 <rodata_start+0x2b0>
-    8020483c:	e28ff0ef          	jal	ra,80203e64 <print_str>
+    80204890:	00002517          	auipc	a0,0x2
+    80204894:	a2050513          	addi	a0,a0,-1504 # 802062b0 <rodata_start+0x2b0>
+    80204898:	e28ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:91 (discriminator 3)
 
         // Clear the application area and copy the new app into place
         memset_t(dst, 0, 0x20000); // Ensure APP_MAX_SIZE covers the max possible app size
-    80204840:	00020637          	lui	a2,0x20
-    80204844:	4581                	li	a1,0
-    80204846:	fb843503          	ld	a0,-72(s0)
-    8020484a:	cd3fd0ef          	jal	ra,8020251c <memset_t>
+    8020489c:	00020637          	lui	a2,0x20
+    802048a0:	4581                	li	a1,0
+    802048a2:	fb843503          	ld	a0,-72(s0)
+    802048a6:	c77fd0ef          	jal	ra,8020251c <memset_t>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:92 (discriminator 3)
         memcpy_t(dst, src, app_size);
-    8020484e:	fc843783          	ld	a5,-56(s0)
-    80204852:	2781                	sext.w	a5,a5
-    80204854:	863e                	mv	a2,a5
-    80204856:	fc043583          	ld	a1,-64(s0)
-    8020485a:	fb843503          	ld	a0,-72(s0)
-    8020485e:	afbfd0ef          	jal	ra,80202358 <memcpy_t>
+    802048aa:	fc843783          	ld	a5,-56(s0)
+    802048ae:	2781                	sext.w	a5,a5
+    802048b0:	863e                	mv	a2,a5
+    802048b2:	fc043583          	ld	a1,-64(s0)
+    802048b6:	fb843503          	ld	a0,-72(s0)
+    802048ba:	a9ffd0ef          	jal	ra,80202358 <memcpy_t>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:94 (discriminator 3)
         // Instruction synchronization barrier to ensure all instructions are executed correctly
         __asm__ volatile ("fence.i");
-    80204862:	0000100f          	fence.i
+    802048be:	0000100f          	fence.i
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:76 (discriminator 3)
     for (uint64_t i = 0; i < num_app; i++) {
-    80204866:	fe843783          	ld	a5,-24(s0)
-    8020486a:	0785                	addi	a5,a5,1
-    8020486c:	fef43423          	sd	a5,-24(s0)
+    802048c2:	fe843783          	ld	a5,-24(s0)
+    802048c6:	0785                	addi	a5,a5,1
+    802048c8:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:76 (discriminator 1)
-    80204870:	fe843703          	ld	a4,-24(s0)
-    80204874:	fe043783          	ld	a5,-32(s0)
-    80204878:	f2f76be3          	bltu	a4,a5,802047ae <load_app_test+0x20>
+    802048cc:	fe843703          	ld	a4,-24(s0)
+    802048d0:	fe043783          	ld	a5,-32(s0)
+    802048d4:	f2f76be3          	bltu	a4,a5,8020480a <load_app_test+0x20>
 /home/caigoubencai/Desktop/os_c/kernel/batch/batch.c:96
     }
-    8020487c:	0001                	nop
-    8020487e:	0001                	nop
-    80204880:	60a6                	ld	ra,72(sp)
-    80204882:	6406                	ld	s0,64(sp)
-    80204884:	6161                	addi	sp,sp,80
-    80204886:	8082                	ret
+    802048d8:	0001                	nop
+    802048da:	0001                	nop
+    802048dc:	60a6                	ld	ra,72(sp)
+    802048de:	6406                	ld	s0,64(sp)
+    802048e0:	6161                	addi	sp,sp,80
+    802048e2:	8082                	ret
 
-0000000080204888 <get_kernel_stack_top>:
+00000000802048e4 <get_kernel_stack_top>:
 get_kernel_stack_top():
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:13
 uint8_t Trap_Stack[1024];
@@ -8070,103 +8125,103 @@ uint8_t Kernelstack[MAX_APP_NUM][KERNEL_STACK_SIZE];
 
 
 uint64_t get_kernel_stack_top( uint64_t app_id ) {
-    80204888:	1101                	addi	sp,sp,-32
-    8020488a:	ec22                	sd	s0,24(sp)
-    8020488c:	1000                	addi	s0,sp,32
-    8020488e:	fea43423          	sd	a0,-24(s0)
+    802048e4:	1101                	addi	sp,sp,-32
+    802048e6:	ec22                	sd	s0,24(sp)
+    802048e8:	1000                	addi	s0,sp,32
+    802048ea:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:14
     return (uint64_t)(Kernelstack[app_id]) + KERNEL_STACK_SIZE;
-    80204892:	fe843783          	ld	a5,-24(s0)
-    80204896:	00d79713          	slli	a4,a5,0xd
-    8020489a:	0083e797          	auipc	a5,0x83e
-    8020489e:	71e78793          	addi	a5,a5,1822 # 80a42fb8 <Kernelstack>
-    802048a2:	97ba                	add	a5,a5,a4
-    802048a4:	873e                	mv	a4,a5
-    802048a6:	6789                	lui	a5,0x2
-    802048a8:	97ba                	add	a5,a5,a4
+    802048ee:	fe843783          	ld	a5,-24(s0)
+    802048f2:	00d79713          	slli	a4,a5,0xd
+    802048f6:	0083e797          	auipc	a5,0x83e
+    802048fa:	6c278793          	addi	a5,a5,1730 # 80a42fb8 <Kernelstack>
+    802048fe:	97ba                	add	a5,a5,a4
+    80204900:	873e                	mv	a4,a5
+    80204902:	6789                	lui	a5,0x2
+    80204904:	97ba                	add	a5,a5,a4
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:15
 }
-    802048aa:	853e                	mv	a0,a5
-    802048ac:	6462                	ld	s0,24(sp)
-    802048ae:	6105                	addi	sp,sp,32
-    802048b0:	8082                	ret
+    80204906:	853e                	mv	a0,a5
+    80204908:	6462                	ld	s0,24(sp)
+    8020490a:	6105                	addi	sp,sp,32
+    8020490c:	8082                	ret
 
-00000000802048b2 <get_user_stack_top>:
+000000008020490e <get_user_stack_top>:
 get_user_stack_top():
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:18
 
 
 uint64_t get_user_stack_top( uint64_t app_id ) {
-    802048b2:	1101                	addi	sp,sp,-32
-    802048b4:	ec22                	sd	s0,24(sp)
-    802048b6:	1000                	addi	s0,sp,32
-    802048b8:	fea43423          	sd	a0,-24(s0)
+    8020490e:	1101                	addi	sp,sp,-32
+    80204910:	ec22                	sd	s0,24(sp)
+    80204912:	1000                	addi	s0,sp,32
+    80204914:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:19
     return (uint64_t)(UserStack[app_id]) + USER_STACK_SIZE;
-    802048bc:	fe843783          	ld	a5,-24(s0)
-    802048c0:	00d79713          	slli	a4,a5,0xd
-    802048c4:	00816797          	auipc	a5,0x816
-    802048c8:	6f478793          	addi	a5,a5,1780 # 80a1afb8 <UserStack>
-    802048cc:	97ba                	add	a5,a5,a4
-    802048ce:	873e                	mv	a4,a5
-    802048d0:	6789                	lui	a5,0x2
-    802048d2:	97ba                	add	a5,a5,a4
+    80204918:	fe843783          	ld	a5,-24(s0)
+    8020491c:	00d79713          	slli	a4,a5,0xd
+    80204920:	00816797          	auipc	a5,0x816
+    80204924:	69878793          	addi	a5,a5,1688 # 80a1afb8 <UserStack>
+    80204928:	97ba                	add	a5,a5,a4
+    8020492a:	873e                	mv	a4,a5
+    8020492c:	6789                	lui	a5,0x2
+    8020492e:	97ba                	add	a5,a5,a4
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:20
 }
-    802048d4:	853e                	mv	a0,a5
-    802048d6:	6462                	ld	s0,24(sp)
-    802048d8:	6105                	addi	sp,sp,32
-    802048da:	8082                	ret
+    80204930:	853e                	mv	a0,a5
+    80204932:	6462                	ld	s0,24(sp)
+    80204934:	6105                	addi	sp,sp,32
+    80204936:	8082                	ret
 
-00000000802048dc <Kernelstack_push_TrapContext>:
+0000000080204938 <Kernelstack_push_TrapContext>:
 Kernelstack_push_TrapContext():
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:24
 
 
 uint8_t* Kernelstack_push_TrapContext(struct TrapContext trapContext,uint64_t task_id) 
 {
-    802048dc:	7179                	addi	sp,sp,-48
-    802048de:	f406                	sd	ra,40(sp)
-    802048e0:	f022                	sd	s0,32(sp)
-    802048e2:	1800                	addi	s0,sp,48
-    802048e4:	80aa                	mv	ra,a0
-    802048e6:	fcb43c23          	sd	a1,-40(s0)
+    80204938:	7179                	addi	sp,sp,-48
+    8020493a:	f406                	sd	ra,40(sp)
+    8020493c:	f022                	sd	s0,32(sp)
+    8020493e:	1800                	addi	s0,sp,48
+    80204940:	80aa                	mv	ra,a0
+    80204942:	fcb43c23          	sd	a1,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:25
     uint8_t* stackTop = Kernelstack[task_id] + KERNEL_STACK_SIZE; // 指向栈顶
-    802048ea:	fd843783          	ld	a5,-40(s0)
-    802048ee:	00d79713          	slli	a4,a5,0xd
-    802048f2:	0083e797          	auipc	a5,0x83e
-    802048f6:	6c678793          	addi	a5,a5,1734 # 80a42fb8 <Kernelstack>
-    802048fa:	973e                	add	a4,a4,a5
-    802048fc:	6789                	lui	a5,0x2
-    802048fe:	97ba                	add	a5,a5,a4
-    80204900:	fef43423          	sd	a5,-24(s0)
+    80204946:	fd843783          	ld	a5,-40(s0)
+    8020494a:	00d79713          	slli	a4,a5,0xd
+    8020494e:	0083e797          	auipc	a5,0x83e
+    80204952:	66a78793          	addi	a5,a5,1642 # 80a42fb8 <Kernelstack>
+    80204956:	973e                	add	a4,a4,a5
+    80204958:	6789                	lui	a5,0x2
+    8020495a:	97ba                	add	a5,a5,a4
+    8020495c:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:26
     stackTop -= sizeof(struct TrapContext); // 为TrapContext腾出空间
-    80204904:	fe843783          	ld	a5,-24(s0)
-    80204908:	ef078793          	addi	a5,a5,-272 # 1ef0 <n+0x1ed0>
-    8020490c:	fef43423          	sd	a5,-24(s0)
+    80204960:	fe843783          	ld	a5,-24(s0)
+    80204964:	ef078793          	addi	a5,a5,-272 # 1ef0 <n+0x1ed0>
+    80204968:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:27
     *((struct TrapContext*)stackTop) = trapContext; // 复制TrapContext到栈顶
-    80204910:	fe843783          	ld	a5,-24(s0)
-    80204914:	873e                	mv	a4,a5
-    80204916:	8686                	mv	a3,ra
-    80204918:	11000793          	li	a5,272
-    8020491c:	863e                	mv	a2,a5
-    8020491e:	85b6                	mv	a1,a3
-    80204920:	853a                	mv	a0,a4
-    80204922:	dc9fd0ef          	jal	ra,802026ea <memcpy>
+    8020496c:	fe843783          	ld	a5,-24(s0)
+    80204970:	873e                	mv	a4,a5
+    80204972:	8686                	mv	a3,ra
+    80204974:	11000793          	li	a5,272
+    80204978:	863e                	mv	a2,a5
+    8020497a:	85b6                	mv	a1,a3
+    8020497c:	853a                	mv	a0,a4
+    8020497e:	d6dfd0ef          	jal	ra,802026ea <memcpy>
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:28
     return stackTop; // 返回新的栈顶地址
-    80204926:	fe843783          	ld	a5,-24(s0)
+    80204982:	fe843783          	ld	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/stack/stack.c:29
-    8020492a:	853e                	mv	a0,a5
-    8020492c:	70a2                	ld	ra,40(sp)
-    8020492e:	7402                	ld	s0,32(sp)
-    80204930:	6145                	addi	sp,sp,48
-    80204932:	8082                	ret
+    80204986:	853e                	mv	a0,a5
+    80204988:	70a2                	ld	ra,40(sp)
+    8020498a:	7402                	ld	s0,32(sp)
+    8020498c:	6145                	addi	sp,sp,48
+    8020498e:	8082                	ret
 
-0000000080204934 <set_sstatus_spp_user>:
+0000000080204990 <set_sstatus_spp_user>:
 set_sstatus_spp_user():
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:5
 // TrapContext.c
@@ -8174,156 +8229,156 @@ set_sstatus_spp_user():
 #include "context.h"
 void set_sstatus_spp_user(uint64_t *sstatus) 
 {
-    80204934:	7179                	addi	sp,sp,-48
-    80204936:	f422                	sd	s0,40(sp)
-    80204938:	1800                	addi	s0,sp,48
-    8020493a:	fca43c23          	sd	a0,-40(s0)
+    80204990:	7179                	addi	sp,sp,-48
+    80204992:	f422                	sd	s0,40(sp)
+    80204994:	1800                	addi	s0,sp,48
+    80204996:	fca43c23          	sd	a0,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:6
     uint64_t mask = 1UL << 8;
-    8020493e:	10000793          	li	a5,256
-    80204942:	fef43423          	sd	a5,-24(s0)
+    8020499a:	10000793          	li	a5,256
+    8020499e:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:7
     *sstatus &= ~mask;
-    80204946:	fd843783          	ld	a5,-40(s0)
-    8020494a:	6398                	ld	a4,0(a5)
-    8020494c:	fe843783          	ld	a5,-24(s0)
-    80204950:	fff7c793          	not	a5,a5
-    80204954:	8f7d                	and	a4,a4,a5
-    80204956:	fd843783          	ld	a5,-40(s0)
-    8020495a:	e398                	sd	a4,0(a5)
+    802049a2:	fd843783          	ld	a5,-40(s0)
+    802049a6:	6398                	ld	a4,0(a5)
+    802049a8:	fe843783          	ld	a5,-24(s0)
+    802049ac:	fff7c793          	not	a5,a5
+    802049b0:	8f7d                	and	a4,a4,a5
+    802049b2:	fd843783          	ld	a5,-40(s0)
+    802049b6:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:8
 }
-    8020495c:	0001                	nop
-    8020495e:	7422                	ld	s0,40(sp)
-    80204960:	6145                	addi	sp,sp,48
-    80204962:	8082                	ret
+    802049b8:	0001                	nop
+    802049ba:	7422                	ld	s0,40(sp)
+    802049bc:	6145                	addi	sp,sp,48
+    802049be:	8082                	ret
 
-0000000080204964 <read_sstatus>:
+00000000802049c0 <read_sstatus>:
 read_sstatus():
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:11
 
 // 假设的sstatus读取和设置函数
 uint64_t read_sstatus(void) {
-    80204964:	1101                	addi	sp,sp,-32
-    80204966:	ec22                	sd	s0,24(sp)
-    80204968:	1000                	addi	s0,sp,32
+    802049c0:	1101                	addi	sp,sp,-32
+    802049c2:	ec22                	sd	s0,24(sp)
+    802049c4:	1000                	addi	s0,sp,32
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:12
     return READ_CSR(sstatus);
-    8020496a:	100027f3          	csrr	a5,sstatus
-    8020496e:	fef43423          	sd	a5,-24(s0)
-    80204972:	fe843783          	ld	a5,-24(s0)
+    802049c6:	100027f3          	csrr	a5,sstatus
+    802049ca:	fef43423          	sd	a5,-24(s0)
+    802049ce:	fe843783          	ld	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:13
 }
-    80204976:	853e                	mv	a0,a5
-    80204978:	6462                	ld	s0,24(sp)
-    8020497a:	6105                	addi	sp,sp,32
-    8020497c:	8082                	ret
+    802049d2:	853e                	mv	a0,a5
+    802049d4:	6462                	ld	s0,24(sp)
+    802049d6:	6105                	addi	sp,sp,32
+    802049d8:	8082                	ret
 
-000000008020497e <set_sp>:
+00000000802049da <set_sp>:
 set_sp():
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:16
 
 // 设置栈指针
 void set_sp(struct TrapContext *ctx, uint64_t sp) {
-    8020497e:	1101                	addi	sp,sp,-32
-    80204980:	ec22                	sd	s0,24(sp)
-    80204982:	1000                	addi	s0,sp,32
-    80204984:	fea43423          	sd	a0,-24(s0)
-    80204988:	feb43023          	sd	a1,-32(s0)
+    802049da:	1101                	addi	sp,sp,-32
+    802049dc:	ec22                	sd	s0,24(sp)
+    802049de:	1000                	addi	s0,sp,32
+    802049e0:	fea43423          	sd	a0,-24(s0)
+    802049e4:	feb43023          	sd	a1,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:17
     ctx->x[2] = sp;
-    8020498c:	fe843783          	ld	a5,-24(s0)
-    80204990:	fe043703          	ld	a4,-32(s0)
-    80204994:	eb98                	sd	a4,16(a5)
+    802049e8:	fe843783          	ld	a5,-24(s0)
+    802049ec:	fe043703          	ld	a4,-32(s0)
+    802049f0:	eb98                	sd	a4,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:18
 }
-    80204996:	0001                	nop
-    80204998:	6462                	ld	s0,24(sp)
-    8020499a:	6105                	addi	sp,sp,32
-    8020499c:	8082                	ret
+    802049f2:	0001                	nop
+    802049f4:	6462                	ld	s0,24(sp)
+    802049f6:	6105                	addi	sp,sp,32
+    802049f8:	8082                	ret
 
-000000008020499e <app_init_context>:
+00000000802049fa <app_init_context>:
 app_init_context():
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:22
 
 // 初始化应用程序上下文
 struct TrapContext app_init_context(uint64_t entry, uint64_t sp) 
 {
-    8020499e:	714d                	addi	sp,sp,-336
-    802049a0:	e686                	sd	ra,328(sp)
-    802049a2:	e2a2                	sd	s0,320(sp)
-    802049a4:	0a80                	addi	s0,sp,336
-    802049a6:	eca43423          	sd	a0,-312(s0)
-    802049aa:	ecb43023          	sd	a1,-320(s0)
-    802049ae:	eac43c23          	sd	a2,-328(s0)
+    802049fa:	714d                	addi	sp,sp,-336
+    802049fc:	e686                	sd	ra,328(sp)
+    802049fe:	e2a2                	sd	s0,320(sp)
+    80204a00:	0a80                	addi	s0,sp,336
+    80204a02:	eca43423          	sd	a0,-312(s0)
+    80204a06:	ecb43023          	sd	a1,-320(s0)
+    80204a0a:	eac43c23          	sd	a2,-328(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:24
     struct TrapContext ctx;
     uint64_t sstatus = read_sstatus();
-    802049b2:	fb3ff0ef          	jal	ra,80204964 <read_sstatus>
-    802049b6:	87aa                	mv	a5,a0
-    802049b8:	ecf43823          	sd	a5,-304(s0)
+    80204a0e:	fb3ff0ef          	jal	ra,802049c0 <read_sstatus>
+    80204a12:	87aa                	mv	a5,a0
+    80204a14:	ecf43823          	sd	a5,-304(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:25
     set_sstatus_spp_user(&sstatus); // 设置为用户模式
-    802049bc:	ed040793          	addi	a5,s0,-304
-    802049c0:	853e                	mv	a0,a5
-    802049c2:	f73ff0ef          	jal	ra,80204934 <set_sstatus_spp_user>
+    80204a18:	ed040793          	addi	a5,s0,-304
+    80204a1c:	853e                	mv	a0,a5
+    80204a1e:	f73ff0ef          	jal	ra,80204990 <set_sstatus_spp_user>
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:26
     ctx.sstatus = sstatus;
-    802049c6:	ed043783          	ld	a5,-304(s0)
-    802049ca:	fcf43c23          	sd	a5,-40(s0)
+    80204a22:	ed043783          	ld	a5,-304(s0)
+    80204a26:	fcf43c23          	sd	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:27
     ctx.sepc = entry; // 设置入口地址
-    802049ce:	ec043783          	ld	a5,-320(s0)
-    802049d2:	fef43023          	sd	a5,-32(s0)
+    80204a2a:	ec043783          	ld	a5,-320(s0)
+    80204a2e:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:28
     set_sp(&ctx, sp); // 设置栈指针
-    802049d6:	ed840793          	addi	a5,s0,-296
-    802049da:	eb843583          	ld	a1,-328(s0)
-    802049de:	853e                	mv	a0,a5
-    802049e0:	f9fff0ef          	jal	ra,8020497e <set_sp>
+    80204a32:	ed840793          	addi	a5,s0,-296
+    80204a36:	eb843583          	ld	a1,-328(s0)
+    80204a3a:	853e                	mv	a0,a5
+    80204a3c:	f9fff0ef          	jal	ra,802049da <set_sp>
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:30
     //初始化通用寄存器为0
     for(int i = 0; i < 32; i++)
-    802049e4:	fe042623          	sw	zero,-20(s0)
-    802049e8:	a831                	j	80204a04 <app_init_context+0x66>
+    80204a40:	fe042623          	sw	zero,-20(s0)
+    80204a44:	a831                	j	80204a60 <app_init_context+0x66>
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:32 (discriminator 3)
     {
         ctx.x[i] = 0;
-    802049ea:	fec42783          	lw	a5,-20(s0)
-    802049ee:	078e                	slli	a5,a5,0x3
-    802049f0:	ff040713          	addi	a4,s0,-16
-    802049f4:	97ba                	add	a5,a5,a4
-    802049f6:	ee07b423          	sd	zero,-280(a5)
+    80204a46:	fec42783          	lw	a5,-20(s0)
+    80204a4a:	078e                	slli	a5,a5,0x3
+    80204a4c:	ff040713          	addi	a4,s0,-16
+    80204a50:	97ba                	add	a5,a5,a4
+    80204a52:	ee07b423          	sd	zero,-280(a5)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:30 (discriminator 3)
     for(int i = 0; i < 32; i++)
-    802049fa:	fec42783          	lw	a5,-20(s0)
-    802049fe:	2785                	addiw	a5,a5,1
-    80204a00:	fef42623          	sw	a5,-20(s0)
+    80204a56:	fec42783          	lw	a5,-20(s0)
+    80204a5a:	2785                	addiw	a5,a5,1
+    80204a5c:	fef42623          	sw	a5,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:30 (discriminator 1)
-    80204a04:	fec42783          	lw	a5,-20(s0)
-    80204a08:	0007871b          	sext.w	a4,a5
-    80204a0c:	47fd                	li	a5,31
-    80204a0e:	fce7dee3          	bge	a5,a4,802049ea <app_init_context+0x4c>
+    80204a60:	fec42783          	lw	a5,-20(s0)
+    80204a64:	0007871b          	sext.w	a4,a5
+    80204a68:	47fd                	li	a5,31
+    80204a6a:	fce7dee3          	bge	a5,a4,80204a46 <app_init_context+0x4c>
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:34
     }
     return ctx;
-    80204a12:	ec843783          	ld	a5,-312(s0)
-    80204a16:	86be                	mv	a3,a5
-    80204a18:	ed840793          	addi	a5,s0,-296
-    80204a1c:	11000713          	li	a4,272
-    80204a20:	863a                	mv	a2,a4
-    80204a22:	85be                	mv	a1,a5
-    80204a24:	8536                	mv	a0,a3
-    80204a26:	cc5fd0ef          	jal	ra,802026ea <memcpy>
+    80204a6e:	ec843783          	ld	a5,-312(s0)
+    80204a72:	86be                	mv	a3,a5
+    80204a74:	ed840793          	addi	a5,s0,-296
+    80204a78:	11000713          	li	a4,272
+    80204a7c:	863a                	mv	a2,a4
+    80204a7e:	85be                	mv	a1,a5
+    80204a80:	8536                	mv	a0,a3
+    80204a82:	c69fd0ef          	jal	ra,802026ea <memcpy>
 /home/caigoubencai/Desktop/os_c/kernel/batch/context/context.c:35
 }
-    80204a2a:	ec843503          	ld	a0,-312(s0)
-    80204a2e:	60b6                	ld	ra,328(sp)
-    80204a30:	6416                	ld	s0,320(sp)
-    80204a32:	6171                	addi	sp,sp,336
-    80204a34:	8082                	ret
+    80204a86:	ec843503          	ld	a0,-312(s0)
+    80204a8a:	60b6                	ld	ra,328(sp)
+    80204a8c:	6416                	ld	s0,320(sp)
+    80204a8e:	6171                	addi	sp,sp,336
+    80204a90:	8082                	ret
 
-0000000080204a36 <print_sepc>:
+0000000080204a92 <print_sepc>:
 print_sepc():
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:15
 #include "task.h"
@@ -8332,432 +8387,485 @@ extern void __alltraps(void);
 
 void print_sepc()
 {
-    80204a36:	1101                	addi	sp,sp,-32
-    80204a38:	ec06                	sd	ra,24(sp)
-    80204a3a:	e822                	sd	s0,16(sp)
-    80204a3c:	1000                	addi	s0,sp,32
+    80204a92:	1101                	addi	sp,sp,-32
+    80204a94:	ec06                	sd	ra,24(sp)
+    80204a96:	e822                	sd	s0,16(sp)
+    80204a98:	1000                	addi	s0,sp,32
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:16
     print_str("sepc : ");
-    80204a3e:	00002517          	auipc	a0,0x2
-    80204a42:	91a50513          	addi	a0,a0,-1766 # 80206358 <rodata_start+0x358>
-    80204a46:	c1eff0ef          	jal	ra,80203e64 <print_str>
+    80204a9a:	00002517          	auipc	a0,0x2
+    80204a9e:	8be50513          	addi	a0,a0,-1858 # 80206358 <rodata_start+0x358>
+    80204aa2:	c1eff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:17
     print_uint64(READ_CSR(sepc));
-    80204a4a:	141027f3          	csrr	a5,sepc
-    80204a4e:	fef43423          	sd	a5,-24(s0)
-    80204a52:	fe843783          	ld	a5,-24(s0)
-    80204a56:	853e                	mv	a0,a5
-    80204a58:	d8aff0ef          	jal	ra,80203fe2 <print_uint64>
+    80204aa6:	141027f3          	csrr	a5,sepc
+    80204aaa:	fef43423          	sd	a5,-24(s0)
+    80204aae:	fe843783          	ld	a5,-24(s0)
+    80204ab2:	853e                	mv	a0,a5
+    80204ab4:	d8aff0ef          	jal	ra,8020403e <print_uint64>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:18
     print_str("\n");    
-    80204a5c:	00002517          	auipc	a0,0x2
-    80204a60:	90450513          	addi	a0,a0,-1788 # 80206360 <rodata_start+0x360>
-    80204a64:	c00ff0ef          	jal	ra,80203e64 <print_str>
+    80204ab8:	00002517          	auipc	a0,0x2
+    80204abc:	8a850513          	addi	a0,a0,-1880 # 80206360 <rodata_start+0x360>
+    80204ac0:	c00ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:19
 }
-    80204a68:	0001                	nop
-    80204a6a:	60e2                	ld	ra,24(sp)
-    80204a6c:	6442                	ld	s0,16(sp)
-    80204a6e:	6105                	addi	sp,sp,32
-    80204a70:	8082                	ret
+    80204ac4:	0001                	nop
+    80204ac6:	60e2                	ld	ra,24(sp)
+    80204ac8:	6442                	ld	s0,16(sp)
+    80204aca:	6105                	addi	sp,sp,32
+    80204acc:	8082                	ret
 
-0000000080204a72 <init_interrupt>:
+0000000080204ace <init_interrupt>:
 init_interrupt():
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:22
 
 void init_interrupt()
 {
-    80204a72:	7139                	addi	sp,sp,-64
-    80204a74:	fc22                	sd	s0,56(sp)
-    80204a76:	0080                	addi	s0,sp,64
+    80204ace:	7139                	addi	sp,sp,-64
+    80204ad0:	fc22                	sd	s0,56(sp)
+    80204ad2:	0080                	addi	s0,sp,64
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:24
     //print_str("----init_interrupt----\n");
     uint64_t stvec_value = (uint64_t)(__alltraps);
-    80204a78:	00000797          	auipc	a5,0x0
-    80204a7c:	7e878793          	addi	a5,a5,2024 # 80205260 <__alltraps>
-    80204a80:	fef43423          	sd	a5,-24(s0)
+    80204ad4:	00001797          	auipc	a5,0x1
+    80204ad8:	87078793          	addi	a5,a5,-1936 # 80205344 <__alltraps>
+    80204adc:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:26
     // WRITE_CSR(stvec,stvec_value);
     asm volatile("csrw stvec, %0" :: "r"(stvec_value));
-    80204a84:	fe843783          	ld	a5,-24(s0)
-    80204a88:	10579073          	csrw	stvec,a5
+    80204ae0:	fe843783          	ld	a5,-24(s0)
+    80204ae4:	10579073          	csrw	stvec,a5
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:27
     uint64_t mask = 0x202; // 定义启用S模式时钟中断和软件中断的掩码
-    80204a8c:	20200793          	li	a5,514
-    80204a90:	fef43023          	sd	a5,-32(s0)
+    80204ae8:	20200793          	li	a5,514
+    80204aec:	fef43023          	sd	a5,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:28
     WRITE_CSR(sie,mask);
-    80204a94:	fe043783          	ld	a5,-32(s0)
-    80204a98:	10479073          	csrw	sie,a5
+    80204af0:	fe043783          	ld	a5,-32(s0)
+    80204af4:	10479073          	csrw	sie,a5
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:29
     uint64_t sstatus = READ_CSR(sstatus);
-    80204a9c:	100027f3          	csrr	a5,sstatus
-    80204aa0:	fcf43c23          	sd	a5,-40(s0)
-    80204aa4:	fd843783          	ld	a5,-40(s0)
-    80204aa8:	fcf43823          	sd	a5,-48(s0)
+    80204af8:	100027f3          	csrr	a5,sstatus
+    80204afc:	fcf43c23          	sd	a5,-40(s0)
+    80204b00:	fd843783          	ld	a5,-40(s0)
+    80204b04:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:30
     sstatus |= SSTATUS_SIE_BIT;
-    80204aac:	fd043783          	ld	a5,-48(s0)
-    80204ab0:	0027e793          	ori	a5,a5,2
-    80204ab4:	fcf43823          	sd	a5,-48(s0)
+    80204b08:	fd043783          	ld	a5,-48(s0)
+    80204b0c:	0027e793          	ori	a5,a5,2
+    80204b10:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:31
     WRITE_CSR(sstatus, sstatus);
-    80204ab8:	fd043783          	ld	a5,-48(s0)
-    80204abc:	10079073          	csrw	sstatus,a5
+    80204b14:	fd043783          	ld	a5,-48(s0)
+    80204b18:	10079073          	csrw	sstatus,a5
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:32
     uint64_t sie = READ_CSR(sie);
-    80204ac0:	104027f3          	csrr	a5,sie
-    80204ac4:	fcf43423          	sd	a5,-56(s0)
-    80204ac8:	fc843783          	ld	a5,-56(s0)
-    80204acc:	fcf43023          	sd	a5,-64(s0)
+    80204b1c:	104027f3          	csrr	a5,sie
+    80204b20:	fcf43423          	sd	a5,-56(s0)
+    80204b24:	fc843783          	ld	a5,-56(s0)
+    80204b28:	fcf43023          	sd	a5,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:33
     sie |= SIE_SSIE_BIT | SIE_STIE_BIT | SIE_SEIE_BIT;
-    80204ad0:	fc043783          	ld	a5,-64(s0)
-    80204ad4:	2227e793          	ori	a5,a5,546
-    80204ad8:	fcf43023          	sd	a5,-64(s0)
+    80204b2c:	fc043783          	ld	a5,-64(s0)
+    80204b30:	2227e793          	ori	a5,a5,546
+    80204b34:	fcf43023          	sd	a5,-64(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:34
     WRITE_CSR(sie, sie);
-    80204adc:	fc043783          	ld	a5,-64(s0)
-    80204ae0:	10479073          	csrw	sie,a5
+    80204b38:	fc043783          	ld	a5,-64(s0)
+    80204b3c:	10479073          	csrw	sie,a5
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:35
     WRITE_CSR(sscratch,Trap_Stack);
-    80204ae4:	00816797          	auipc	a5,0x816
-    80204ae8:	0d478793          	addi	a5,a5,212 # 80a1abb8 <Trap_Stack>
-    80204aec:	14079073          	csrw	sscratch,a5
+    80204b40:	00816797          	auipc	a5,0x816
+    80204b44:	07878793          	addi	a5,a5,120 # 80a1abb8 <Trap_Stack>
+    80204b48:	14079073          	csrw	sscratch,a5
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:36
 }
-    80204af0:	0001                	nop
-    80204af2:	7462                	ld	s0,56(sp)
-    80204af4:	6121                	addi	sp,sp,64
-    80204af6:	8082                	ret
+    80204b4c:	0001                	nop
+    80204b4e:	7462                	ld	s0,56(sp)
+    80204b50:	6121                	addi	sp,sp,64
+    80204b52:	8082                	ret
 
-0000000080204af8 <trap_handler>:
+0000000080204b54 <trap_handler>:
 trap_handler():
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:39
 
 struct TrapContext* trap_handler(struct TrapContext* cx) 
 {
-    80204af8:	711d                	addi	sp,sp,-96
-    80204afa:	ec86                	sd	ra,88(sp)
-    80204afc:	e8a2                	sd	s0,80(sp)
-    80204afe:	1080                	addi	s0,sp,96
-    80204b00:	faa43423          	sd	a0,-88(s0)
+    80204b54:	711d                	addi	sp,sp,-96
+    80204b56:	ec86                	sd	ra,88(sp)
+    80204b58:	e8a2                	sd	s0,80(sp)
+    80204b5a:	1080                	addi	s0,sp,96
+    80204b5c:	faa43423          	sd	a0,-88(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:41
     //print_str("trap_handler\n");
     uint64_t scause = READ_CSR(scause);
-    80204b04:	142027f3          	csrr	a5,scause
-    80204b08:	fcf43c23          	sd	a5,-40(s0)
-    80204b0c:	fd843783          	ld	a5,-40(s0)
-    80204b10:	fcf43823          	sd	a5,-48(s0)
+    80204b60:	142027f3          	csrr	a5,scause
+    80204b64:	fcf43c23          	sd	a5,-40(s0)
+    80204b68:	fd843783          	ld	a5,-40(s0)
+    80204b6c:	fcf43823          	sd	a5,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:44
     //uint64_t stval = READ_CSR(stval);
 
     switch (scause)
-    80204b14:	fd043703          	ld	a4,-48(s0)
-    80204b18:	47bd                	li	a5,15
-    80204b1a:	02e7e963          	bltu	a5,a4,80204b4c <trap_handler+0x54>
-    80204b1e:	fd043703          	ld	a4,-48(s0)
-    80204b22:	47bd                	li	a5,15
-    80204b24:	1ee7e463          	bltu	a5,a4,80204d0c <trap_handler+0x214>
-    80204b28:	fd043783          	ld	a5,-48(s0)
-    80204b2c:	00279713          	slli	a4,a5,0x2
-    80204b30:	00002797          	auipc	a5,0x2
-    80204b34:	a3478793          	addi	a5,a5,-1484 # 80206564 <rodata_start+0x564>
-    80204b38:	97ba                	add	a5,a5,a4
-    80204b3a:	439c                	lw	a5,0(a5)
-    80204b3c:	0007871b          	sext.w	a4,a5
-    80204b40:	00002797          	auipc	a5,0x2
-    80204b44:	a2478793          	addi	a5,a5,-1500 # 80206564 <rodata_start+0x564>
-    80204b48:	97ba                	add	a5,a5,a4
-    80204b4a:	8782                	jr	a5
-    80204b4c:	fd043703          	ld	a4,-48(s0)
-    80204b50:	57fd                	li	a5,-1
-    80204b52:	17fe                	slli	a5,a5,0x3f
-    80204b54:	0795                	addi	a5,a5,5
-    80204b56:	1af70863          	beq	a4,a5,80204d06 <trap_handler+0x20e>
-    80204b5a:	aa4d                	j	80204d0c <trap_handler+0x214>
+    80204b70:	fd043703          	ld	a4,-48(s0)
+    80204b74:	47bd                	li	a5,15
+    80204b76:	02e7e963          	bltu	a5,a4,80204ba8 <trap_handler+0x54>
+    80204b7a:	fd043703          	ld	a4,-48(s0)
+    80204b7e:	47bd                	li	a5,15
+    80204b80:	26e7e763          	bltu	a5,a4,80204dee <trap_handler+0x29a>
+    80204b84:	fd043783          	ld	a5,-48(s0)
+    80204b88:	00279713          	slli	a4,a5,0x2
+    80204b8c:	00002797          	auipc	a5,0x2
+    80204b90:	9f078793          	addi	a5,a5,-1552 # 8020657c <rodata_start+0x57c>
+    80204b94:	97ba                	add	a5,a5,a4
+    80204b96:	439c                	lw	a5,0(a5)
+    80204b98:	0007871b          	sext.w	a4,a5
+    80204b9c:	00002797          	auipc	a5,0x2
+    80204ba0:	9e078793          	addi	a5,a5,-1568 # 8020657c <rodata_start+0x57c>
+    80204ba4:	97ba                	add	a5,a5,a4
+    80204ba6:	8782                	jr	a5
+    80204ba8:	fd043703          	ld	a4,-48(s0)
+    80204bac:	57fd                	li	a5,-1
+    80204bae:	17fe                	slli	a5,a5,0x3f
+    80204bb0:	0795                	addi	a5,a5,5
+    80204bb2:	22f70b63          	beq	a4,a5,80204de8 <trap_handler+0x294>
+    80204bb6:	ac25                	j	80204dee <trap_handler+0x29a>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:47
     {
         case 0x00: // 指令地址错位
             print_str("[kernel] Instruction Address Misaligned.\n");
-    80204b5c:	00002517          	auipc	a0,0x2
-    80204b60:	80c50513          	addi	a0,a0,-2036 # 80206368 <rodata_start+0x368>
-    80204b64:	b00ff0ef          	jal	ra,80203e64 <print_str>
+    80204bb8:	00001517          	auipc	a0,0x1
+    80204bbc:	7b050513          	addi	a0,a0,1968 # 80206368 <rodata_start+0x368>
+    80204bc0:	b00ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:48
             print_sepc();
-    80204b68:	ecfff0ef          	jal	ra,80204a36 <print_sepc>
+    80204bc4:	ecfff0ef          	jal	ra,80204a92 <print_sepc>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:49
             run_next_task(3);
-    80204b6c:	450d                	li	a0,3
-    80204b6e:	f44ff0ef          	jal	ra,802042b2 <run_next_task>
+    80204bc8:	450d                	li	a0,3
+    80204bca:	f44ff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:50
             break;
-    80204b72:	aa55                	j	80204d26 <trap_handler+0x22e>
+    80204bce:	ac2d                	j	80204e08 <trap_handler+0x2b4>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:52
         case 0x01: // 指令访问故障
             print_sepc();
-    80204b74:	ec3ff0ef          	jal	ra,80204a36 <print_sepc>
+    80204bd0:	ec3ff0ef          	jal	ra,80204a92 <print_sepc>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:53
             print_str("[kernel] Instruction Access Fault.\n");
-    80204b78:	00002517          	auipc	a0,0x2
-    80204b7c:	82050513          	addi	a0,a0,-2016 # 80206398 <rodata_start+0x398>
-    80204b80:	ae4ff0ef          	jal	ra,80203e64 <print_str>
+    80204bd4:	00001517          	auipc	a0,0x1
+    80204bd8:	7c450513          	addi	a0,a0,1988 # 80206398 <rodata_start+0x398>
+    80204bdc:	ae4ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:54
             run_next_task(3);
-    80204b84:	450d                	li	a0,3
-    80204b86:	f2cff0ef          	jal	ra,802042b2 <run_next_task>
+    80204be0:	450d                	li	a0,3
+    80204be2:	f2cff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:55
             break;
-    80204b8a:	aa71                	j	80204d26 <trap_handler+0x22e>
+    80204be6:	a40d                	j	80204e08 <trap_handler+0x2b4>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:57
         case 0x02: // 非法指令
-            print_str("kernel] Illegal Instruction.\n");
-    80204b8c:	00002517          	auipc	a0,0x2
-    80204b90:	83450513          	addi	a0,a0,-1996 # 802063c0 <rodata_start+0x3c0>
-    80204b94:	ad0ff0ef          	jal	ra,80203e64 <print_str>
+            print_sepc();
+    80204be8:	eabff0ef          	jal	ra,80204a92 <print_sepc>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:58
-            run_next_task(3);
-    80204b98:	450d                	li	a0,3
-    80204b9a:	f18ff0ef          	jal	ra,802042b2 <run_next_task>
+            print_str("kernel] Illegal Instruction.\n");
+    80204bec:	00001517          	auipc	a0,0x1
+    80204bf0:	7d450513          	addi	a0,a0,2004 # 802063c0 <rodata_start+0x3c0>
+    80204bf4:	accff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:59
-            break;
-    80204b9e:	a261                	j	80204d26 <trap_handler+0x22e>
+            ASSERT(0);
+    80204bf8:	03b00593          	li	a1,59
+    80204bfc:	00001517          	auipc	a0,0x1
+    80204c00:	7e450513          	addi	a0,a0,2020 # 802063e0 <rodata_start+0x3e0>
+    80204c04:	d80ff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:60
+            run_next_task(3);
+    80204c08:	450d                	li	a0,3
+    80204c0a:	f04ff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:61
+            break;
+    80204c0e:	aaed                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:63
         case 0x03: // 断点
             print_str("[kernel] Breakpoint.\n");
-    80204ba0:	00002517          	auipc	a0,0x2
-    80204ba4:	84050513          	addi	a0,a0,-1984 # 802063e0 <rodata_start+0x3e0>
-    80204ba8:	abcff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:63
-            // 特定的调试处理或直接运行下一个应用
-            cx->sepc +=2;
-    80204bac:	fa843783          	ld	a5,-88(s0)
-    80204bb0:	1087b783          	ld	a5,264(a5)
-    80204bb4:	00278713          	addi	a4,a5,2
-    80204bb8:	fa843783          	ld	a5,-88(s0)
-    80204bbc:	10e7b423          	sd	a4,264(a5)
+    80204c10:	00001517          	auipc	a0,0x1
+    80204c14:	7e850513          	addi	a0,a0,2024 # 802063f8 <rodata_start+0x3f8>
+    80204c18:	aa8ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:65
+            // 特定的调试处理或直接运行下一个应用
+            ASSERT(0);
+    80204c1c:	04100593          	li	a1,65
+    80204c20:	00001517          	auipc	a0,0x1
+    80204c24:	7c050513          	addi	a0,a0,1984 # 802063e0 <rodata_start+0x3e0>
+    80204c28:	d5cff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:66
+            cx->sepc +=2;
+    80204c2c:	fa843783          	ld	a5,-88(s0)
+    80204c30:	1087b783          	ld	a5,264(a5)
+    80204c34:	00278713          	addi	a4,a5,2
+    80204c38:	fa843783          	ld	a5,-88(s0)
+    80204c3c:	10e7b423          	sd	a4,264(a5)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:67
+            ASSERT(0);
+    80204c40:	04300593          	li	a1,67
+    80204c44:	00001517          	auipc	a0,0x1
+    80204c48:	79c50513          	addi	a0,a0,1948 # 802063e0 <rodata_start+0x3e0>
+    80204c4c:	d38ff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:69
             //run_next_app();
             break;
-    80204bc0:	a29d                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:67
+    80204c50:	aa65                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:71
         case 0x04: // 加载地址错位
             print_str("[kernel] Load Address Misaligned.\n");
-    80204bc2:	00002517          	auipc	a0,0x2
-    80204bc6:	83650513          	addi	a0,a0,-1994 # 802063f8 <rodata_start+0x3f8>
-    80204bca:	a9aff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:68
-            run_next_task(3);
-    80204bce:	450d                	li	a0,3
-    80204bd0:	ee2ff0ef          	jal	ra,802042b2 <run_next_task>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:69
-            break;
-    80204bd4:	aa89                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:71
-        case 0x05: // 加载访问故障
-            print_sepc();
-    80204bd6:	e61ff0ef          	jal	ra,80204a36 <print_sepc>
+    80204c52:	00001517          	auipc	a0,0x1
+    80204c56:	7be50513          	addi	a0,a0,1982 # 80206410 <rodata_start+0x410>
+    80204c5a:	a66ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:72
-            print_str("[kernel] Load Access Fault.\n");
-    80204bda:	00002517          	auipc	a0,0x2
-    80204bde:	84650513          	addi	a0,a0,-1978 # 80206420 <rodata_start+0x420>
-    80204be2:	a82ff0ef          	jal	ra,80203e64 <print_str>
+            ASSERT(0);
+    80204c5e:	04800593          	li	a1,72
+    80204c62:	00001517          	auipc	a0,0x1
+    80204c66:	77e50513          	addi	a0,a0,1918 # 802063e0 <rodata_start+0x3e0>
+    80204c6a:	d1aff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:73
             run_next_task(3);
-    80204be6:	450d                	li	a0,3
-    80204be8:	ecaff0ef          	jal	ra,802042b2 <run_next_task>
+    80204c6e:	450d                	li	a0,3
+    80204c70:	e9eff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:74
             break;
-    80204bec:	aa2d                	j	80204d26 <trap_handler+0x22e>
+    80204c74:	aa51                	j	80204e08 <trap_handler+0x2b4>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:76
-        case 0x06: // 存储地址错位
-            print_str("[kernel] Store/AMO Address Misaligned.\n");
-    80204bee:	00002517          	auipc	a0,0x2
-    80204bf2:	85250513          	addi	a0,a0,-1966 # 80206440 <rodata_start+0x440>
-    80204bf6:	a6eff0ef          	jal	ra,80203e64 <print_str>
+        case 0x05: // 加载访问故障
+            print_sepc();
+    80204c76:	e1dff0ef          	jal	ra,80204a92 <print_sepc>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:77
-            run_next_task(3);
-    80204bfa:	450d                	li	a0,3
-    80204bfc:	eb6ff0ef          	jal	ra,802042b2 <run_next_task>
+            print_str("[kernel] Load Access Fault.\n");
+    80204c7a:	00001517          	auipc	a0,0x1
+    80204c7e:	7be50513          	addi	a0,a0,1982 # 80206438 <rodata_start+0x438>
+    80204c82:	a3eff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:78
-            break;
-    80204c00:	a21d                	j	80204d26 <trap_handler+0x22e>
+            ASSERT(0);
+    80204c86:	04e00593          	li	a1,78
+    80204c8a:	00001517          	auipc	a0,0x1
+    80204c8e:	75650513          	addi	a0,a0,1878 # 802063e0 <rodata_start+0x3e0>
+    80204c92:	cf2ff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:79
+            run_next_task(3);
+    80204c96:	450d                	li	a0,3
+    80204c98:	e76ff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:80
+            break;
+    80204c9c:	a2b5                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:82
+        case 0x06: // 存储地址错位
+            print_sepc();
+    80204c9e:	df5ff0ef          	jal	ra,80204a92 <print_sepc>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:83
+            print_str("[kernel] Store/AMO Address Misaligned.\n");
+    80204ca2:	00001517          	auipc	a0,0x1
+    80204ca6:	7b650513          	addi	a0,a0,1974 # 80206458 <rodata_start+0x458>
+    80204caa:	a16ff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:84
+            ASSERT(0);
+    80204cae:	05400593          	li	a1,84
+    80204cb2:	00001517          	auipc	a0,0x1
+    80204cb6:	72e50513          	addi	a0,a0,1838 # 802063e0 <rodata_start+0x3e0>
+    80204cba:	ccaff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:85
+            run_next_task(3);
+    80204cbe:	450d                	li	a0,3
+    80204cc0:	e4eff0ef          	jal	ra,8020430e <run_next_task>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:86
+            break;
+    80204cc4:	a291                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:88
         case 0x07: // 存储/AMO访问故障
             print_str("[kernel] Store/AMO Access Fault.\n");
-    80204c02:	00002517          	auipc	a0,0x2
-    80204c06:	86650513          	addi	a0,a0,-1946 # 80206468 <rodata_start+0x468>
-    80204c0a:	a5aff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:81
-            print_sepc(3);
-    80204c0e:	450d                	li	a0,3
-    80204c10:	e27ff0ef          	jal	ra,80204a36 <print_sepc>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:82
+    80204cc6:	00001517          	auipc	a0,0x1
+    80204cca:	7ba50513          	addi	a0,a0,1978 # 80206480 <rodata_start+0x480>
+    80204cce:	9f2ff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:89
+            print_sepc();
+    80204cd2:	dc1ff0ef          	jal	ra,80204a92 <print_sepc>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:90
+            ASSERT(0);
+    80204cd6:	05a00593          	li	a1,90
+    80204cda:	00001517          	auipc	a0,0x1
+    80204cde:	70650513          	addi	a0,a0,1798 # 802063e0 <rodata_start+0x3e0>
+    80204ce2:	ca2ff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:91
             uint64_t cnt=10000000000;
-    80204c14:	009507b7          	lui	a5,0x950
-    80204c18:	2f978793          	addi	a5,a5,761 # 9502f9 <n+0x9502d9>
-    80204c1c:	07aa                	slli	a5,a5,0xa
-    80204c1e:	fef43423          	sd	a5,-24(s0)
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:83
+    80204ce6:	009507b7          	lui	a5,0x950
+    80204cea:	2f978793          	addi	a5,a5,761 # 9502f9 <n+0x9502d9>
+    80204cee:	07aa                	slli	a5,a5,0xa
+    80204cf0:	fef43423          	sd	a5,-24(s0)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:92
             while(cnt--){}
-    80204c22:	0001                	nop
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:83 (discriminator 1)
-    80204c24:	fe843783          	ld	a5,-24(s0)
-    80204c28:	fff78713          	addi	a4,a5,-1
-    80204c2c:	fee43423          	sd	a4,-24(s0)
-    80204c30:	fbf5                	bnez	a5,80204c24 <trap_handler+0x12c>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:85
+    80204cf4:	0001                	nop
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:92 (discriminator 1)
+    80204cf6:	fe843783          	ld	a5,-24(s0)
+    80204cfa:	fff78713          	addi	a4,a5,-1
+    80204cfe:	fee43423          	sd	a4,-24(s0)
+    80204d02:	fbf5                	bnez	a5,80204cf6 <trap_handler+0x1a2>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:94
             //run_next_app();
             break;
-    80204c32:	a8d5                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:87
+    80204d04:	a211                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:96
         case 0x08: // 环境调用来自U模式
             cx->sepc += 4; // 跳过环境调用指令
-    80204c34:	fa843783          	ld	a5,-88(s0)
-    80204c38:	1087b783          	ld	a5,264(a5)
-    80204c3c:	00478713          	addi	a4,a5,4
-    80204c40:	fa843783          	ld	a5,-88(s0)
-    80204c44:	10e7b423          	sd	a4,264(a5)
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:88
+    80204d06:	fa843783          	ld	a5,-88(s0)
+    80204d0a:	1087b783          	ld	a5,264(a5)
+    80204d0e:	00478713          	addi	a4,a5,4
+    80204d12:	fa843783          	ld	a5,-88(s0)
+    80204d16:	10e7b423          	sd	a4,264(a5)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:97
             uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
-    80204c48:	fa843783          	ld	a5,-88(s0)
-    80204c4c:	6bbc                	ld	a5,80(a5)
-    80204c4e:	faf43c23          	sd	a5,-72(s0)
-    80204c52:	fa843783          	ld	a5,-88(s0)
-    80204c56:	6fbc                	ld	a5,88(a5)
-    80204c58:	fcf43023          	sd	a5,-64(s0)
-    80204c5c:	fa843783          	ld	a5,-88(s0)
-    80204c60:	73bc                	ld	a5,96(a5)
-    80204c62:	fcf43423          	sd	a5,-56(s0)
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:89
+    80204d1a:	fa843783          	ld	a5,-88(s0)
+    80204d1e:	6bbc                	ld	a5,80(a5)
+    80204d20:	faf43c23          	sd	a5,-72(s0)
+    80204d24:	fa843783          	ld	a5,-88(s0)
+    80204d28:	6fbc                	ld	a5,88(a5)
+    80204d2a:	fcf43023          	sd	a5,-64(s0)
+    80204d2e:	fa843783          	ld	a5,-88(s0)
+    80204d32:	73bc                	ld	a5,96(a5)
+    80204d34:	fcf43423          	sd	a5,-56(s0)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:98
             cx->x[10] = syscall(cx->x[17], args); // 执行系统调用
-    80204c66:	fa843783          	ld	a5,-88(s0)
-    80204c6a:	67dc                	ld	a5,136(a5)
-    80204c6c:	fb840713          	addi	a4,s0,-72
-    80204c70:	85ba                	mv	a1,a4
-    80204c72:	853e                	mv	a0,a5
-    80204c74:	1de000ef          	jal	ra,80204e52 <syscall>
-    80204c78:	87aa                	mv	a5,a0
-    80204c7a:	873e                	mv	a4,a5
-    80204c7c:	fa843783          	ld	a5,-88(s0)
-    80204c80:	ebb8                	sd	a4,80(a5)
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:90
+    80204d38:	fa843783          	ld	a5,-88(s0)
+    80204d3c:	67dc                	ld	a5,136(a5)
+    80204d3e:	fb840713          	addi	a4,s0,-72
+    80204d42:	85ba                	mv	a1,a4
+    80204d44:	853e                	mv	a0,a5
+    80204d46:	1ee000ef          	jal	ra,80204f34 <syscall>
+    80204d4a:	87aa                	mv	a5,a0
+    80204d4c:	873e                	mv	a4,a5
+    80204d4e:	fa843783          	ld	a5,-88(s0)
+    80204d52:	ebb8                	sd	a4,80(a5)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:99
             break;
-    80204c82:	a055                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:92
+    80204d54:	a855                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:101
         case 0x09: // 环境调用来自S模式
             print_str("[kernel] Environment Call from S-mode.\n");
-    80204c84:	00002517          	auipc	a0,0x2
-    80204c88:	80c50513          	addi	a0,a0,-2036 # 80206490 <rodata_start+0x490>
-    80204c8c:	9d8ff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:93
+    80204d56:	00001517          	auipc	a0,0x1
+    80204d5a:	75250513          	addi	a0,a0,1874 # 802064a8 <rodata_start+0x4a8>
+    80204d5e:	962ff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:102
             uint64_t cnt1=10000000000;
-    80204c90:	009507b7          	lui	a5,0x950
-    80204c94:	2f978793          	addi	a5,a5,761 # 9502f9 <n+0x9502d9>
-    80204c98:	07aa                	slli	a5,a5,0xa
-    80204c9a:	fef43023          	sd	a5,-32(s0)
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:94
+    80204d62:	009507b7          	lui	a5,0x950
+    80204d66:	2f978793          	addi	a5,a5,761 # 9502f9 <n+0x9502d9>
+    80204d6a:	07aa                	slli	a5,a5,0xa
+    80204d6c:	fef43023          	sd	a5,-32(s0)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:103
             while(cnt1--){}
-    80204c9e:	0001                	nop
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:94 (discriminator 1)
-    80204ca0:	fe043783          	ld	a5,-32(s0)
-    80204ca4:	fff78713          	addi	a4,a5,-1
-    80204ca8:	fee43023          	sd	a4,-32(s0)
-    80204cac:	fbf5                	bnez	a5,80204ca0 <trap_handler+0x1a8>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:95
+    80204d70:	0001                	nop
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:103 (discriminator 1)
+    80204d72:	fe043783          	ld	a5,-32(s0)
+    80204d76:	fff78713          	addi	a4,a5,-1
+    80204d7a:	fee43023          	sd	a4,-32(s0)
+    80204d7e:	fbf5                	bnez	a5,80204d72 <trap_handler+0x21e>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:104 (discriminator 1)
+            ASSERT(0);
+    80204d80:	06800593          	li	a1,104
+    80204d84:	00001517          	auipc	a0,0x1
+    80204d88:	65c50513          	addi	a0,a0,1628 # 802063e0 <rodata_start+0x3e0>
+    80204d8c:	bf8ff0ef          	jal	ra,80204184 <panic>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:105 (discriminator 1)
             run_next_task(3);
-    80204cae:	450d                	li	a0,3
-    80204cb0:	e02ff0ef          	jal	ra,802042b2 <run_next_task>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:96
+    80204d90:	450d                	li	a0,3
+    80204d92:	d7cff0ef          	jal	ra,8020430e <run_next_task>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:106 (discriminator 1)
             break;
-    80204cb4:	a88d                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:98
+    80204d96:	a88d                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:108
         case 0x0B: // 环境调用来自M模式
             print_str("[kernel] Environment Call from M-mode.\n");
-    80204cb6:	00002517          	auipc	a0,0x2
-    80204cba:	80250513          	addi	a0,a0,-2046 # 802064b8 <rodata_start+0x4b8>
-    80204cbe:	9a6ff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:100
+    80204d98:	00001517          	auipc	a0,0x1
+    80204d9c:	73850513          	addi	a0,a0,1848 # 802064d0 <rodata_start+0x4d0>
+    80204da0:	920ff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:110
             // 处理或运行下一个应用
             run_next_task(3);
-    80204cc2:	450d                	li	a0,3
-    80204cc4:	deeff0ef          	jal	ra,802042b2 <run_next_task>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:101
+    80204da4:	450d                	li	a0,3
+    80204da6:	d68ff0ef          	jal	ra,8020430e <run_next_task>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:111
             break;
-    80204cc8:	a8b9                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:103
+    80204daa:	a8b9                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:113
         case 0x0C: // 指令页面错误
             print_str("[kernel] Instruction Page Fault.\n");
-    80204cca:	00002517          	auipc	a0,0x2
-    80204cce:	81650513          	addi	a0,a0,-2026 # 802064e0 <rodata_start+0x4e0>
-    80204cd2:	992ff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:104
+    80204dac:	00001517          	auipc	a0,0x1
+    80204db0:	74c50513          	addi	a0,a0,1868 # 802064f8 <rodata_start+0x4f8>
+    80204db4:	90cff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:114
             run_next_task(3);
-    80204cd6:	450d                	li	a0,3
-    80204cd8:	ddaff0ef          	jal	ra,802042b2 <run_next_task>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:105
+    80204db8:	450d                	li	a0,3
+    80204dba:	d54ff0ef          	jal	ra,8020430e <run_next_task>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:115
             break;
-    80204cdc:	a0a9                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:107
+    80204dbe:	a0a9                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:117
         case 0x0D: // 加载页面错误
             print_str("[kernel] Load Page Fault.\n");
-    80204cde:	00002517          	auipc	a0,0x2
-    80204ce2:	82a50513          	addi	a0,a0,-2006 # 80206508 <rodata_start+0x508>
-    80204ce6:	97eff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:108
+    80204dc0:	00001517          	auipc	a0,0x1
+    80204dc4:	76050513          	addi	a0,a0,1888 # 80206520 <rodata_start+0x520>
+    80204dc8:	8f8ff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:118
             run_next_task(3);
-    80204cea:	450d                	li	a0,3
-    80204cec:	dc6ff0ef          	jal	ra,802042b2 <run_next_task>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:109
+    80204dcc:	450d                	li	a0,3
+    80204dce:	d40ff0ef          	jal	ra,8020430e <run_next_task>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:119
             break;
-    80204cf0:	a81d                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:111
+    80204dd2:	a81d                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:121
         case 0x0F: // 存储页面错误
             print_str("[kernel] Store/AMO Page Fault.\n");
-    80204cf2:	00002517          	auipc	a0,0x2
-    80204cf6:	83650513          	addi	a0,a0,-1994 # 80206528 <rodata_start+0x528>
-    80204cfa:	96aff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:112
+    80204dd4:	00001517          	auipc	a0,0x1
+    80204dd8:	76c50513          	addi	a0,a0,1900 # 80206540 <rodata_start+0x540>
+    80204ddc:	8e4ff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:122
             run_next_task(3);
-    80204cfe:	450d                	li	a0,3
-    80204d00:	db2ff0ef          	jal	ra,802042b2 <run_next_task>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:113
+    80204de0:	450d                	li	a0,3
+    80204de2:	d2cff0ef          	jal	ra,8020430e <run_next_task>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:123
             break;
-    80204d04:	a00d                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:116
+    80204de6:	a00d                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:126
         case 0x8000000000000005: 
             //print_str("intr_timer_handle\n");
             intr_timer_handle();
-    80204d06:	268000ef          	jal	ra,80204f6e <intr_timer_handle>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:117
+    80204de8:	268000ef          	jal	ra,80205050 <intr_timer_handle>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:127
             break;
-    80204d0a:	a831                	j	80204d26 <trap_handler+0x22e>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:119
+    80204dec:	a831                	j	80204e08 <trap_handler+0x2b4>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:129
         default:
             print_str("[kernel] Unsupported trap.\n");
-    80204d0c:	00002517          	auipc	a0,0x2
-    80204d10:	83c50513          	addi	a0,a0,-1988 # 80206548 <rodata_start+0x548>
-    80204d14:	950ff0ef          	jal	ra,80203e64 <print_str>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:120
+    80204dee:	00001517          	auipc	a0,0x1
+    80204df2:	77250513          	addi	a0,a0,1906 # 80206560 <rodata_start+0x560>
+    80204df6:	8caff0ef          	jal	ra,80203ec0 <print_str>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:130
             print_uint64(scause);
-    80204d18:	fd043503          	ld	a0,-48(s0)
-    80204d1c:	ac6ff0ef          	jal	ra,80203fe2 <print_uint64>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:121
+    80204dfa:	fd043503          	ld	a0,-48(s0)
+    80204dfe:	a40ff0ef          	jal	ra,8020403e <print_uint64>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:131
             exit(1);
-    80204d20:	4505                	li	a0,1
-    80204d22:	012000ef          	jal	ra,80204d34 <exit>
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:123
+    80204e02:	4505                	li	a0,1
+    80204e04:	012000ef          	jal	ra,80204e16 <exit>
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:133
     }
     return cx;
-    80204d26:	fa843783          	ld	a5,-88(s0)
-/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:124
-    80204d2a:	853e                	mv	a0,a5
-    80204d2c:	60e6                	ld	ra,88(sp)
-    80204d2e:	6446                	ld	s0,80(sp)
-    80204d30:	6125                	addi	sp,sp,96
-    80204d32:	8082                	ret
+    80204e08:	fa843783          	ld	a5,-88(s0)
+/home/caigoubencai/Desktop/os_c/kernel/trap/trap.c:134
+    80204e0c:	853e                	mv	a0,a5
+    80204e0e:	60e6                	ld	ra,88(sp)
+    80204e10:	6446                	ld	s0,80(sp)
+    80204e12:	6125                	addi	sp,sp,96
+    80204e14:	8082                	ret
 
-0000000080204d34 <exit>:
+0000000080204e16 <exit>:
 exit():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:10
 #include "debug.h"
@@ -8766,291 +8874,291 @@ exit():
 
 int32_t exit(int32_t value)
 {
-    80204d34:	1101                	addi	sp,sp,-32
-    80204d36:	ec06                	sd	ra,24(sp)
-    80204d38:	e822                	sd	s0,16(sp)
-    80204d3a:	1000                	addi	s0,sp,32
-    80204d3c:	87aa                	mv	a5,a0
-    80204d3e:	fef42623          	sw	a5,-20(s0)
+    80204e16:	1101                	addi	sp,sp,-32
+    80204e18:	ec06                	sd	ra,24(sp)
+    80204e1a:	e822                	sd	s0,16(sp)
+    80204e1c:	1000                	addi	s0,sp,32
+    80204e1e:	87aa                	mv	a5,a0
+    80204e20:	fef42623          	sw	a5,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:11
     print_str("exit : ");
-    80204d42:	00002517          	auipc	a0,0x2
-    80204d46:	86650513          	addi	a0,a0,-1946 # 802065a8 <rodata_start+0x5a8>
-    80204d4a:	91aff0ef          	jal	ra,80203e64 <print_str>
+    80204e24:	00001517          	auipc	a0,0x1
+    80204e28:	79c50513          	addi	a0,a0,1948 # 802065c0 <rodata_start+0x5c0>
+    80204e2c:	894ff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:12
     print_uint32((uint32_t)value);
-    80204d4e:	fec42783          	lw	a5,-20(s0)
-    80204d52:	853e                	mv	a0,a5
-    80204d54:	9daff0ef          	jal	ra,80203f2e <print_uint32>
+    80204e30:	fec42783          	lw	a5,-20(s0)
+    80204e34:	853e                	mv	a0,a5
+    80204e36:	954ff0ef          	jal	ra,80203f8a <print_uint32>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:13
     print_str("\n");
-    80204d58:	00002517          	auipc	a0,0x2
-    80204d5c:	85850513          	addi	a0,a0,-1960 # 802065b0 <rodata_start+0x5b0>
-    80204d60:	904ff0ef          	jal	ra,80203e64 <print_str>
+    80204e3a:	00001517          	auipc	a0,0x1
+    80204e3e:	78e50513          	addi	a0,a0,1934 # 802065c8 <rodata_start+0x5c8>
+    80204e42:	87eff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:14
     return value;
-    80204d64:	fec42783          	lw	a5,-20(s0)
+    80204e46:	fec42783          	lw	a5,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:15
 }
-    80204d68:	853e                	mv	a0,a5
-    80204d6a:	60e2                	ld	ra,24(sp)
-    80204d6c:	6442                	ld	s0,16(sp)
-    80204d6e:	6105                	addi	sp,sp,32
-    80204d70:	8082                	ret
+    80204e4a:	853e                	mv	a0,a5
+    80204e4c:	60e2                	ld	ra,24(sp)
+    80204e4e:	6442                	ld	s0,16(sp)
+    80204e50:	6105                	addi	sp,sp,32
+    80204e52:	8082                	ret
 
-0000000080204d72 <write>:
+0000000080204e54 <write>:
 write():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:18
 
 int64_t write(uint64_t fd, const void *buf, uint64_t count)
 {
-    80204d72:	7179                	addi	sp,sp,-48
-    80204d74:	f406                	sd	ra,40(sp)
-    80204d76:	f022                	sd	s0,32(sp)
-    80204d78:	1800                	addi	s0,sp,48
-    80204d7a:	fea43423          	sd	a0,-24(s0)
-    80204d7e:	feb43023          	sd	a1,-32(s0)
-    80204d82:	fcc43c23          	sd	a2,-40(s0)
+    80204e54:	7179                	addi	sp,sp,-48
+    80204e56:	f406                	sd	ra,40(sp)
+    80204e58:	f022                	sd	s0,32(sp)
+    80204e5a:	1800                	addi	s0,sp,48
+    80204e5c:	fea43423          	sd	a0,-24(s0)
+    80204e60:	feb43023          	sd	a1,-32(s0)
+    80204e64:	fcc43c23          	sd	a2,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:19
     if(fd==1)
-    80204d86:	fe843703          	ld	a4,-24(s0)
-    80204d8a:	4785                	li	a5,1
-    80204d8c:	00f71d63          	bne	a4,a5,80204da6 <write+0x34>
+    80204e68:	fe843703          	ld	a4,-24(s0)
+    80204e6c:	4785                	li	a5,1
+    80204e6e:	00f71d63          	bne	a4,a5,80204e88 <write+0x34>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:22
     {
         buf = (char*) buf;
         print_str(buf);
-    80204d90:	fe043503          	ld	a0,-32(s0)
-    80204d94:	8d0ff0ef          	jal	ra,80203e64 <print_str>
+    80204e72:	fe043503          	ld	a0,-32(s0)
+    80204e76:	84aff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:23
         print_str("\n");
-    80204d98:	00002517          	auipc	a0,0x2
-    80204d9c:	81850513          	addi	a0,a0,-2024 # 802065b0 <rodata_start+0x5b0>
-    80204da0:	8c4ff0ef          	jal	ra,80203e64 <print_str>
-    80204da4:	a801                	j	80204db4 <write+0x42>
+    80204e7a:	00001517          	auipc	a0,0x1
+    80204e7e:	74e50513          	addi	a0,a0,1870 # 802065c8 <rodata_start+0x5c8>
+    80204e82:	83eff0ef          	jal	ra,80203ec0 <print_str>
+    80204e86:	a801                	j	80204e96 <write+0x42>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:26 (discriminator 1)
     }else 
     {
         ASSERT(0);
-    80204da6:	45e9                	li	a1,26
-    80204da8:	00002517          	auipc	a0,0x2
-    80204dac:	81050513          	addi	a0,a0,-2032 # 802065b8 <rodata_start+0x5b8>
-    80204db0:	b78ff0ef          	jal	ra,80204128 <panic>
+    80204e88:	45e9                	li	a1,26
+    80204e8a:	00001517          	auipc	a0,0x1
+    80204e8e:	74650513          	addi	a0,a0,1862 # 802065d0 <rodata_start+0x5d0>
+    80204e92:	af2ff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:28
     }
     return count;
-    80204db4:	fd843783          	ld	a5,-40(s0)
+    80204e96:	fd843783          	ld	a5,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:29
 }
-    80204db8:	853e                	mv	a0,a5
-    80204dba:	70a2                	ld	ra,40(sp)
-    80204dbc:	7402                	ld	s0,32(sp)
-    80204dbe:	6145                	addi	sp,sp,48
-    80204dc0:	8082                	ret
+    80204e9a:	853e                	mv	a0,a5
+    80204e9c:	70a2                	ld	ra,40(sp)
+    80204e9e:	7402                	ld	s0,32(sp)
+    80204ea0:	6145                	addi	sp,sp,48
+    80204ea2:	8082                	ret
 
-0000000080204dc2 <yield>:
+0000000080204ea4 <yield>:
 yield():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:32
 
 int64_t yield()
 {
-    80204dc2:	1141                	addi	sp,sp,-16
-    80204dc4:	e406                	sd	ra,8(sp)
-    80204dc6:	e022                	sd	s0,0(sp)
-    80204dc8:	0800                	addi	s0,sp,16
+    80204ea4:	1141                	addi	sp,sp,-16
+    80204ea6:	e406                	sd	ra,8(sp)
+    80204ea8:	e022                	sd	s0,0(sp)
+    80204eaa:	0800                	addi	s0,sp,16
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:33
     print_str("\n-------yield------\n");
-    80204dca:	00002517          	auipc	a0,0x2
-    80204dce:	80e50513          	addi	a0,a0,-2034 # 802065d8 <rodata_start+0x5d8>
-    80204dd2:	892ff0ef          	jal	ra,80203e64 <print_str>
+    80204eac:	00001517          	auipc	a0,0x1
+    80204eb0:	74450513          	addi	a0,a0,1860 # 802065f0 <rodata_start+0x5f0>
+    80204eb4:	80cff0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:34
     run_next_task(1);
-    80204dd6:	4505                	li	a0,1
-    80204dd8:	cdaff0ef          	jal	ra,802042b2 <run_next_task>
+    80204eb8:	4505                	li	a0,1
+    80204eba:	c54ff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:35
     return 1;
-    80204ddc:	4785                	li	a5,1
+    80204ebe:	4785                	li	a5,1
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:36
 }
-    80204dde:	853e                	mv	a0,a5
-    80204de0:	60a2                	ld	ra,8(sp)
-    80204de2:	6402                	ld	s0,0(sp)
-    80204de4:	0141                	addi	sp,sp,16
-    80204de6:	8082                	ret
+    80204ec0:	853e                	mv	a0,a5
+    80204ec2:	60a2                	ld	ra,8(sp)
+    80204ec4:	6402                	ld	s0,0(sp)
+    80204ec6:	0141                	addi	sp,sp,16
+    80204ec8:	8082                	ret
 
-0000000080204de8 <sys_write>:
+0000000080204eca <sys_write>:
 sys_write():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:39
 
 int64_t sys_write(uint64_t fd, const void *buf, uint64_t count) 
 {
-    80204de8:	7179                	addi	sp,sp,-48
-    80204dea:	f406                	sd	ra,40(sp)
-    80204dec:	f022                	sd	s0,32(sp)
-    80204dee:	1800                	addi	s0,sp,48
-    80204df0:	fea43423          	sd	a0,-24(s0)
-    80204df4:	feb43023          	sd	a1,-32(s0)
-    80204df8:	fcc43c23          	sd	a2,-40(s0)
+    80204eca:	7179                	addi	sp,sp,-48
+    80204ecc:	f406                	sd	ra,40(sp)
+    80204ece:	f022                	sd	s0,32(sp)
+    80204ed0:	1800                	addi	s0,sp,48
+    80204ed2:	fea43423          	sd	a0,-24(s0)
+    80204ed6:	feb43023          	sd	a1,-32(s0)
+    80204eda:	fcc43c23          	sd	a2,-40(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:40
     return write(fd, buf, count); // 使用POSIX write
-    80204dfc:	fd843603          	ld	a2,-40(s0)
-    80204e00:	fe043583          	ld	a1,-32(s0)
-    80204e04:	fe843503          	ld	a0,-24(s0)
-    80204e08:	f6bff0ef          	jal	ra,80204d72 <write>
-    80204e0c:	87aa                	mv	a5,a0
+    80204ede:	fd843603          	ld	a2,-40(s0)
+    80204ee2:	fe043583          	ld	a1,-32(s0)
+    80204ee6:	fe843503          	ld	a0,-24(s0)
+    80204eea:	f6bff0ef          	jal	ra,80204e54 <write>
+    80204eee:	87aa                	mv	a5,a0
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:41
 }
-    80204e0e:	853e                	mv	a0,a5
-    80204e10:	70a2                	ld	ra,40(sp)
-    80204e12:	7402                	ld	s0,32(sp)
-    80204e14:	6145                	addi	sp,sp,48
-    80204e16:	8082                	ret
+    80204ef0:	853e                	mv	a0,a5
+    80204ef2:	70a2                	ld	ra,40(sp)
+    80204ef4:	7402                	ld	s0,32(sp)
+    80204ef6:	6145                	addi	sp,sp,48
+    80204ef8:	8082                	ret
 
-0000000080204e18 <sys_exit>:
+0000000080204efa <sys_exit>:
 sys_exit():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:44
 
 void sys_exit(int32_t status) 
 {
-    80204e18:	1101                	addi	sp,sp,-32
-    80204e1a:	ec06                	sd	ra,24(sp)
-    80204e1c:	e822                	sd	s0,16(sp)
-    80204e1e:	1000                	addi	s0,sp,32
-    80204e20:	87aa                	mv	a5,a0
-    80204e22:	fef42623          	sw	a5,-20(s0)
+    80204efa:	1101                	addi	sp,sp,-32
+    80204efc:	ec06                	sd	ra,24(sp)
+    80204efe:	e822                	sd	s0,16(sp)
+    80204f00:	1000                	addi	s0,sp,32
+    80204f02:	87aa                	mv	a5,a0
+    80204f04:	fef42623          	sw	a5,-20(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:45
     exit(status);
-    80204e26:	fec42783          	lw	a5,-20(s0)
-    80204e2a:	853e                	mv	a0,a5
-    80204e2c:	f09ff0ef          	jal	ra,80204d34 <exit>
+    80204f08:	fec42783          	lw	a5,-20(s0)
+    80204f0c:	853e                	mv	a0,a5
+    80204f0e:	f09ff0ef          	jal	ra,80204e16 <exit>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:46
 }
-    80204e30:	0001                	nop
-    80204e32:	60e2                	ld	ra,24(sp)
-    80204e34:	6442                	ld	s0,16(sp)
-    80204e36:	6105                	addi	sp,sp,32
-    80204e38:	8082                	ret
+    80204f12:	0001                	nop
+    80204f14:	60e2                	ld	ra,24(sp)
+    80204f16:	6442                	ld	s0,16(sp)
+    80204f18:	6105                	addi	sp,sp,32
+    80204f1a:	8082                	ret
 
-0000000080204e3a <sys_yield>:
+0000000080204f1c <sys_yield>:
 sys_yield():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:49
 
 int64_t sys_yield()
 {
-    80204e3a:	1141                	addi	sp,sp,-16
-    80204e3c:	e406                	sd	ra,8(sp)
-    80204e3e:	e022                	sd	s0,0(sp)
-    80204e40:	0800                	addi	s0,sp,16
+    80204f1c:	1141                	addi	sp,sp,-16
+    80204f1e:	e406                	sd	ra,8(sp)
+    80204f20:	e022                	sd	s0,0(sp)
+    80204f22:	0800                	addi	s0,sp,16
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:50
     return yield();
-    80204e42:	f81ff0ef          	jal	ra,80204dc2 <yield>
-    80204e46:	87aa                	mv	a5,a0
+    80204f24:	f81ff0ef          	jal	ra,80204ea4 <yield>
+    80204f28:	87aa                	mv	a5,a0
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:51
 }
-    80204e48:	853e                	mv	a0,a5
-    80204e4a:	60a2                	ld	ra,8(sp)
-    80204e4c:	6402                	ld	s0,0(sp)
-    80204e4e:	0141                	addi	sp,sp,16
-    80204e50:	8082                	ret
+    80204f2a:	853e                	mv	a0,a5
+    80204f2c:	60a2                	ld	ra,8(sp)
+    80204f2e:	6402                	ld	s0,0(sp)
+    80204f30:	0141                	addi	sp,sp,16
+    80204f32:	8082                	ret
 
-0000000080204e52 <syscall>:
+0000000080204f34 <syscall>:
 syscall():
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:55
 
 // 系统调用处理函数
 int64_t syscall(uint64_t syscall_id, uint64_t args[3]) 
 {
-    80204e52:	1101                	addi	sp,sp,-32
-    80204e54:	ec06                	sd	ra,24(sp)
-    80204e56:	e822                	sd	s0,16(sp)
-    80204e58:	1000                	addi	s0,sp,32
-    80204e5a:	fea43423          	sd	a0,-24(s0)
-    80204e5e:	feb43023          	sd	a1,-32(s0)
+    80204f34:	1101                	addi	sp,sp,-32
+    80204f36:	ec06                	sd	ra,24(sp)
+    80204f38:	e822                	sd	s0,16(sp)
+    80204f3a:	1000                	addi	s0,sp,32
+    80204f3c:	fea43423          	sd	a0,-24(s0)
+    80204f40:	feb43023          	sd	a1,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:56
     switch (syscall_id)
-    80204e62:	fe843703          	ld	a4,-24(s0)
-    80204e66:	07c00793          	li	a5,124
-    80204e6a:	06f70163          	beq	a4,a5,80204ecc <syscall+0x7a>
-    80204e6e:	fe843703          	ld	a4,-24(s0)
-    80204e72:	07c00793          	li	a5,124
-    80204e76:	04e7ef63          	bltu	a5,a4,80204ed4 <syscall+0x82>
-    80204e7a:	fe843703          	ld	a4,-24(s0)
-    80204e7e:	04000793          	li	a5,64
-    80204e82:	00f70963          	beq	a4,a5,80204e94 <syscall+0x42>
-    80204e86:	fe843703          	ld	a4,-24(s0)
-    80204e8a:	05d00793          	li	a5,93
-    80204e8e:	02f70663          	beq	a4,a5,80204eba <syscall+0x68>
-    80204e92:	a089                	j	80204ed4 <syscall+0x82>
+    80204f44:	fe843703          	ld	a4,-24(s0)
+    80204f48:	07c00793          	li	a5,124
+    80204f4c:	06f70163          	beq	a4,a5,80204fae <syscall+0x7a>
+    80204f50:	fe843703          	ld	a4,-24(s0)
+    80204f54:	07c00793          	li	a5,124
+    80204f58:	04e7ef63          	bltu	a5,a4,80204fb6 <syscall+0x82>
+    80204f5c:	fe843703          	ld	a4,-24(s0)
+    80204f60:	04000793          	li	a5,64
+    80204f64:	00f70963          	beq	a4,a5,80204f76 <syscall+0x42>
+    80204f68:	fe843703          	ld	a4,-24(s0)
+    80204f6c:	05d00793          	li	a5,93
+    80204f70:	02f70663          	beq	a4,a5,80204f9c <syscall+0x68>
+    80204f74:	a089                	j	80204fb6 <syscall+0x82>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:60
     {
         case SYSCALL_WRITE:
             //print_str("------sys_write-----\n");
             return sys_write(args[0], (const void*)args[1], args[2]);
-    80204e94:	fe043783          	ld	a5,-32(s0)
-    80204e98:	6398                	ld	a4,0(a5)
-    80204e9a:	fe043783          	ld	a5,-32(s0)
-    80204e9e:	07a1                	addi	a5,a5,8
-    80204ea0:	639c                	ld	a5,0(a5)
-    80204ea2:	86be                	mv	a3,a5
-    80204ea4:	fe043783          	ld	a5,-32(s0)
-    80204ea8:	07c1                	addi	a5,a5,16
-    80204eaa:	639c                	ld	a5,0(a5)
-    80204eac:	863e                	mv	a2,a5
-    80204eae:	85b6                	mv	a1,a3
-    80204eb0:	853a                	mv	a0,a4
-    80204eb2:	f37ff0ef          	jal	ra,80204de8 <sys_write>
-    80204eb6:	87aa                	mv	a5,a0
-    80204eb8:	a0a9                	j	80204f02 <syscall+0xb0>
+    80204f76:	fe043783          	ld	a5,-32(s0)
+    80204f7a:	6398                	ld	a4,0(a5)
+    80204f7c:	fe043783          	ld	a5,-32(s0)
+    80204f80:	07a1                	addi	a5,a5,8
+    80204f82:	639c                	ld	a5,0(a5)
+    80204f84:	86be                	mv	a3,a5
+    80204f86:	fe043783          	ld	a5,-32(s0)
+    80204f8a:	07c1                	addi	a5,a5,16
+    80204f8c:	639c                	ld	a5,0(a5)
+    80204f8e:	863e                	mv	a2,a5
+    80204f90:	85b6                	mv	a1,a3
+    80204f92:	853a                	mv	a0,a4
+    80204f94:	f37ff0ef          	jal	ra,80204eca <sys_write>
+    80204f98:	87aa                	mv	a5,a0
+    80204f9a:	a0a9                	j	80204fe4 <syscall+0xb0>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:62
         case SYSCALL_EXIT:
             sys_exit((int)args[0]);
-    80204eba:	fe043783          	ld	a5,-32(s0)
-    80204ebe:	639c                	ld	a5,0(a5)
-    80204ec0:	2781                	sext.w	a5,a5
-    80204ec2:	853e                	mv	a0,a5
-    80204ec4:	f55ff0ef          	jal	ra,80204e18 <sys_exit>
+    80204f9c:	fe043783          	ld	a5,-32(s0)
+    80204fa0:	639c                	ld	a5,0(a5)
+    80204fa2:	2781                	sext.w	a5,a5
+    80204fa4:	853e                	mv	a0,a5
+    80204fa6:	f55ff0ef          	jal	ra,80204efa <sys_exit>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:63
             return 0;
-    80204ec8:	4781                	li	a5,0
-    80204eca:	a825                	j	80204f02 <syscall+0xb0>
+    80204faa:	4781                	li	a5,0
+    80204fac:	a825                	j	80204fe4 <syscall+0xb0>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:66
         case SYSCALL_YIELD:
             //print_str("----sys_yield----\n");
             return sys_yield();
-    80204ecc:	f6fff0ef          	jal	ra,80204e3a <sys_yield>
-    80204ed0:	87aa                	mv	a5,a0
-    80204ed2:	a805                	j	80204f02 <syscall+0xb0>
+    80204fae:	f6fff0ef          	jal	ra,80204f1c <sys_yield>
+    80204fb2:	87aa                	mv	a5,a0
+    80204fb4:	a805                	j	80204fe4 <syscall+0xb0>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:68
         default:
             print_str("unsupportable syscall_id\n");
-    80204ed4:	00001517          	auipc	a0,0x1
-    80204ed8:	71c50513          	addi	a0,a0,1820 # 802065f0 <rodata_start+0x5f0>
-    80204edc:	f89fe0ef          	jal	ra,80203e64 <print_str>
+    80204fb6:	00001517          	auipc	a0,0x1
+    80204fba:	65250513          	addi	a0,a0,1618 # 80206608 <rodata_start+0x608>
+    80204fbe:	f03fe0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:69
             ASSERT(0);
-    80204ee0:	04500593          	li	a1,69
-    80204ee4:	00001517          	auipc	a0,0x1
-    80204ee8:	6d450513          	addi	a0,a0,1748 # 802065b8 <rodata_start+0x5b8>
-    80204eec:	a3cff0ef          	jal	ra,80204128 <panic>
+    80204fc2:	04500593          	li	a1,69
+    80204fc6:	00001517          	auipc	a0,0x1
+    80204fca:	60a50513          	addi	a0,a0,1546 # 802065d0 <rodata_start+0x5d0>
+    80204fce:	9b6ff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:71
     }
     ASSERT(0);
-    80204ef0:	04700593          	li	a1,71
-    80204ef4:	00001517          	auipc	a0,0x1
-    80204ef8:	6c450513          	addi	a0,a0,1732 # 802065b8 <rodata_start+0x5b8>
-    80204efc:	a2cff0ef          	jal	ra,80204128 <panic>
+    80204fd2:	04700593          	li	a1,71
+    80204fd6:	00001517          	auipc	a0,0x1
+    80204fda:	5fa50513          	addi	a0,a0,1530 # 802065d0 <rodata_start+0x5d0>
+    80204fde:	9a6ff0ef          	jal	ra,80204184 <panic>
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:72
     return -1;
-    80204f00:	57fd                	li	a5,-1
+    80204fe2:	57fd                	li	a5,-1
 /home/caigoubencai/Desktop/os_c/kernel/trap/syscall/syscall.c:73
 }
-    80204f02:	853e                	mv	a0,a5
-    80204f04:	60e2                	ld	ra,24(sp)
-    80204f06:	6442                	ld	s0,16(sp)
-    80204f08:	6105                	addi	sp,sp,32
-    80204f0a:	8082                	ret
+    80204fe4:	853e                	mv	a0,a5
+    80204fe6:	60e2                	ld	ra,24(sp)
+    80204fe8:	6442                	ld	s0,16(sp)
+    80204fea:	6105                	addi	sp,sp,32
+    80204fec:	8082                	ret
 
-0000000080204f0c <read_time>:
+0000000080204fee <read_time>:
 read_time():
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:5
 #include "timer.h"
@@ -9058,522 +9166,523 @@ read_time():
 #include "task.h"
 static inline uint64_t read_time(void) 
 {
-    80204f0c:	1101                	addi	sp,sp,-32
-    80204f0e:	ec22                	sd	s0,24(sp)
-    80204f10:	1000                	addi	s0,sp,32
+    80204fee:	1101                	addi	sp,sp,-32
+    80204ff0:	ec22                	sd	s0,24(sp)
+    80204ff2:	1000                	addi	s0,sp,32
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:7
     uint64_t time;
     __asm__ volatile ("csrr %0, time" : "=r"(time));
-    80204f12:	c01027f3          	rdtime	a5
-    80204f16:	fef43423          	sd	a5,-24(s0)
+    80204ff4:	c01027f3          	rdtime	a5
+    80204ff8:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:8
     return time;
-    80204f1a:	fe843783          	ld	a5,-24(s0)
+    80204ffc:	fe843783          	ld	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:9
 }
-    80204f1e:	853e                	mv	a0,a5
-    80204f20:	6462                	ld	s0,24(sp)
-    80204f22:	6105                	addi	sp,sp,32
-    80204f24:	8082                	ret
+    80205000:	853e                	mv	a0,a5
+    80205002:	6462                	ld	s0,24(sp)
+    80205004:	6105                	addi	sp,sp,32
+    80205006:	8082                	ret
 
-0000000080204f26 <clock_set_next_event>:
+0000000080205008 <clock_set_next_event>:
 clock_set_next_event():
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:12
 
 void clock_set_next_event() 
 {
-    80204f26:	1141                	addi	sp,sp,-16
-    80204f28:	e406                	sd	ra,8(sp)
-    80204f2a:	e022                	sd	s0,0(sp)
-    80204f2c:	0800                	addi	s0,sp,16
+    80205008:	1141                	addi	sp,sp,-16
+    8020500a:	e406                	sd	ra,8(sp)
+    8020500c:	e022                	sd	s0,0(sp)
+    8020500e:	0800                	addi	s0,sp,16
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:13
     sbi_set_timer(read_time() + TIMEBASE);
-    80204f2e:	fdfff0ef          	jal	ra,80204f0c <read_time>
-    80204f32:	872a                	mv	a4,a0
-    80204f34:	67e1                	lui	a5,0x18
-    80204f36:	6a078793          	addi	a5,a5,1696 # 186a0 <n+0x18680>
-    80204f3a:	97ba                	add	a5,a5,a4
-    80204f3c:	853e                	mv	a0,a5
-    80204f3e:	bbcfd0ef          	jal	ra,802022fa <sbi_set_timer>
+    80205010:	fdfff0ef          	jal	ra,80204fee <read_time>
+    80205014:	872a                	mv	a4,a0
+    80205016:	67e1                	lui	a5,0x18
+    80205018:	6a078793          	addi	a5,a5,1696 # 186a0 <n+0x18680>
+    8020501c:	97ba                	add	a5,a5,a4
+    8020501e:	853e                	mv	a0,a5
+    80205020:	adafd0ef          	jal	ra,802022fa <sbi_set_timer>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:14
 }
-    80204f42:	0001                	nop
-    80204f44:	60a2                	ld	ra,8(sp)
-    80204f46:	6402                	ld	s0,0(sp)
-    80204f48:	0141                	addi	sp,sp,16
-    80204f4a:	8082                	ret
+    80205024:	0001                	nop
+    80205026:	60a2                	ld	ra,8(sp)
+    80205028:	6402                	ld	s0,0(sp)
+    8020502a:	0141                	addi	sp,sp,16
+    8020502c:	8082                	ret
 
-0000000080204f4c <timer_init>:
+000000008020502e <timer_init>:
 timer_init():
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:18
 
 
 void timer_init()
 {
-    80204f4c:	1141                	addi	sp,sp,-16
-    80204f4e:	e406                	sd	ra,8(sp)
-    80204f50:	e022                	sd	s0,0(sp)
-    80204f52:	0800                	addi	s0,sp,16
+    8020502e:	1141                	addi	sp,sp,-16
+    80205030:	e406                	sd	ra,8(sp)
+    80205032:	e022                	sd	s0,0(sp)
+    80205034:	0800                	addi	s0,sp,16
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:19
     clock_set_next_event();
-    80204f54:	fd3ff0ef          	jal	ra,80204f26 <clock_set_next_event>
+    80205036:	fd3ff0ef          	jal	ra,80205008 <clock_set_next_event>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:20
     print_str("----timer_init----\n");
-    80204f58:	00001517          	auipc	a0,0x1
-    80204f5c:	6b850513          	addi	a0,a0,1720 # 80206610 <rodata_start+0x610>
-    80204f60:	f05fe0ef          	jal	ra,80203e64 <print_str>
+    8020503a:	00001517          	auipc	a0,0x1
+    8020503e:	5ee50513          	addi	a0,a0,1518 # 80206628 <rodata_start+0x628>
+    80205042:	e7ffe0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:21
 }
-    80204f64:	0001                	nop
-    80204f66:	60a2                	ld	ra,8(sp)
-    80204f68:	6402                	ld	s0,0(sp)
-    80204f6a:	0141                	addi	sp,sp,16
-    80204f6c:	8082                	ret
+    80205046:	0001                	nop
+    80205048:	60a2                	ld	ra,8(sp)
+    8020504a:	6402                	ld	s0,0(sp)
+    8020504c:	0141                	addi	sp,sp,16
+    8020504e:	8082                	ret
 
-0000000080204f6e <intr_timer_handle>:
+0000000080205050 <intr_timer_handle>:
 intr_timer_handle():
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:25
 
 
 void intr_timer_handle()
 {
-    80204f6e:	1141                	addi	sp,sp,-16
-    80204f70:	e406                	sd	ra,8(sp)
-    80204f72:	e022                	sd	s0,0(sp)
-    80204f74:	0800                	addi	s0,sp,16
+    80205050:	1141                	addi	sp,sp,-16
+    80205052:	e406                	sd	ra,8(sp)
+    80205054:	e022                	sd	s0,0(sp)
+    80205056:	0800                	addi	s0,sp,16
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:26
     run_next_task(1);
-    80204f76:	4505                	li	a0,1
-    80204f78:	b3aff0ef          	jal	ra,802042b2 <run_next_task>
+    80205058:	4505                	li	a0,1
+    8020505a:	ab4ff0ef          	jal	ra,8020430e <run_next_task>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:27
     ticks++;
-    80204f7c:	00866797          	auipc	a5,0x866
-    80204f80:	04478793          	addi	a5,a5,68 # 80a6afc0 <ticks>
-    80204f84:	639c                	ld	a5,0(a5)
-    80204f86:	00178713          	addi	a4,a5,1
-    80204f8a:	00866797          	auipc	a5,0x866
-    80204f8e:	03678793          	addi	a5,a5,54 # 80a6afc0 <ticks>
-    80204f92:	e398                	sd	a4,0(a5)
+    8020505e:	00866797          	auipc	a5,0x866
+    80205062:	f6278793          	addi	a5,a5,-158 # 80a6afc0 <ticks>
+    80205066:	639c                	ld	a5,0(a5)
+    80205068:	00178713          	addi	a4,a5,1
+    8020506c:	00866797          	auipc	a5,0x866
+    80205070:	f5478793          	addi	a5,a5,-172 # 80a6afc0 <ticks>
+    80205074:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:28
     clock_set_next_event();
-    80204f94:	f93ff0ef          	jal	ra,80204f26 <clock_set_next_event>
+    80205076:	f93ff0ef          	jal	ra,80205008 <clock_set_next_event>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:29
     if(ticks % 10 == 0)
-    80204f98:	00866797          	auipc	a5,0x866
-    80204f9c:	02878793          	addi	a5,a5,40 # 80a6afc0 <ticks>
-    80204fa0:	6398                	ld	a4,0(a5)
-    80204fa2:	47a9                	li	a5,10
-    80204fa4:	02f777b3          	remu	a5,a4,a5
-    80204fa8:	e799                	bnez	a5,80204fb6 <intr_timer_handle+0x48>
+    8020507a:	00866797          	auipc	a5,0x866
+    8020507e:	f4678793          	addi	a5,a5,-186 # 80a6afc0 <ticks>
+    80205082:	6398                	ld	a4,0(a5)
+    80205084:	47a9                	li	a5,10
+    80205086:	02f777b3          	remu	a5,a4,a5
+    8020508a:	e799                	bnez	a5,80205098 <intr_timer_handle+0x48>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:31
     {
         print_str("timer_interrupt\n");
-    80204faa:	00001517          	auipc	a0,0x1
-    80204fae:	67e50513          	addi	a0,a0,1662 # 80206628 <rodata_start+0x628>
-    80204fb2:	eb3fe0ef          	jal	ra,80203e64 <print_str>
+    8020508c:	00001517          	auipc	a0,0x1
+    80205090:	5b450513          	addi	a0,a0,1460 # 80206640 <rodata_start+0x640>
+    80205094:	e2dfe0ef          	jal	ra,80203ec0 <print_str>
 /home/caigoubencai/Desktop/os_c/kernel/trap/timer/timer.c:39
     // {
     //     print_str("timer interrupt: ");
     //     print_uint32(ticks);
     //     print_str("\n");
     // }else if(ticks==200) ticks=0;
-    80204fb6:	0001                	nop
-    80204fb8:	60a2                	ld	ra,8(sp)
-    80204fba:	6402                	ld	s0,0(sp)
-    80204fbc:	0141                	addi	sp,sp,16
-    80204fbe:	8082                	ret
+    80205098:	0001                	nop
+    8020509a:	60a2                	ld	ra,8(sp)
+    8020509c:	6402                	ld	s0,0(sp)
+    8020509e:	0141                	addi	sp,sp,16
+    802050a0:	8082                	ret
 
-0000000080204fc0 <vector_init>:
+00000000802050a2 <vector_init>:
 vector_init():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:3
 #include "vector.h"
 #include "stdint.h"
 void vector_init(Vector *v) {
-    80204fc0:	1101                	addi	sp,sp,-32
-    80204fc2:	ec06                	sd	ra,24(sp)
-    80204fc4:	e822                	sd	s0,16(sp)
-    80204fc6:	1000                	addi	s0,sp,32
-    80204fc8:	fea43423          	sd	a0,-24(s0)
+    802050a2:	1101                	addi	sp,sp,-32
+    802050a4:	ec06                	sd	ra,24(sp)
+    802050a6:	e822                	sd	s0,16(sp)
+    802050a8:	1000                	addi	s0,sp,32
+    802050aa:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:4
     v->capacity = 4;
-    80204fcc:	fe843783          	ld	a5,-24(s0)
-    80204fd0:	4711                	li	a4,4
-    80204fd2:	e798                	sd	a4,8(a5)
+    802050ae:	fe843783          	ld	a5,-24(s0)
+    802050b2:	4711                	li	a4,4
+    802050b4:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:5
     v->total = 0;
-    80204fd4:	fe843783          	ld	a5,-24(s0)
-    80204fd8:	0007b823          	sd	zero,16(a5)
+    802050b6:	fe843783          	ld	a5,-24(s0)
+    802050ba:	0007b823          	sd	zero,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:6
     v->items = malloc(sizeof(void*) * v->capacity);
-    80204fdc:	fe843783          	ld	a5,-24(s0)
-    80204fe0:	679c                	ld	a5,8(a5)
-    80204fe2:	078e                	slli	a5,a5,0x3
-    80204fe4:	853e                	mv	a0,a5
-    80204fe6:	899fd0ef          	jal	ra,8020287e <malloc>
-    80204fea:	872a                	mv	a4,a0
-    80204fec:	fe843783          	ld	a5,-24(s0)
-    80204ff0:	e398                	sd	a4,0(a5)
+    802050be:	fe843783          	ld	a5,-24(s0)
+    802050c2:	679c                	ld	a5,8(a5)
+    802050c4:	078e                	slli	a5,a5,0x3
+    802050c6:	853e                	mv	a0,a5
+    802050c8:	fb6fd0ef          	jal	ra,8020287e <malloc>
+    802050cc:	872a                	mv	a4,a0
+    802050ce:	fe843783          	ld	a5,-24(s0)
+    802050d2:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:7
 }
-    80204ff2:	0001                	nop
-    80204ff4:	60e2                	ld	ra,24(sp)
-    80204ff6:	6442                	ld	s0,16(sp)
-    80204ff8:	6105                	addi	sp,sp,32
-    80204ffa:	8082                	ret
+    802050d4:	0001                	nop
+    802050d6:	60e2                	ld	ra,24(sp)
+    802050d8:	6442                	ld	s0,16(sp)
+    802050da:	6105                	addi	sp,sp,32
+    802050dc:	8082                	ret
 
-0000000080204ffc <vector_total>:
+00000000802050de <vector_total>:
 vector_total():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:9
 
 size_t vector_total(Vector *v) {
-    80204ffc:	1101                	addi	sp,sp,-32
-    80204ffe:	ec22                	sd	s0,24(sp)
-    80205000:	1000                	addi	s0,sp,32
-    80205002:	fea43423          	sd	a0,-24(s0)
+    802050de:	1101                	addi	sp,sp,-32
+    802050e0:	ec22                	sd	s0,24(sp)
+    802050e2:	1000                	addi	s0,sp,32
+    802050e4:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:10
     return v->total;
-    80205006:	fe843783          	ld	a5,-24(s0)
-    8020500a:	6b9c                	ld	a5,16(a5)
+    802050e8:	fe843783          	ld	a5,-24(s0)
+    802050ec:	6b9c                	ld	a5,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:11
 }
-    8020500c:	853e                	mv	a0,a5
-    8020500e:	6462                	ld	s0,24(sp)
-    80205010:	6105                	addi	sp,sp,32
-    80205012:	8082                	ret
+    802050ee:	853e                	mv	a0,a5
+    802050f0:	6462                	ld	s0,24(sp)
+    802050f2:	6105                	addi	sp,sp,32
+    802050f4:	8082                	ret
 
-0000000080205014 <vector_resize>:
+00000000802050f6 <vector_resize>:
 vector_resize():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:13
 
 void vector_resize(Vector *v, size_t capacity) {
-    80205014:	7179                	addi	sp,sp,-48
-    80205016:	f406                	sd	ra,40(sp)
-    80205018:	f022                	sd	s0,32(sp)
-    8020501a:	1800                	addi	s0,sp,48
-    8020501c:	fca43c23          	sd	a0,-40(s0)
-    80205020:	fcb43823          	sd	a1,-48(s0)
+    802050f6:	7179                	addi	sp,sp,-48
+    802050f8:	f406                	sd	ra,40(sp)
+    802050fa:	f022                	sd	s0,32(sp)
+    802050fc:	1800                	addi	s0,sp,48
+    802050fe:	fca43c23          	sd	a0,-40(s0)
+    80205102:	fcb43823          	sd	a1,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:14
     void **items = realloc(v->items, sizeof(void*) * capacity);
-    80205024:	fd843783          	ld	a5,-40(s0)
-    80205028:	6398                	ld	a4,0(a5)
-    8020502a:	fd043783          	ld	a5,-48(s0)
-    8020502e:	078e                	slli	a5,a5,0x3
-    80205030:	85be                	mv	a1,a5
-    80205032:	853a                	mv	a0,a4
-    80205034:	9bffd0ef          	jal	ra,802029f2 <realloc>
-    80205038:	fea43423          	sd	a0,-24(s0)
+    80205106:	fd843783          	ld	a5,-40(s0)
+    8020510a:	6398                	ld	a4,0(a5)
+    8020510c:	fd043783          	ld	a5,-48(s0)
+    80205110:	078e                	slli	a5,a5,0x3
+    80205112:	85be                	mv	a1,a5
+    80205114:	853a                	mv	a0,a4
+    80205116:	8ddfd0ef          	jal	ra,802029f2 <realloc>
+    8020511a:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:15
     if (items) {
-    8020503c:	fe843783          	ld	a5,-24(s0)
-    80205040:	cb99                	beqz	a5,80205056 <vector_resize+0x42>
+    8020511e:	fe843783          	ld	a5,-24(s0)
+    80205122:	cb99                	beqz	a5,80205138 <vector_resize+0x42>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:16
         v->items = items;
-    80205042:	fd843783          	ld	a5,-40(s0)
-    80205046:	fe843703          	ld	a4,-24(s0)
-    8020504a:	e398                	sd	a4,0(a5)
+    80205124:	fd843783          	ld	a5,-40(s0)
+    80205128:	fe843703          	ld	a4,-24(s0)
+    8020512c:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:17
         v->capacity = capacity;
-    8020504c:	fd843783          	ld	a5,-40(s0)
-    80205050:	fd043703          	ld	a4,-48(s0)
-    80205054:	e798                	sd	a4,8(a5)
+    8020512e:	fd843783          	ld	a5,-40(s0)
+    80205132:	fd043703          	ld	a4,-48(s0)
+    80205136:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:19
     }
 }
-    80205056:	0001                	nop
-    80205058:	70a2                	ld	ra,40(sp)
-    8020505a:	7402                	ld	s0,32(sp)
-    8020505c:	6145                	addi	sp,sp,48
-    8020505e:	8082                	ret
+    80205138:	0001                	nop
+    8020513a:	70a2                	ld	ra,40(sp)
+    8020513c:	7402                	ld	s0,32(sp)
+    8020513e:	6145                	addi	sp,sp,48
+    80205140:	8082                	ret
 
-0000000080205060 <vector_add>:
+0000000080205142 <vector_add>:
 vector_add():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:21
 
 void vector_add(Vector *v, void *item) {
-    80205060:	1101                	addi	sp,sp,-32
-    80205062:	ec06                	sd	ra,24(sp)
-    80205064:	e822                	sd	s0,16(sp)
-    80205066:	1000                	addi	s0,sp,32
-    80205068:	fea43423          	sd	a0,-24(s0)
-    8020506c:	feb43023          	sd	a1,-32(s0)
+    80205142:	1101                	addi	sp,sp,-32
+    80205144:	ec06                	sd	ra,24(sp)
+    80205146:	e822                	sd	s0,16(sp)
+    80205148:	1000                	addi	s0,sp,32
+    8020514a:	fea43423          	sd	a0,-24(s0)
+    8020514e:	feb43023          	sd	a1,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:22
     if (v->capacity == v->total) {
-    80205070:	fe843783          	ld	a5,-24(s0)
-    80205074:	6798                	ld	a4,8(a5)
-    80205076:	fe843783          	ld	a5,-24(s0)
-    8020507a:	6b9c                	ld	a5,16(a5)
-    8020507c:	00f71b63          	bne	a4,a5,80205092 <vector_add+0x32>
+    80205152:	fe843783          	ld	a5,-24(s0)
+    80205156:	6798                	ld	a4,8(a5)
+    80205158:	fe843783          	ld	a5,-24(s0)
+    8020515c:	6b9c                	ld	a5,16(a5)
+    8020515e:	00f71b63          	bne	a4,a5,80205174 <vector_add+0x32>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:23
         vector_resize(v, v->capacity * 2);
-    80205080:	fe843783          	ld	a5,-24(s0)
-    80205084:	679c                	ld	a5,8(a5)
-    80205086:	0786                	slli	a5,a5,0x1
-    80205088:	85be                	mv	a1,a5
-    8020508a:	fe843503          	ld	a0,-24(s0)
-    8020508e:	f87ff0ef          	jal	ra,80205014 <vector_resize>
+    80205162:	fe843783          	ld	a5,-24(s0)
+    80205166:	679c                	ld	a5,8(a5)
+    80205168:	0786                	slli	a5,a5,0x1
+    8020516a:	85be                	mv	a1,a5
+    8020516c:	fe843503          	ld	a0,-24(s0)
+    80205170:	f87ff0ef          	jal	ra,802050f6 <vector_resize>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:25
     }
     v->items[v->total++] = item;
-    80205092:	fe843783          	ld	a5,-24(s0)
-    80205096:	6398                	ld	a4,0(a5)
-    80205098:	fe843783          	ld	a5,-24(s0)
-    8020509c:	6b9c                	ld	a5,16(a5)
-    8020509e:	00178613          	addi	a2,a5,1
-    802050a2:	fe843683          	ld	a3,-24(s0)
-    802050a6:	ea90                	sd	a2,16(a3)
-    802050a8:	078e                	slli	a5,a5,0x3
-    802050aa:	97ba                	add	a5,a5,a4
-    802050ac:	fe043703          	ld	a4,-32(s0)
-    802050b0:	e398                	sd	a4,0(a5)
+    80205174:	fe843783          	ld	a5,-24(s0)
+    80205178:	6398                	ld	a4,0(a5)
+    8020517a:	fe843783          	ld	a5,-24(s0)
+    8020517e:	6b9c                	ld	a5,16(a5)
+    80205180:	00178613          	addi	a2,a5,1
+    80205184:	fe843683          	ld	a3,-24(s0)
+    80205188:	ea90                	sd	a2,16(a3)
+    8020518a:	078e                	slli	a5,a5,0x3
+    8020518c:	97ba                	add	a5,a5,a4
+    8020518e:	fe043703          	ld	a4,-32(s0)
+    80205192:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:26
 }
-    802050b2:	0001                	nop
-    802050b4:	60e2                	ld	ra,24(sp)
-    802050b6:	6442                	ld	s0,16(sp)
-    802050b8:	6105                	addi	sp,sp,32
-    802050ba:	8082                	ret
+    80205194:	0001                	nop
+    80205196:	60e2                	ld	ra,24(sp)
+    80205198:	6442                	ld	s0,16(sp)
+    8020519a:	6105                	addi	sp,sp,32
+    8020519c:	8082                	ret
 
-00000000802050bc <vector_get>:
+000000008020519e <vector_get>:
 vector_get():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:28
 
 void *vector_get(Vector *v, size_t index) {
-    802050bc:	1101                	addi	sp,sp,-32
-    802050be:	ec22                	sd	s0,24(sp)
-    802050c0:	1000                	addi	s0,sp,32
-    802050c2:	fea43423          	sd	a0,-24(s0)
-    802050c6:	feb43023          	sd	a1,-32(s0)
+    8020519e:	1101                	addi	sp,sp,-32
+    802051a0:	ec22                	sd	s0,24(sp)
+    802051a2:	1000                	addi	s0,sp,32
+    802051a4:	fea43423          	sd	a0,-24(s0)
+    802051a8:	feb43023          	sd	a1,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:29
     if (index < v->total) {
-    802050ca:	fe843783          	ld	a5,-24(s0)
-    802050ce:	6b9c                	ld	a5,16(a5)
-    802050d0:	fe043703          	ld	a4,-32(s0)
-    802050d4:	00f77b63          	bgeu	a4,a5,802050ea <vector_get+0x2e>
+    802051ac:	fe843783          	ld	a5,-24(s0)
+    802051b0:	6b9c                	ld	a5,16(a5)
+    802051b2:	fe043703          	ld	a4,-32(s0)
+    802051b6:	00f77b63          	bgeu	a4,a5,802051cc <vector_get+0x2e>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:30
         return v->items[index];
-    802050d8:	fe843783          	ld	a5,-24(s0)
-    802050dc:	6398                	ld	a4,0(a5)
-    802050de:	fe043783          	ld	a5,-32(s0)
-    802050e2:	078e                	slli	a5,a5,0x3
-    802050e4:	97ba                	add	a5,a5,a4
-    802050e6:	639c                	ld	a5,0(a5)
-    802050e8:	a011                	j	802050ec <vector_get+0x30>
+    802051ba:	fe843783          	ld	a5,-24(s0)
+    802051be:	6398                	ld	a4,0(a5)
+    802051c0:	fe043783          	ld	a5,-32(s0)
+    802051c4:	078e                	slli	a5,a5,0x3
+    802051c6:	97ba                	add	a5,a5,a4
+    802051c8:	639c                	ld	a5,0(a5)
+    802051ca:	a011                	j	802051ce <vector_get+0x30>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:32
     }
     return NULL;
-    802050ea:	4781                	li	a5,0
+    802051cc:	4781                	li	a5,0
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:33
 }
-    802050ec:	853e                	mv	a0,a5
-    802050ee:	6462                	ld	s0,24(sp)
-    802050f0:	6105                	addi	sp,sp,32
-    802050f2:	8082                	ret
+    802051ce:	853e                	mv	a0,a5
+    802051d0:	6462                	ld	s0,24(sp)
+    802051d2:	6105                	addi	sp,sp,32
+    802051d4:	8082                	ret
 
-00000000802050f4 <vector_delete>:
+00000000802051d6 <vector_delete>:
 vector_delete():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:35
 
 void vector_delete(Vector *v, size_t index) {
-    802050f4:	7179                	addi	sp,sp,-48
-    802050f6:	f406                	sd	ra,40(sp)
-    802050f8:	f022                	sd	s0,32(sp)
-    802050fa:	1800                	addi	s0,sp,48
-    802050fc:	fca43c23          	sd	a0,-40(s0)
-    80205100:	fcb43823          	sd	a1,-48(s0)
+    802051d6:	7179                	addi	sp,sp,-48
+    802051d8:	f406                	sd	ra,40(sp)
+    802051da:	f022                	sd	s0,32(sp)
+    802051dc:	1800                	addi	s0,sp,48
+    802051de:	fca43c23          	sd	a0,-40(s0)
+    802051e2:	fcb43823          	sd	a1,-48(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:36
     if (index < v->total) {
-    80205104:	fd843783          	ld	a5,-40(s0)
-    80205108:	6b9c                	ld	a5,16(a5)
-    8020510a:	fd043703          	ld	a4,-48(s0)
-    8020510e:	0af77663          	bgeu	a4,a5,802051ba <vector_delete+0xc6>
+    802051e6:	fd843783          	ld	a5,-40(s0)
+    802051ea:	6b9c                	ld	a5,16(a5)
+    802051ec:	fd043703          	ld	a4,-48(s0)
+    802051f0:	0af77663          	bgeu	a4,a5,8020529c <vector_delete+0xc6>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:37
         v->items[index] = NULL;
-    80205112:	fd843783          	ld	a5,-40(s0)
-    80205116:	6398                	ld	a4,0(a5)
-    80205118:	fd043783          	ld	a5,-48(s0)
-    8020511c:	078e                	slli	a5,a5,0x3
-    8020511e:	97ba                	add	a5,a5,a4
-    80205120:	0007b023          	sd	zero,0(a5)
+    802051f4:	fd843783          	ld	a5,-40(s0)
+    802051f8:	6398                	ld	a4,0(a5)
+    802051fa:	fd043783          	ld	a5,-48(s0)
+    802051fe:	078e                	slli	a5,a5,0x3
+    80205200:	97ba                	add	a5,a5,a4
+    80205202:	0007b023          	sd	zero,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:38
         for (size_t i = index; i < v->total - 1; ++i) {
-    80205124:	fd043783          	ld	a5,-48(s0)
-    80205128:	fef43423          	sd	a5,-24(s0)
-    8020512c:	a089                	j	8020516e <vector_delete+0x7a>
+    80205206:	fd043783          	ld	a5,-48(s0)
+    8020520a:	fef43423          	sd	a5,-24(s0)
+    8020520e:	a089                	j	80205250 <vector_delete+0x7a>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:39 (discriminator 3)
             v->items[i] = v->items[i + 1];
-    8020512e:	fd843783          	ld	a5,-40(s0)
-    80205132:	6398                	ld	a4,0(a5)
-    80205134:	fe843783          	ld	a5,-24(s0)
-    80205138:	0785                	addi	a5,a5,1
-    8020513a:	078e                	slli	a5,a5,0x3
-    8020513c:	973e                	add	a4,a4,a5
-    8020513e:	fd843783          	ld	a5,-40(s0)
-    80205142:	6394                	ld	a3,0(a5)
-    80205144:	fe843783          	ld	a5,-24(s0)
-    80205148:	078e                	slli	a5,a5,0x3
-    8020514a:	97b6                	add	a5,a5,a3
-    8020514c:	6318                	ld	a4,0(a4)
-    8020514e:	e398                	sd	a4,0(a5)
+    80205210:	fd843783          	ld	a5,-40(s0)
+    80205214:	6398                	ld	a4,0(a5)
+    80205216:	fe843783          	ld	a5,-24(s0)
+    8020521a:	0785                	addi	a5,a5,1
+    8020521c:	078e                	slli	a5,a5,0x3
+    8020521e:	973e                	add	a4,a4,a5
+    80205220:	fd843783          	ld	a5,-40(s0)
+    80205224:	6394                	ld	a3,0(a5)
+    80205226:	fe843783          	ld	a5,-24(s0)
+    8020522a:	078e                	slli	a5,a5,0x3
+    8020522c:	97b6                	add	a5,a5,a3
+    8020522e:	6318                	ld	a4,0(a4)
+    80205230:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:40 (discriminator 3)
             v->items[i + 1] = NULL;
-    80205150:	fd843783          	ld	a5,-40(s0)
-    80205154:	6398                	ld	a4,0(a5)
-    80205156:	fe843783          	ld	a5,-24(s0)
-    8020515a:	0785                	addi	a5,a5,1
-    8020515c:	078e                	slli	a5,a5,0x3
-    8020515e:	97ba                	add	a5,a5,a4
-    80205160:	0007b023          	sd	zero,0(a5)
+    80205232:	fd843783          	ld	a5,-40(s0)
+    80205236:	6398                	ld	a4,0(a5)
+    80205238:	fe843783          	ld	a5,-24(s0)
+    8020523c:	0785                	addi	a5,a5,1
+    8020523e:	078e                	slli	a5,a5,0x3
+    80205240:	97ba                	add	a5,a5,a4
+    80205242:	0007b023          	sd	zero,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:38 (discriminator 3)
         for (size_t i = index; i < v->total - 1; ++i) {
-    80205164:	fe843783          	ld	a5,-24(s0)
-    80205168:	0785                	addi	a5,a5,1
-    8020516a:	fef43423          	sd	a5,-24(s0)
+    80205246:	fe843783          	ld	a5,-24(s0)
+    8020524a:	0785                	addi	a5,a5,1
+    8020524c:	fef43423          	sd	a5,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:38 (discriminator 1)
-    8020516e:	fd843783          	ld	a5,-40(s0)
-    80205172:	6b9c                	ld	a5,16(a5)
-    80205174:	17fd                	addi	a5,a5,-1
-    80205176:	fe843703          	ld	a4,-24(s0)
-    8020517a:	faf76ae3          	bltu	a4,a5,8020512e <vector_delete+0x3a>
+    80205250:	fd843783          	ld	a5,-40(s0)
+    80205254:	6b9c                	ld	a5,16(a5)
+    80205256:	17fd                	addi	a5,a5,-1
+    80205258:	fe843703          	ld	a4,-24(s0)
+    8020525c:	faf76ae3          	bltu	a4,a5,80205210 <vector_delete+0x3a>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:42
         }
         v->total--;
-    8020517e:	fd843783          	ld	a5,-40(s0)
-    80205182:	6b9c                	ld	a5,16(a5)
-    80205184:	fff78713          	addi	a4,a5,-1
-    80205188:	fd843783          	ld	a5,-40(s0)
-    8020518c:	eb98                	sd	a4,16(a5)
+    80205260:	fd843783          	ld	a5,-40(s0)
+    80205264:	6b9c                	ld	a5,16(a5)
+    80205266:	fff78713          	addi	a4,a5,-1
+    8020526a:	fd843783          	ld	a5,-40(s0)
+    8020526e:	eb98                	sd	a4,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:43
         if (v->total > 0 && v->total == v->capacity / 4) {
-    8020518e:	fd843783          	ld	a5,-40(s0)
-    80205192:	6b9c                	ld	a5,16(a5)
-    80205194:	c39d                	beqz	a5,802051ba <vector_delete+0xc6>
+    80205270:	fd843783          	ld	a5,-40(s0)
+    80205274:	6b9c                	ld	a5,16(a5)
+    80205276:	c39d                	beqz	a5,8020529c <vector_delete+0xc6>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:43 (discriminator 1)
-    80205196:	fd843783          	ld	a5,-40(s0)
-    8020519a:	6b98                	ld	a4,16(a5)
-    8020519c:	fd843783          	ld	a5,-40(s0)
-    802051a0:	679c                	ld	a5,8(a5)
-    802051a2:	8389                	srli	a5,a5,0x2
-    802051a4:	00f71b63          	bne	a4,a5,802051ba <vector_delete+0xc6>
+    80205278:	fd843783          	ld	a5,-40(s0)
+    8020527c:	6b98                	ld	a4,16(a5)
+    8020527e:	fd843783          	ld	a5,-40(s0)
+    80205282:	679c                	ld	a5,8(a5)
+    80205284:	8389                	srli	a5,a5,0x2
+    80205286:	00f71b63          	bne	a4,a5,8020529c <vector_delete+0xc6>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:44
             vector_resize(v, v->capacity / 2);
-    802051a8:	fd843783          	ld	a5,-40(s0)
-    802051ac:	679c                	ld	a5,8(a5)
-    802051ae:	8385                	srli	a5,a5,0x1
-    802051b0:	85be                	mv	a1,a5
-    802051b2:	fd843503          	ld	a0,-40(s0)
-    802051b6:	e5fff0ef          	jal	ra,80205014 <vector_resize>
+    8020528a:	fd843783          	ld	a5,-40(s0)
+    8020528e:	679c                	ld	a5,8(a5)
+    80205290:	8385                	srli	a5,a5,0x1
+    80205292:	85be                	mv	a1,a5
+    80205294:	fd843503          	ld	a0,-40(s0)
+    80205298:	e5fff0ef          	jal	ra,802050f6 <vector_resize>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:47
         }
     }
 }
-    802051ba:	0001                	nop
-    802051bc:	70a2                	ld	ra,40(sp)
-    802051be:	7402                	ld	s0,32(sp)
-    802051c0:	6145                	addi	sp,sp,48
-    802051c2:	8082                	ret
+    8020529c:	0001                	nop
+    8020529e:	70a2                	ld	ra,40(sp)
+    802052a0:	7402                	ld	s0,32(sp)
+    802052a2:	6145                	addi	sp,sp,48
+    802052a4:	8082                	ret
 
-00000000802051c4 <vector_free>:
+00000000802052a6 <vector_free>:
 vector_free():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:49
 
 void vector_free(Vector *v) {
-    802051c4:	1101                	addi	sp,sp,-32
-    802051c6:	ec06                	sd	ra,24(sp)
-    802051c8:	e822                	sd	s0,16(sp)
-    802051ca:	1000                	addi	s0,sp,32
-    802051cc:	fea43423          	sd	a0,-24(s0)
+    802052a6:	1101                	addi	sp,sp,-32
+    802052a8:	ec06                	sd	ra,24(sp)
+    802052aa:	e822                	sd	s0,16(sp)
+    802052ac:	1000                	addi	s0,sp,32
+    802052ae:	fea43423          	sd	a0,-24(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:50
     free(v->items);
-    802051d0:	fe843783          	ld	a5,-24(s0)
-    802051d4:	639c                	ld	a5,0(a5)
-    802051d6:	853e                	mv	a0,a5
-    802051d8:	f5afd0ef          	jal	ra,80202932 <free>
+    802052b2:	fe843783          	ld	a5,-24(s0)
+    802052b6:	639c                	ld	a5,0(a5)
+    802052b8:	853e                	mv	a0,a5
+    802052ba:	e78fd0ef          	jal	ra,80202932 <free>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:51
     v->items = NULL;
-    802051dc:	fe843783          	ld	a5,-24(s0)
-    802051e0:	0007b023          	sd	zero,0(a5)
+    802052be:	fe843783          	ld	a5,-24(s0)
+    802052c2:	0007b023          	sd	zero,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:52
     v->capacity = 0;
-    802051e4:	fe843783          	ld	a5,-24(s0)
-    802051e8:	0007b423          	sd	zero,8(a5)
+    802052c6:	fe843783          	ld	a5,-24(s0)
+    802052ca:	0007b423          	sd	zero,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:53
     v->total = 0;
-    802051ec:	fe843783          	ld	a5,-24(s0)
-    802051f0:	0007b823          	sd	zero,16(a5)
+    802052ce:	fe843783          	ld	a5,-24(s0)
+    802052d2:	0007b823          	sd	zero,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:54
 }
-    802051f4:	0001                	nop
-    802051f6:	60e2                	ld	ra,24(sp)
-    802051f8:	6442                	ld	s0,16(sp)
-    802051fa:	6105                	addi	sp,sp,32
-    802051fc:	8082                	ret
+    802052d6:	0001                	nop
+    802052d8:	60e2                	ld	ra,24(sp)
+    802052da:	6442                	ld	s0,16(sp)
+    802052dc:	6105                	addi	sp,sp,32
+    802052de:	8082                	ret
 
-00000000802051fe <vector_new>:
+00000000802052e0 <vector_new>:
 vector_new():
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:58
 
 
 void vector_new(Vector *v, size_t initial_capacity) 
 {
-    802051fe:	1101                	addi	sp,sp,-32
-    80205200:	ec06                	sd	ra,24(sp)
-    80205202:	e822                	sd	s0,16(sp)
-    80205204:	1000                	addi	s0,sp,32
-    80205206:	fea43423          	sd	a0,-24(s0)
-    8020520a:	feb43023          	sd	a1,-32(s0)
+    802052e0:	1101                	addi	sp,sp,-32
+    802052e2:	ec06                	sd	ra,24(sp)
+    802052e4:	e822                	sd	s0,16(sp)
+    802052e6:	1000                	addi	s0,sp,32
+    802052e8:	fea43423          	sd	a0,-24(s0)
+    802052ec:	feb43023          	sd	a1,-32(s0)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:59
     if (!v) return;
-    8020520e:	fe843783          	ld	a5,-24(s0)
-    80205212:	c3b1                	beqz	a5,80205256 <vector_new+0x58>
+    802052f0:	fe843783          	ld	a5,-24(s0)
+    802052f4:	c3b1                	beqz	a5,80205338 <vector_new+0x58>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:60
     v->items = (void**)malloc(initial_capacity * sizeof(void*));
-    80205214:	fe043783          	ld	a5,-32(s0)
-    80205218:	078e                	slli	a5,a5,0x3
-    8020521a:	853e                	mv	a0,a5
-    8020521c:	e62fd0ef          	jal	ra,8020287e <malloc>
-    80205220:	872a                	mv	a4,a0
-    80205222:	fe843783          	ld	a5,-24(s0)
-    80205226:	e398                	sd	a4,0(a5)
+    802052f6:	fe043783          	ld	a5,-32(s0)
+    802052fa:	078e                	slli	a5,a5,0x3
+    802052fc:	853e                	mv	a0,a5
+    802052fe:	d80fd0ef          	jal	ra,8020287e <malloc>
+    80205302:	872a                	mv	a4,a0
+    80205304:	fe843783          	ld	a5,-24(s0)
+    80205308:	e398                	sd	a4,0(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:61
     if (v->items == NULL) {
-    80205228:	fe843783          	ld	a5,-24(s0)
-    8020522c:	639c                	ld	a5,0(a5)
-    8020522e:	eb91                	bnez	a5,80205242 <vector_new+0x44>
+    8020530a:	fe843783          	ld	a5,-24(s0)
+    8020530e:	639c                	ld	a5,0(a5)
+    80205310:	eb91                	bnez	a5,80205324 <vector_new+0x44>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:63
         // 如果内存分配失败，则容量和总数设置为 0
         v->capacity = 0;
-    80205230:	fe843783          	ld	a5,-24(s0)
-    80205234:	0007b423          	sd	zero,8(a5)
+    80205312:	fe843783          	ld	a5,-24(s0)
+    80205316:	0007b423          	sd	zero,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:64
         v->total = 0;
-    80205238:	fe843783          	ld	a5,-24(s0)
-    8020523c:	0007b823          	sd	zero,16(a5)
+    8020531a:	fe843783          	ld	a5,-24(s0)
+    8020531e:	0007b823          	sd	zero,16(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:65
         return; // 可以在这里处理错误或者返回
-    80205240:	a821                	j	80205258 <vector_new+0x5a>
+    80205322:	a821                	j	8020533a <vector_new+0x5a>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:69
     }
 
     // 初始化 Vector 结构体的其他成员
     v->capacity = initial_capacity;
-    80205242:	fe843783          	ld	a5,-24(s0)
-    80205246:	fe043703          	ld	a4,-32(s0)
-    8020524a:	e798                	sd	a4,8(a5)
+    80205324:	fe843783          	ld	a5,-24(s0)
+    80205328:	fe043703          	ld	a4,-32(s0)
+    8020532c:	e798                	sd	a4,8(a5)
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:70
     v->total = 0; // 初始时，Vector 为空
-    8020524c:	fe843783          	ld	a5,-24(s0)
-    80205250:	0007b823          	sd	zero,16(a5)
-    80205254:	a011                	j	80205258 <vector_new+0x5a>
+    8020532e:	fe843783          	ld	a5,-24(s0)
+    80205332:	0007b823          	sd	zero,16(a5)
+    80205336:	a011                	j	8020533a <vector_new+0x5a>
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:59
     if (!v) return;
-    80205256:	0001                	nop
+    80205338:	0001                	nop
 /home/caigoubencai/Desktop/os_c/kernel/data_structure/vector.c:71
-    80205258:	60e2                	ld	ra,24(sp)
-    8020525a:	6442                	ld	s0,16(sp)
-    8020525c:	6105                	addi	sp,sp,32
-    8020525e:	8082                	ret
+    8020533a:	60e2                	ld	ra,24(sp)
+    8020533c:	6442                	ld	s0,16(sp)
+    8020533e:	6105                	addi	sp,sp,32
+    80205340:	8082                	ret
+	...
 
-0000000080205260 <__alltraps>:
+0000000080205344 <__alltraps>:
 __alltraps():
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:13
     .align 2
@@ -9582,20 +9691,20 @@ __alltraps():
     .globl __restore
 __alltraps:
     csrrw sp, sscratch, sp
-    80205260:	14011173          	csrrw	sp,sscratch,sp
+    80205344:	14011173          	csrrw	sp,sscratch,sp
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:16
     # now sp->kernel stack, sscratch->user stack
     # allocate a TrapContext on kernel stack
     addi sp, sp, -34*8
-    80205264:	716d                	addi	sp,sp,-272
+    80205348:	716d                	addi	sp,sp,-272
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:18
     # save general-purpose registers
     sd x1, 1*8(sp)
-    80205266:	e406                	sd	ra,8(sp)
+    8020534a:	e406                	sd	ra,8(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:20
     # skip sp(x2), we will save it later
     sd x3, 3*8(sp)
-    80205268:	ec0e                	sd	gp,24(sp)
+    8020534c:	ec0e                	sd	gp,24(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:27
     # save x5~x31
     .set n, 5
@@ -9603,62 +9712,62 @@ __alltraps:
         SAVE_GP %n
         .set n, n+1
     .endr
-    8020526a:	f416                	sd	t0,40(sp)
-    8020526c:	f81a                	sd	t1,48(sp)
-    8020526e:	fc1e                	sd	t2,56(sp)
-    80205270:	e0a2                	sd	s0,64(sp)
-    80205272:	e4a6                	sd	s1,72(sp)
-    80205274:	e8aa                	sd	a0,80(sp)
-    80205276:	ecae                	sd	a1,88(sp)
-    80205278:	f0b2                	sd	a2,96(sp)
-    8020527a:	f4b6                	sd	a3,104(sp)
-    8020527c:	f8ba                	sd	a4,112(sp)
-    8020527e:	fcbe                	sd	a5,120(sp)
-    80205280:	e142                	sd	a6,128(sp)
-    80205282:	e546                	sd	a7,136(sp)
-    80205284:	e94a                	sd	s2,144(sp)
-    80205286:	ed4e                	sd	s3,152(sp)
-    80205288:	f152                	sd	s4,160(sp)
-    8020528a:	f556                	sd	s5,168(sp)
-    8020528c:	f95a                	sd	s6,176(sp)
-    8020528e:	fd5e                	sd	s7,184(sp)
-    80205290:	e1e2                	sd	s8,192(sp)
-    80205292:	e5e6                	sd	s9,200(sp)
-    80205294:	e9ea                	sd	s10,208(sp)
-    80205296:	edee                	sd	s11,216(sp)
-    80205298:	f1f2                	sd	t3,224(sp)
-    8020529a:	f5f6                	sd	t4,232(sp)
-    8020529c:	f9fa                	sd	t5,240(sp)
-    8020529e:	fdfe                	sd	t6,248(sp)
+    8020534e:	f416                	sd	t0,40(sp)
+    80205350:	f81a                	sd	t1,48(sp)
+    80205352:	fc1e                	sd	t2,56(sp)
+    80205354:	e0a2                	sd	s0,64(sp)
+    80205356:	e4a6                	sd	s1,72(sp)
+    80205358:	e8aa                	sd	a0,80(sp)
+    8020535a:	ecae                	sd	a1,88(sp)
+    8020535c:	f0b2                	sd	a2,96(sp)
+    8020535e:	f4b6                	sd	a3,104(sp)
+    80205360:	f8ba                	sd	a4,112(sp)
+    80205362:	fcbe                	sd	a5,120(sp)
+    80205364:	e142                	sd	a6,128(sp)
+    80205366:	e546                	sd	a7,136(sp)
+    80205368:	e94a                	sd	s2,144(sp)
+    8020536a:	ed4e                	sd	s3,152(sp)
+    8020536c:	f152                	sd	s4,160(sp)
+    8020536e:	f556                	sd	s5,168(sp)
+    80205370:	f95a                	sd	s6,176(sp)
+    80205372:	fd5e                	sd	s7,184(sp)
+    80205374:	e1e2                	sd	s8,192(sp)
+    80205376:	e5e6                	sd	s9,200(sp)
+    80205378:	e9ea                	sd	s10,208(sp)
+    8020537a:	edee                	sd	s11,216(sp)
+    8020537c:	f1f2                	sd	t3,224(sp)
+    8020537e:	f5f6                	sd	t4,232(sp)
+    80205380:	f9fa                	sd	t5,240(sp)
+    80205382:	fdfe                	sd	t6,248(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:29
     # we can use t0/t1/t2 freely, because they were saved on kernel stack
     csrr t0, sstatus
-    802052a0:	100022f3          	csrr	t0,sstatus
+    80205384:	100022f3          	csrr	t0,sstatus
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:30
     csrr t1, sepc
-    802052a4:	14102373          	csrr	t1,sepc
+    80205388:	14102373          	csrr	t1,sepc
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:31
     sd t0, 32*8(sp)
-    802052a8:	e216                	sd	t0,256(sp)
+    8020538c:	e216                	sd	t0,256(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:32
     sd t1, 33*8(sp)
-    802052aa:	e61a                	sd	t1,264(sp)
+    8020538e:	e61a                	sd	t1,264(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:34
     # read user stack from sscratch and save it on the kernel stack
     csrr t2, sscratch
-    802052ac:	140023f3          	csrr	t2,sscratch
+    80205390:	140023f3          	csrr	t2,sscratch
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:35
     sd t2, 2*8(sp)
-    802052b0:	e81e                	sd	t2,16(sp)
+    80205394:	e81e                	sd	t2,16(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:37
     # set input argument of trap_handler(cx: &mut TrapContext)
     mv a0, sp
-    802052b2:	850a                	mv	a0,sp
+    80205396:	850a                	mv	a0,sp
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:38
     call trap_handler
-    802052b4:	845ff0ef          	jal	ra,80204af8 <trap_handler>
+    80205398:	fbcff0ef          	jal	ra,80204b54 <trap_handler>
 
-00000000802052b8 <__restore>:
+000000008020539c <__restore>:
 __restore():
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:44
 
@@ -9667,77 +9776,76 @@ __restore:
     # now sp->kernel stack(after allocated), sscratch->user stack
     # restore sstatus/sepc
     ld t0, 32*8(sp)
-    802052b8:	6292                	ld	t0,256(sp)
+    8020539c:	6292                	ld	t0,256(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:45
     ld t1, 33*8(sp)
-    802052ba:	6332                	ld	t1,264(sp)
+    8020539e:	6332                	ld	t1,264(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:46
     ld t2, 2*8(sp)
-    802052bc:	63c2                	ld	t2,16(sp)
+    802053a0:	63c2                	ld	t2,16(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:47
     csrw sstatus, t0
-    802052be:	10029073          	csrw	sstatus,t0
+    802053a2:	10029073          	csrw	sstatus,t0
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:48
     csrw sepc, t1
-    802052c2:	14131073          	csrw	sepc,t1
+    802053a6:	14131073          	csrw	sepc,t1
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:49
     csrw sscratch, t2
-    802052c6:	14039073          	csrw	sscratch,t2
+    802053aa:	14039073          	csrw	sscratch,t2
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:51
     # restore general-purpuse registers except sp/tp
     ld x1, 1*8(sp)
-    802052ca:	60a2                	ld	ra,8(sp)
+    802053ae:	60a2                	ld	ra,8(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:52
     ld x3, 3*8(sp)
-    802052cc:	61e2                	ld	gp,24(sp)
+    802053b0:	61e2                	ld	gp,24(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:57
     .set n, 5
     .rept 27
         LOAD_GP %n
         .set n, n+1
     .endr
-    802052ce:	72a2                	ld	t0,40(sp)
-    802052d0:	7342                	ld	t1,48(sp)
-    802052d2:	73e2                	ld	t2,56(sp)
-    802052d4:	6406                	ld	s0,64(sp)
-    802052d6:	64a6                	ld	s1,72(sp)
-    802052d8:	6546                	ld	a0,80(sp)
-    802052da:	65e6                	ld	a1,88(sp)
-    802052dc:	7606                	ld	a2,96(sp)
-    802052de:	76a6                	ld	a3,104(sp)
-    802052e0:	7746                	ld	a4,112(sp)
-    802052e2:	77e6                	ld	a5,120(sp)
-    802052e4:	680a                	ld	a6,128(sp)
-    802052e6:	68aa                	ld	a7,136(sp)
-    802052e8:	694a                	ld	s2,144(sp)
-    802052ea:	69ea                	ld	s3,152(sp)
-    802052ec:	7a0a                	ld	s4,160(sp)
-    802052ee:	7aaa                	ld	s5,168(sp)
-    802052f0:	7b4a                	ld	s6,176(sp)
-    802052f2:	7bea                	ld	s7,184(sp)
-    802052f4:	6c0e                	ld	s8,192(sp)
-    802052f6:	6cae                	ld	s9,200(sp)
-    802052f8:	6d4e                	ld	s10,208(sp)
-    802052fa:	6dee                	ld	s11,216(sp)
-    802052fc:	7e0e                	ld	t3,224(sp)
-    802052fe:	7eae                	ld	t4,232(sp)
-    80205300:	7f4e                	ld	t5,240(sp)
-    80205302:	7fee                	ld	t6,248(sp)
+    802053b2:	72a2                	ld	t0,40(sp)
+    802053b4:	7342                	ld	t1,48(sp)
+    802053b6:	73e2                	ld	t2,56(sp)
+    802053b8:	6406                	ld	s0,64(sp)
+    802053ba:	64a6                	ld	s1,72(sp)
+    802053bc:	6546                	ld	a0,80(sp)
+    802053be:	65e6                	ld	a1,88(sp)
+    802053c0:	7606                	ld	a2,96(sp)
+    802053c2:	76a6                	ld	a3,104(sp)
+    802053c4:	7746                	ld	a4,112(sp)
+    802053c6:	77e6                	ld	a5,120(sp)
+    802053c8:	680a                	ld	a6,128(sp)
+    802053ca:	68aa                	ld	a7,136(sp)
+    802053cc:	694a                	ld	s2,144(sp)
+    802053ce:	69ea                	ld	s3,152(sp)
+    802053d0:	7a0a                	ld	s4,160(sp)
+    802053d2:	7aaa                	ld	s5,168(sp)
+    802053d4:	7b4a                	ld	s6,176(sp)
+    802053d6:	7bea                	ld	s7,184(sp)
+    802053d8:	6c0e                	ld	s8,192(sp)
+    802053da:	6cae                	ld	s9,200(sp)
+    802053dc:	6d4e                	ld	s10,208(sp)
+    802053de:	6dee                	ld	s11,216(sp)
+    802053e0:	7e0e                	ld	t3,224(sp)
+    802053e2:	7eae                	ld	t4,232(sp)
+    802053e4:	7f4e                	ld	t5,240(sp)
+    802053e6:	7fee                	ld	t6,248(sp)
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:59
     # release TrapContext on kernel stack
     addi sp, sp, 34*8
-    80205304:	6151                	addi	sp,sp,272
+    802053e8:	6151                	addi	sp,sp,272
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:61
     # now sp->kernel stack, sscratch->user stack
     csrrw sp, sscratch, sp
-    80205306:	14011173          	csrrw	sp,sscratch,sp
+    802053ea:	14011173          	csrrw	sp,sscratch,sp
 /home/caigoubencai/Desktop/os_c/kernel/asm/trap.asm:62
     sret
-    8020530a:	10200073          	sret
-    8020530e:	0000                	unimp
+    802053ee:	10200073          	sret
 	...
 
-0000000080205312 <__switch>:
+00000000802053fa <__switch>:
 __switch():
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:16
     # __switch(
@@ -9746,55 +9854,55 @@ __switch():
     # )
     # save kernel stack of current task
     sd sp, 8(a0)
-    80205312:	00253423          	sd	sp,8(a0)
+    802053fa:	00253423          	sd	sp,8(a0)
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:18
     # save ra & s0~s11 of current execution
     sd ra, 0(a0)
-    80205316:	00153023          	sd	ra,0(a0)
+    802053fe:	00153023          	sd	ra,0(a0)
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:23
     .set n, 0
     .rept 12
         SAVE_SN %n
         .set n, n + 1
     .endr
-    8020531a:	e900                	sd	s0,16(a0)
-    8020531c:	ed04                	sd	s1,24(a0)
-    8020531e:	03253023          	sd	s2,32(a0)
-    80205322:	03353423          	sd	s3,40(a0)
-    80205326:	03453823          	sd	s4,48(a0)
-    8020532a:	03553c23          	sd	s5,56(a0)
-    8020532e:	05653023          	sd	s6,64(a0)
-    80205332:	05753423          	sd	s7,72(a0)
-    80205336:	05853823          	sd	s8,80(a0)
-    8020533a:	05953c23          	sd	s9,88(a0)
-    8020533e:	07a53023          	sd	s10,96(a0)
-    80205342:	07b53423          	sd	s11,104(a0)
+    80205402:	e900                	sd	s0,16(a0)
+    80205404:	ed04                	sd	s1,24(a0)
+    80205406:	03253023          	sd	s2,32(a0)
+    8020540a:	03353423          	sd	s3,40(a0)
+    8020540e:	03453823          	sd	s4,48(a0)
+    80205412:	03553c23          	sd	s5,56(a0)
+    80205416:	05653023          	sd	s6,64(a0)
+    8020541a:	05753423          	sd	s7,72(a0)
+    8020541e:	05853823          	sd	s8,80(a0)
+    80205422:	05953c23          	sd	s9,88(a0)
+    80205426:	07a53023          	sd	s10,96(a0)
+    8020542a:	07b53423          	sd	s11,104(a0)
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:25
     # restore ra & s0~s11 of next execution
     ld ra, 0(a1)
-    80205346:	0005b083          	ld	ra,0(a1)
+    8020542e:	0005b083          	ld	ra,0(a1)
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:30
     .set n, 0
     .rept 12
         LOAD_SN %n
         .set n, n + 1
     .endr
-    8020534a:	6980                	ld	s0,16(a1)
-    8020534c:	6d84                	ld	s1,24(a1)
-    8020534e:	0205b903          	ld	s2,32(a1)
-    80205352:	0285b983          	ld	s3,40(a1)
-    80205356:	0305ba03          	ld	s4,48(a1)
-    8020535a:	0385ba83          	ld	s5,56(a1)
-    8020535e:	0405bb03          	ld	s6,64(a1)
-    80205362:	0485bb83          	ld	s7,72(a1)
-    80205366:	0505bc03          	ld	s8,80(a1)
-    8020536a:	0585bc83          	ld	s9,88(a1)
-    8020536e:	0605bd03          	ld	s10,96(a1)
-    80205372:	0685bd83          	ld	s11,104(a1)
+    80205432:	6980                	ld	s0,16(a1)
+    80205434:	6d84                	ld	s1,24(a1)
+    80205436:	0205b903          	ld	s2,32(a1)
+    8020543a:	0285b983          	ld	s3,40(a1)
+    8020543e:	0305ba03          	ld	s4,48(a1)
+    80205442:	0385ba83          	ld	s5,56(a1)
+    80205446:	0405bb03          	ld	s6,64(a1)
+    8020544a:	0485bb83          	ld	s7,72(a1)
+    8020544e:	0505bc03          	ld	s8,80(a1)
+    80205452:	0585bc83          	ld	s9,88(a1)
+    80205456:	0605bd03          	ld	s10,96(a1)
+    8020545a:	0685bd83          	ld	s11,104(a1)
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:32
     # restore kernel stack of next task
     ld sp, 8(a1)
-    80205376:	0085b103          	ld	sp,8(a1)
+    8020545e:	0085b103          	ld	sp,8(a1)
 /home/caigoubencai/Desktop/os_c/kernel/asm/switch.asm:33
     ret
-    8020537a:	8082                	ret
+    80205462:	8082                	ret

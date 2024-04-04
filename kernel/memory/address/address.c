@@ -39,8 +39,7 @@ PhysAddr phys_page_num_to_addr(PhysPageNum ppn) {
 }
 
 // 解析虚拟页号，获取页内偏移及三级页表中各级的索引
-uint64_t* decompose_vpn(uint64_t vpn) 
-{
+uint64_t* decompose_vpn(uint64_t vpn) {
     static uint64_t result[4];
     // 获取页内偏移
     uint64_t page_offset = vpn & OFFSET_MASK;

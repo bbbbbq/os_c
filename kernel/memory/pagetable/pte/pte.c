@@ -26,7 +26,7 @@ PageTableEntry pte_empty(void)
 // @return 页表项中的物理页号
 uint64_t pte_ppn(PageTableEntry pte) 
 {
-    return pte.bits >> 10 & ((1ULL << 44) - 1); // 从位域中提取物理页号
+    return (((pte.bits) >> 10) & ((1L << 44) - 1)); // 从位域中提取物理页号
 }
 
 // 获取页表项中的标志位

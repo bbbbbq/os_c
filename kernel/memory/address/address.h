@@ -4,7 +4,7 @@
 
 #define PAGE_SIZE 4096 // 假设页大小为4096字节
 #define PAGE_SIZE_BITS 12 // 对应于4096字节页大小的位数
-#define MEMORY_END 0x80800000
+#define MEMORY_END 0x88000000
 #define INDEX_BITS 9
 #define INDEX_MASK ((1ULL << INDEX_BITS) - 1)
 #define OFFSET_MASK ((1ULL << PAGE_SIZE_BITS) - 1)

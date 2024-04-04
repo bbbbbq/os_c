@@ -74,13 +74,15 @@ void memory_set_map_kernel_stack_kernel(MemorySet *ms)
 void memory_set_map_trampoline(MemorySet *ms)
 {
     VirtAddr va;
-    va.addr = TRAMPOLINE_FULL;
+    va.addr = TRAMPOLINE;
     PhysAddr pha;
     pha.addr = (size_t)&strampoline;
+    VirtPageNum tmp = virt_addr_to_page_num(va,1);
     PageTable_map_ppn_2_vpn(&ms->page_table,virt_addr_to_page_num(va,0),phys_addr_to_page_num(pha,1),PTE_R|PTE_X);
 }
 
-void memory_set_kernel_new(MemorySet* ms) {
+void memory_set_kernel_new(MemorySet* ms) 
+{
     MapArea ma_tmp;
     printk("[mm/memory_set.c] text: 0x%x - 0x%x\n", (uint64_t)text_start, (uint64_t)text_end);
     printk("[mm/memory_set.c] rodata: 0x%x - 0x%x\n", (uint64_t)rodata_start, (uint64_t)rodata_end);

@@ -8,7 +8,7 @@
 #define MAP_PREMISSION_W  (1 << 2)
 #define MAP_PREMISSION_X  (1 << 3)
 #define MAP_PREMISSION_U  (1 << 4)
-#define TRAMPOLINE         (((uint64_t)0x7fFFFFFfff - PAGE_SIZE + 1))
+#define TRAMPOLINE         (UINT64_MAX - PAGE_SIZE + 1)
 #define TRAMPOLINE_FULL    (0xffffff8000000000 | TRAMPOLINE)
 #define TRAP_CONTEXT       (TRAMPOLINE - PAGE_SIZE)
 #define TRAP_CONTEXT_FULL  (0xffffff8000000000 | TRAP_CONTEXT)

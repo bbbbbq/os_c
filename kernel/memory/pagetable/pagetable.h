@@ -24,4 +24,5 @@ PhysPageNum pte_get_ppn(PageTableEntry pte);
 uint64_t page_table_token(PageTable *pt);
 PageTableEntry* page_table_find_pte(PageTable *pt, VirtPageNum vpn);
 PageTableEntry *page_table_find_pte_create(PageTable *pt, VirtPageNum vpn);
+void vpn_indexes(VirtPageNum vpn, uint64_t *idx);
 #endif // PAGE_TABLE_H
