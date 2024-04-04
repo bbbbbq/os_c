@@ -20,11 +20,9 @@ size_t vector_total(Vector *v);
 void vector_resize(Vector *v, size_t capacity);
 void vector_add(Vector *v, void *item);
 void *vector_get(Vector *v, size_t index);  
-
-
 void vector_delete(Vector *v, size_t index);
 void vector_free(Vector *v);
-
+void vector_new(Vector *v, size_t initial_capacity);
 #ifdef __cplusplus
 }
 #endif

@@ -1,6 +1,7 @@
 #ifndef PTE_H
 #define PTE_H
 #include "stdint.h"
+#include "address.h"
 // 定义 PTEFlags 作为位掩码的集合
 typedef uint8_t PTEFlags;
 #define ENTRIES_PER_PAGE 4096
@@ -13,16 +14,21 @@ typedef uint8_t PTEFlags;
 #define PTE_A  (1 << 6) // Accessed
 #define PTE_D  (1 << 7) // Dirty
 #define PTE_PPN_SHIFT 10
+
+
 typedef struct 
 {
     uint64_t bits;
 } PageTableEntry;
 
-PageTableEntry pte_new(uint64_t ppn, PTEFlags flags);
 PageTableEntry pte_empty(void);
+PageTableEntry pte_new(uint64_t ppn, PTEFlags flags);
 uint64_t pte_ppn(PageTableEntry pte);
 PTEFlags pte_flags(PageTableEntry pte);
 int pte_is_valid(PageTableEntry pte);
 void set_pte(PageTableEntry* entry, uint64_t ppn, uint64_t flags);
-
+int pte_is_readable(PageTableEntry pte);
+int pte_is_writable(PageTableEntry pte);
+int pte_is_executable(PageTableEntry pte);
+PageTableEntry *ppn_get_pte_array(PhysPageNum ppn);
 #endif

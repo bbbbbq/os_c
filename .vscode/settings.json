@@ -8,6 +8,9 @@
         "vector.h": "c",
         "fram_allocator.h": "c",
         "address.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "elfparse.h": "c",
+        "elf.h": "c",
+        "task_memory.h": "c"
     }
 }

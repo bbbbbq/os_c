@@ -8,10 +8,16 @@ StackFrameAllocator fram_allocator;
 // @param allocator 分配器的指针
 // @param start 可用物理页帧的起始页号
 // @param end 可用物理页帧的结束页号（不包括此页号）
-void StackFrameAllocator_init(StackFrameAllocator* allocator, size_t start, size_t end) {
-    allocator->current = start; // 设置当前可用的起始页号
-    allocator->end = end;       // 设置可用的结束页号
-    vector_init(&allocator->recycled); // 初始化用于存储回收页号的向量
+extern uint8_t ekernel;
+void frame_allocator_init() 
+{
+  PhysAddr start_addr;
+  start_addr.addr =(size_t)&ekernel; // Manually constructing PhysAddr
+  PhysAddr end_addr;                 // Manually constructing PhysAddr
+  end_addr.addr = (size_t)MEMORY_END;
+  fram_allocator.current = phys_addr_to_page_num(start_addr,0).num;
+  fram_allocator.end = phys_addr_to_page_num(end_addr,1).num;
+  vector_init(&fram_allocator.recycled);
 }
 
 // 分配一个物理页帧

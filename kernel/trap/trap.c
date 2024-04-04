@@ -20,7 +20,7 @@ void print_sepc()
 
 void init_interrupt()
 {
-    print_str("----init_interrupt----\n");
+    //print_str("----init_interrupt----\n");
     uint64_t stvec_value = (uint64_t)(__alltraps);
     // WRITE_CSR(stvec,stvec_value);
     asm volatile("csrw stvec, %0" :: "r"(stvec_value));
@@ -68,6 +68,7 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             run_next_task(3);
             break;
         case 0x05: // 加载访问故障
+            print_sepc();
             print_str("[kernel] Load Access Fault.\n");
             run_next_task(3);
             break;

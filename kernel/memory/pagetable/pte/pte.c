@@ -1,5 +1,6 @@
 #include "pte.h"
 #include "stdint.h"
+#include "address.h"
 // 创建一个新的 PageTableEntry 实例
 // @param ppn 物理页号
 // @param flags 页表项的标志位
@@ -44,8 +45,32 @@ int pte_is_valid(PageTableEntry pte)
     return (pte_flags(pte) & PTE_V) != 0; // 检查V标志位是否为1
 }
 
+int pte_is_readable(PageTableEntry pte) 
+{
+    return (pte_flags(pte) & PTE_R) != 0;
+}
+
+int pte_is_writable(PageTableEntry pte) 
+{
+    return (pte_flags(pte) & PTE_W) != 0;
+}
+
+int pte_is_executable(PageTableEntry pte) 
+{
+    return (pte_flags(pte) & PTE_X) != 0;
+}
+
+
 void set_pte(PageTableEntry* entry, uint64_t ppn, uint64_t flags)
 {
     uint64_t ppn_part = ppn << PTE_PPN_SHIFT;
     entry->bits = ppn_part | (flags & ((1ULL << PTE_PPN_SHIFT) - 1));
+}
+
+
+PageTableEntry *ppn_get_pte_array(PhysPageNum ppn) 
+{
+  PhysAddr pa;
+  pa.addr = ((ppn.num) << PAGE_SIZE_BITS);
+  return (PageTableEntry*)pa.addr; // len = 512 * 8
 }

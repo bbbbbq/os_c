@@ -19,7 +19,8 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/memory/kernel_heap  -I$(KERNEL_DIR)/memory/address \
 				-I$(KERNEL_DIR)/data_structure   -I$(KERNEL_DIR)/memory/address/fram_allocator \
 				-I$(KERNEL_DIR)/memory/pagetable   -I$(KERNEL_DIR)/memory/pagetable/pte  \
-				-I$(KERNEL_DIR)/memory/task_memory  -I$(KERNEL_DIR)/lib
+				-I$(KERNEL_DIR)/memory/task_memory  -I$(KERNEL_DIR)/lib  \
+				-I$(KERNEL_DIR)/memory  -I$(KERNEL_DIR)/elf
 
 
 # Compilation and linking flags
@@ -67,10 +68,10 @@ $(OBJDIR)/%.d: %.c
 	$(CC) $(CFLAGS) -MM -MT '$(@:.d=.o)' $< -MF $@
 
 run: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M
 
 qemu_debug: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -S -s
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M -S -s 
 
 elf: $(ELF)
 

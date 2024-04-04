@@ -19,7 +19,9 @@ void PageTable_free(PageTable* pt);
 // 页表操作函数
 void PageTable_map_ppn_2_vpn(PageTable* pt, VirtPageNum vpn, PhysPageNum ppn, PTEFlags flags);
 void PageTable_unmap_ppn_2_vpn(PageTable* pt, VirtPageNum vpn);
-PageTableEntry* navigate_to_pte(PageTable* pt, uint64_t* indexes);
 PageTableEntry* get_pte_address(PhysPageNum current_ppn, uint64_t index);
 PhysPageNum pte_get_ppn(PageTableEntry pte);
+uint64_t page_table_token(PageTable *pt);
+PageTableEntry* page_table_find_pte(PageTable *pt, VirtPageNum vpn);
+PageTableEntry *page_table_find_pte_create(PageTable *pt, VirtPageNum vpn);
 #endif // PAGE_TABLE_H

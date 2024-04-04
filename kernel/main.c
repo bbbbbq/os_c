@@ -8,6 +8,7 @@
 #include "task.h"
 #include "timer.h"
 #include "kernel_heap.h"
+#include "mem.h"
 int main_os()
 {
     printk("123%d\n",123);
@@ -22,6 +23,7 @@ int main_os()
     // init_appmanager();
     task_manager_init();
     //printk("123%d\n",12);
+    mm_init();
     ASSERT(0);
     while(1){}
     ASSERT(0);

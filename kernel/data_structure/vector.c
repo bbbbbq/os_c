@@ -52,3 +52,20 @@ void vector_free(Vector *v) {
     v->capacity = 0;
     v->total = 0;
 }
+
+
+void vector_new(Vector *v, size_t initial_capacity) 
+{
+    if (!v) return;
+    v->items = (void**)malloc(initial_capacity * sizeof(void*));
+    if (v->items == NULL) {
+        // 如果内存分配失败，则容量和总数设置为 0
+        v->capacity = 0;
+        v->total = 0;
+        return; // 可以在这里处理错误或者返回
+    }
+
+    // 初始化 Vector 结构体的其他成员
+    v->capacity = initial_capacity;
+    v->total = 0; // 初始时，Vector 为空
+}
