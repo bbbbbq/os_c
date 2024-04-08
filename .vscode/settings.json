@@ -15,6 +15,8 @@
         "debug.h": "c",
         "string.h": "c",
         "config.h": "c",
-        "buddy.h": "c"
+        "buddy.h": "c",
+        "riscv.h": "c",
+        "mem.h": "c"
     }
 }

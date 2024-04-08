@@ -1,7 +1,7 @@
 #include "mem.h"
 
-void mm_init() {
-  // mm init
+void mm_init() 
+{
   heap_allocator_init();
   frame_allocator_init();
   memory_set_kernel_init();
@@ -9,6 +9,5 @@ void mm_init() {
 }
 
 void mm_free() {
-  // mm free
   frame_allocator_free();
 }

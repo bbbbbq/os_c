@@ -8,7 +8,9 @@
 #include "timer.h"
 #include "stack.h"
 #include "task.h"
-extern void __alltraps(void);
+#include "riscv.h"
+extern void __alltraps();
+extern void __restore();
 
 
 void print_sepc()
@@ -131,4 +133,32 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             exit(1);
     }
     return cx;
+}
+
+
+static inline void set_user_trap_entry() 
+{
+  w_stvec((uint64_t)TRAMPOLINE);
+}
+
+
+uint64_t task_current_user_token() {
+  return task_manager_get_current_token();
+}
+
+void trap_return() 
+{
+  set_user_trap_entry();
+  uint64_t trap_cx_ptr = TRAP_CONTEXT;
+  uint64_t user_satp = task_current_user_token();
+  uint64_t restore_va = (uint64_t)__restore - (uint64_t)__alltraps + TRAMPOLINE;
+  asm volatile("fence.i");
+  asm volatile("");
+  asm volatile("mv x10, %1\n"
+               "mv x11, %2\n"
+               "jr %0\n"
+               :
+               : "r"(restore_va), "r"(trap_cx_ptr), "r"(user_satp)
+               : "memory", "x10", "x11");
+  panic("Unreachable in back_to_user!\n");
 }

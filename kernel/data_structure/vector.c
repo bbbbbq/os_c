@@ -17,11 +17,11 @@ void vector_push(struct vector *v, void *d) {
   if (v->size == v->capacity) {
     v->capacity <<= 1;
     char *t = bd_malloc(v->capacity * v->dsize);
-    memcpy(t, v->buffer, v->size * v->dsize);
+    memcpy((uint8_t*)t, (uint8_t*)v->buffer, v->size * v->dsize);
     bd_free(v->buffer);
     v->buffer = t;
   }
-  memcpy(v->buffer + (v->size++) * v->dsize, d, v->dsize);
+  memcpy((uint8_t*)(v->buffer + (v->size++) * v->dsize), d, v->dsize);
 }
 
 void vector_pop(struct vector *v) {

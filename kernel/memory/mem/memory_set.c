@@ -136,7 +136,8 @@ static inline void memory_set_map_trampoline(MemorySet *memory_set) {
 
 static MemorySet KERNEL_SPACE;
 
-static void memory_set_new_kernel() {
+static void memory_set_new_kernel() 
+{
   MemorySet *memory_set = &KERNEL_SPACE;
   memory_set_new_bare(memory_set);
 
@@ -403,7 +404,8 @@ int64_t memory_set_munmap(MemorySet *memory_set, uint64_t start, uint64_t len) {
   return len;
 }
 
-void memory_set_remap_test() {
+void memory_set_remap_test() 
+{
   VirtAddr mid_text = (VirtAddr)(((uint64_t)&stext + (uint64_t)&etext) / 2);
   VirtAddr mid_rodata =
       (VirtAddr)(((uint64_t)&srodata + (uint64_t)&erodata) / 2);

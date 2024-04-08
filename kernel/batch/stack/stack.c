@@ -3,6 +3,7 @@
 #include "stdint.h"
 #include "batch.h"
 #include "context.h"
+#include "mem.h"
 // uint8_t UserStack[USER_STACK_SIZE];
 // uint8_t Kernelstack[KERNEL_STACK_SIZE];
 uint8_t Trap_Stack[1024];
@@ -26,4 +27,10 @@ uint8_t* Kernelstack_push_TrapContext(struct TrapContext trapContext,uint64_t ta
     stackTop -= sizeof(struct TrapContext); // 为TrapContext腾出空间
     *((struct TrapContext*)stackTop) = trapContext; // 复制TrapContext到栈顶
     return stackTop; // 返回新的栈顶地址
+}
+
+void kernel_stack_position(uint64_t app_id, uint64_t *bottom, uint64_t *top) 
+{
+    *top = TRAMPOLINE - app_id * (KERNEL_STACK_SIZE + PAGE_SIZE);
+    *bottom = *top - KERNEL_STACK_SIZE;
 }

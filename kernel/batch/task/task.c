@@ -5,31 +5,29 @@
 #include "batch.h"
 #include "debug.h"
 #include "string.h"
+#include "mem.h"
 struct TaskManager task_manager;
 extern void __switch(struct TaskContext*,struct TaskContext*);
 extern uint64_t _num_app[];
 
 void task_manager_init( void )
 {
-
     extern void __restore(uint64_t);
     print_str("[Test] __restore: ");
     print_uint64((uint64_t)__restore);
     print_str("\n");
     task_manager.num_task = MAX_APP_NUM;
     task_manager.current_task = 0;
-
     // 初始化TCB
     for(uint64_t i = 0; i < app_manager.app_num; i ++)
     {
-
         // 获取kernel_stack压入TrapContext后的地址
         uint64_t target_sp = get_kernel_stack_top(i) - sizeof(struct TrapContext);
         task_manager.tasks[i].task_status = Ready; // 设置app状态
         task_manager.tasks[i].task_cx.ra = (uint64_t)__restore; // 设置switch函数返回地址
         task_manager.tasks[i].task_cx.sp = target_sp; // 设置各自kernel_stack位置
 
-        /* 初始化kernel_stack */
+        // 初始化kernel_stack
         struct TrapContext tc = {
             {0},
             0,
@@ -61,7 +59,7 @@ void run_next_task(uint64_t status)
     struct TaskControlBlock* target_task_tcb = &task_manager.tasks[target_task_num];
     struct TaskControlBlock* current_task_tcb = &task_manager.tasks[task_manager.current_task];
 
-    /* 改变状态 */
+    // 改变状态
     current_task_tcb->task_status = status;
     target_task_tcb->task_status = Running;
     task_manager.current_task = target_task_num;
@@ -78,4 +76,23 @@ void run_first_task(void)
     print_str("[kernel] ready to run first app\n");
     __switch(&temp, &task_manager.tasks[task_manager.current_task].task_cx);
     ASSERT(0);
+}
+
+void init_taskcontrolblock(struct TaskControlBlock *s, uint8_t *elf_data,
+                            size_t elf_size,uint64_t app_id)
+{
+
+}
+
+
+uint64_t task_manager_get_current_token() 
+{
+  uint64_t current = TASK_MANAGER.current_task;
+  return get_user_token(&TASK_MANAGER.tasks[current]);
+}
+
+
+uint64_t get_user_token(struct TaskControlBlock *s) 
+{
+  return memory_set_token(&s->memory_set);
 }

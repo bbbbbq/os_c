@@ -76,7 +76,8 @@ typedef struct {
   struct vector areas;
 } MemorySet;
 
-/*  Data structure in rcc memory management
+
+/*
  *
  *  MemorySet
  *    ├── PageTable
@@ -89,6 +90,7 @@ typedef struct {
  *                    ├── MapType (Identical / Framed)
  *                    └── MapPermission (R / W / X / U)
  */
+
 
 // mm.c
 void mm_init();
