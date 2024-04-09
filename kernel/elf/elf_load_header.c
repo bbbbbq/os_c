@@ -14,11 +14,14 @@
 /*
 ** Load the identity of the file.
 */
-static int elf_load_ident(t_elf *elf) {
+static int elf_load_ident(t_elf *elf) 
+{
+  printk("elf_load_ident start\n");
   if (elf->size < EI_NIDENT || memcmp(elf->raw_data, ELFMAG, 4)) {
     return (-1);
   }
   elf->ident = elf->raw_data;
+  printk("elf_load_ident end\n");
   return (0);
 }
 
@@ -28,6 +31,7 @@ static int elf_load_ident(t_elf *elf) {
 ** reconized, the entire header is loaded in the field 'elf->header'
 */
 int elf_load_header(t_elf *elf) {
+  //printk("eld load_header\n");
   if (elf_load_ident(elf) == -1)
     return (-1);
   if ((elf->class = elf->ident[EI_CLASS]) != ELFCLASS32 &&
@@ -39,5 +43,6 @@ int elf_load_header(t_elf *elf) {
       (elf->class == ELFCLASS64 && elf->size < sizeof(Elf64_Ehdr))) {
     return (-1);
   }
+  //printk("eld load end\n");
   return (0);
 }

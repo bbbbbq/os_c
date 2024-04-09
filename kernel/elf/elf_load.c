@@ -8,6 +8,7 @@
 ** archive.
 */
 int elf_load(uint8_t *elf_data, size_t elf_size, t_elf *elf) {
+  //printk("elf load\n");
   memset(elf, 0, sizeof(t_elf));
   elf->size = elf_size;
   elf->raw_data = elf_data;
@@ -23,6 +24,6 @@ int elf_load(uint8_t *elf_data, size_t elf_size, t_elf *elf) {
   if (elf_load_programs(elf) != 0) {
     return -1;
   }
-
+  //printk("elf load end\n");
   return 0;
 }

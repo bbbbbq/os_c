@@ -1,8 +1,12 @@
 #ifndef TASK_H
-#define TACK_H
+#define TASK_H
 #include "batch.h"
 #include "stdint.h"
 #include "mem.h"
+#include "batch.h"
+#include "config.h"
+#define MAX_APP_NUM 20
+struct TaskContext;
 enum TaskStatus 
 {
     UnInit, // 未初始化
@@ -29,12 +33,14 @@ struct TaskControlBlock
 
 struct TaskManager
 {
-    uint64_t num_task;
+    TaskControlBlock tasks[MAX_APP_NUM];
     uint64_t current_task;
-    struct TaskControlBlock tasks[MAX_APP_NUM];
+    uint64_t num_app;
 };
 
-extern struct TaskManager task_manager; 
+
+extern struct TaskManager TASK_MANAGER;
+
 
 void task_manager_init(void);
 void run_next_task(uint64_t status);
@@ -43,4 +49,9 @@ void init_taskcontrolblock(struct TaskControlBlock *s, uint8_t *elf_data,
                             size_t elf_size,uint64_t app_id);
 uint64_t task_manager_get_current_token();
 uint64_t get_user_token(struct TaskControlBlock *s);
+
+void task_control_block_new(uint8_t *elf_data, size_t elf_size, uint64_t app_id,
+                            struct TaskControlBlock *s);
+
+struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s);
 #endif

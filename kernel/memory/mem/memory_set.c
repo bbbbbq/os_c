@@ -192,7 +192,8 @@ static void memory_set_new_kernel()
 
 void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,
                          size_t elf_size, uint64_t *user_sp,
-                         uint64_t *entry_point) {
+                         uint64_t *entry_point) 
+{
   memory_set_new_bare(memory_set);
 
   // map trampoline
@@ -201,7 +202,8 @@ void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,
   // map progam headers of elf, with U flag
   t_elf elf;
   int elf_load_ret = elf_load(elf_data, elf_size, &elf);
-  if (elf_load_ret != 0) {
+  if (elf_load_ret != 0)
+  {
     panic("Elf load error.\n");
   }
 

@@ -6,39 +6,21 @@
 #include "debug.h"
 #include "string.h"
 #include "mem.h"
-struct TaskManager task_manager;
+#include "trap.h"
+#include "loader.h" 
+struct TaskManager TASK_MANAGER;
 extern void __switch(struct TaskContext*,struct TaskContext*);
 extern uint64_t _num_app[];
 
-void task_manager_init( void )
+void task_manager_init()
 {
-    extern void __restore(uint64_t);
-    print_str("[Test] __restore: ");
-    print_uint64((uint64_t)__restore);
-    print_str("\n");
-    task_manager.num_task = MAX_APP_NUM;
-    task_manager.current_task = 0;
-    // 初始化TCB
-    for(uint64_t i = 0; i < app_manager.app_num; i ++)
-    {
-        // 获取kernel_stack压入TrapContext后的地址
-        uint64_t target_sp = get_kernel_stack_top(i) - sizeof(struct TrapContext);
-        task_manager.tasks[i].task_status = Ready; // 设置app状态
-        task_manager.tasks[i].task_cx.ra = (uint64_t)__restore; // 设置switch函数返回地址
-        task_manager.tasks[i].task_cx.sp = target_sp; // 设置各自kernel_stack位置
-
-        // 初始化kernel_stack
-        struct TrapContext tc = {
-            {0},
-            0,
-            0
-        };
-        tc.sepc = APP_BASE_ADDRESS + (APP_SIZE_LIMIT * i); // 设置app首次进入的地址
-        tc.sstatus = READ_CSR(sstatus) & (~SSTATUS_SPP); // 设置sstatus寄存器为内核状态
-        tc.x[2] = (uint64_t)get_user_stack_top(i); // 保证sscratch指向user_stack
-        // 将TrapContext压入kernel_stack
-        *(struct TrapContext *)target_sp = tc;
-    }
+   TASK_MANAGER.num_task = loader_get_num_app();
+  for (unsigned i = 0; i < TASK_MANAGER.num_task; i++) {
+    task_control_block_new(loader_get_app_data(i), loader_get_app_size(i), i,
+                           &TASK_MANAGER.tasks[i]);
+  }
+  printk("task_manager_init_end\n");
+  TASK_MANAGER.current_task = 0;
 }
 
 
@@ -46,23 +28,23 @@ void run_next_task(uint64_t status)
 {
     // 寻找ready的task
     uint64_t target_task_num;
-    for (target_task_num = (task_manager.current_task + 1) % MAX_APP_NUM; target_task_num != task_manager.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
-        if (task_manager.tasks[target_task_num].task_status == Ready) {
+    for (target_task_num = (TASK_MANAGER.current_task + 1) % MAX_APP_NUM; target_task_num != TASK_MANAGER.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
+        if (TASK_MANAGER.tasks[target_task_num].task_status == Ready) {
             break;
         }
     }
     // 没有ready的任务
-    if ((target_task_num == task_manager.current_task) && (task_manager.tasks[target_task_num].task_status != Ready)) {
+    if ((target_task_num == TASK_MANAGER.current_task) && (TASK_MANAGER.tasks[target_task_num].task_status != Ready)) {
         ASSERT(0);
     }
 
-    struct TaskControlBlock* target_task_tcb = &task_manager.tasks[target_task_num];
-    struct TaskControlBlock* current_task_tcb = &task_manager.tasks[task_manager.current_task];
+    struct TaskControlBlock* target_task_tcb = &TASK_MANAGER.tasks[target_task_num];
+    struct TaskControlBlock* current_task_tcb = &TASK_MANAGER.tasks[TASK_MANAGER.current_task];
 
     // 改变状态
     current_task_tcb->task_status = status;
     target_task_tcb->task_status = Running;
-    task_manager.current_task = target_task_num;
+    TASK_MANAGER.current_task = target_task_num;
 
     /* 交换TaskContext */
     __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
@@ -72,9 +54,9 @@ void run_next_task(uint64_t status)
 void run_first_task(void) 
 {
     static struct TaskContext temp;
-    task_manager.tasks[task_manager.current_task].task_status = Running;
+    TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_status = Running;
     print_str("[kernel] ready to run first app\n");
-    __switch(&temp, &task_manager.tasks[task_manager.current_task].task_cx);
+    __switch(&temp, &TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_cx);
     ASSERT(0);
 }
 
@@ -95,4 +77,45 @@ uint64_t task_manager_get_current_token()
 uint64_t get_user_token(struct TaskControlBlock *s) 
 {
   return memory_set_token(&s->memory_set);
+}
+
+
+
+void task_control_block_new(uint8_t *elf_data, size_t elf_size, uint64_t app_id,
+                            struct TaskControlBlock *s) 
+{
+  // memory_set with elf program headers/trampoline/trap context/user stack
+  uint64_t user_sp;
+  uint64_t entry_point;
+  memory_set_from_elf(&s->memory_set, elf_data, elf_size, &user_sp,
+                      &entry_point);
+  PhysPageNum trap_cx_ppn = pte_ppn(*memory_set_translate(
+      &s->memory_set, (VirtPageNum)addr2pn((VirtAddr)TRAP_CONTEXT)));
+
+  // map a kernel-stack in kernel space
+  uint64_t kernel_stack_bottom = kernel_stack_position_bottom(app_id);
+  uint64_t kernel_stack_top = kernel_stack_position_top(app_id);
+  kernel_space_insert_framed_area((VirtAddr)kernel_stack_bottom,
+                                  (VirtAddr)kernel_stack_top,
+                                  MAP_PERM_R | MAP_PERM_W);
+
+  struct TaskContext *task_cx_ptr =
+      (struct TaskContext *)(kernel_stack_top - sizeof(struct TaskContext));
+  task_context_goto_trap_return(task_cx_ptr);
+
+  s->task_cx = task_cx_ptr;
+  s->task_status = Ready;
+  s->trap_cx_ppn = trap_cx_ppn;
+  s->base_size = user_sp;
+
+  // prepare TrapContext in user space
+  struct TrapContext *trap_cx = get_trap_cx(s);
+  app_init_context(entry_point, user_sp, kernel_space_token(), kernel_stack_top,
+                   (uint64_t)trap_handler, trap_cx);
+
+}
+
+
+struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s) {
+  return (struct TaskContext **)(&(s->task_cx));
 }

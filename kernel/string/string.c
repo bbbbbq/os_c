@@ -100,7 +100,6 @@ void memset(void *dest, u8 val, u32 len)
 {
     memset_t(dest,val,len);
 }
-
 int memcmp(const void *ptr1, const void *ptr2, size_t num) 
 {
     const unsigned char *p1 = ptr1, *p2 = ptr2;
@@ -108,7 +107,7 @@ int memcmp(const void *ptr1, const void *ptr2, size_t num)
     {
         if (p1[i] != p2[i]) 
         {
-            return p1[i] - p2[i];
+            return (int)p1[i] - (int)p2[i];
         }
     }
     return 0;

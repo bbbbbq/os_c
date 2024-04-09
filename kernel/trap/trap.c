@@ -9,6 +9,7 @@
 #include "stack.h"
 #include "task.h"
 #include "riscv.h"
+#include "mem.h"
 extern void __alltraps();
 extern void __restore();
 
@@ -22,11 +23,9 @@ void print_sepc()
 
 void init_interrupt()
 {
-    //print_str("----init_interrupt----\n");
     uint64_t stvec_value = (uint64_t)(__alltraps);
-    // WRITE_CSR(stvec,stvec_value);
     asm volatile("csrw stvec, %0" :: "r"(stvec_value));
-    uint64_t mask = 0x202; // 定义启用S模式时钟中断和软件中断的掩码
+    uint64_t mask = 0x202;
     WRITE_CSR(sie,mask);
     uint64_t sstatus = READ_CSR(sstatus);
     sstatus |= SSTATUS_SIE_BIT;
@@ -39,10 +38,10 @@ void init_interrupt()
 
 struct TrapContext* trap_handler(struct TrapContext* cx) 
 {
-    //print_str("trap_handler\n");
+    set_kernel_trap_entry();
+    print_str("trap_handler\n");
     uint64_t scause = READ_CSR(scause);
     //uint64_t stval = READ_CSR(stval);
-
     switch (scause)
     {
         case 0x00: // 指令地址错位
@@ -136,7 +135,7 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
 }
 
 
-static inline void set_user_trap_entry() 
+void set_user_trap_entry() 
 {
   w_stvec((uint64_t)TRAMPOLINE);
 }
@@ -162,3 +161,27 @@ void trap_return()
                : "memory", "x10", "x11");
   panic("Unreachable in back_to_user!\n");
 }
+
+
+void init_trap()
+{
+    set_kernel_trap_entry();
+}
+
+
+void trap_from_kernel() 
+{
+    printk("a trap from kernel!\n");
+    uint64_t tmp = r_sepc();
+    printk("trap_from_kernel : sepc : %d\n",tmp);
+    ASSERT(0);
+}
+
+
+void set_kernel_trap_entry() 
+{
+    w_stvec((uint64_t)trap_from_kernel);
+}
+// void set_user_trap_entry() {
+//     w_stvec(TRAMPOLINE);
+// }

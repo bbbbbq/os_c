@@ -9,14 +9,14 @@
 #include "mem.h"
 int main_os()
 {
+    mm_init();
     printk("123%d\n",123);
     init_interrupt();
-    load_app_test();
-    init_appmanager();
+    init_trap();
+    timer_init(); 
     task_manager_init();
-    mm_init();
-    //run_first_app();
-    ASSERT(0);
-    while(1){}
+    //asm("ebreak");
+    // while(1){}
+    run_first_app();
     ASSERT(0);
 }

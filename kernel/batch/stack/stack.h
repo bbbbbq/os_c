@@ -1,6 +1,5 @@
 #ifndef STACK_H
 #define STAKC_H
-#define KERNEL_STACK_SIZE 4096 * 2
 #include "stdint.h"
 #include "batch.h"
 #include "mem.h"
