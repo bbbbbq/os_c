@@ -14,8 +14,9 @@ extern uint64_t _num_app[];
 
 void task_manager_init()
 {
-   TASK_MANAGER.num_task = loader_get_num_app();
-  for (unsigned i = 0; i < TASK_MANAGER.num_task; i++) {
+   TASK_MANAGER.num_app = loader_get_num_app();
+  for (unsigned i = 0; i < TASK_MANAGER.num_app; i++) 
+  {
     task_control_block_new(loader_get_app_data(i), loader_get_app_size(i), i,
                            &TASK_MANAGER.tasks[i]);
   }
@@ -47,7 +48,7 @@ void run_next_task(uint64_t status)
     TASK_MANAGER.current_task = target_task_num;
 
     /* 交换TaskContext */
-    __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
+    __switch(&(current_task_tcb->task_cx_ptr), &(target_task_tcb->task_cx_ptr));
 }
 
 
@@ -56,14 +57,8 @@ void run_first_task(void)
     static struct TaskContext temp;
     TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_status = Running;
     print_str("[kernel] ready to run first app\n");
-    __switch(&temp, &TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_cx);
+    __switch(&temp, &TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_cx_ptr);
     ASSERT(0);
-}
-
-void init_taskcontrolblock(struct TaskControlBlock *s, uint8_t *elf_data,
-                            size_t elf_size,uint64_t app_id)
-{
-
 }
 
 
@@ -103,7 +98,7 @@ void task_control_block_new(uint8_t *elf_data, size_t elf_size, uint64_t app_id,
       (struct TaskContext *)(kernel_stack_top - sizeof(struct TaskContext));
   task_context_goto_trap_return(task_cx_ptr);
 
-  s->task_cx = task_cx_ptr;
+  s->task_cx_ptr = task_cx_ptr;
   s->task_status = Ready;
   s->trap_cx_ppn = trap_cx_ppn;
   s->base_size = user_sp;
@@ -113,9 +108,34 @@ void task_control_block_new(uint8_t *elf_data, size_t elf_size, uint64_t app_id,
   app_init_context(entry_point, user_sp, kernel_space_token(), kernel_stack_top,
                    (uint64_t)trap_handler, trap_cx);
 
+
+//   if(app_id==0)
+//   {
+//   printk("TrapContext values:\n");
+// for (int i = 0; i < 32; i++) {
+//     printk("x[%d] = 0x%lx%08lx\n", i,
+//            (unsigned long)(trap_cx->x[i] >> 32),
+//            (unsigned long)(trap_cx->x[i] & 0xFFFFFFFF));
+// }
+// printk("sstatus = 0x%lx%08lx\n",
+//        (unsigned long)(trap_cx->sstatus >> 32),
+//        (unsigned long)(trap_cx->sstatus & 0xFFFFFFFF));
+// printk("sepc = 0x%lx%08lx\n",
+//        (unsigned long)(trap_cx->sepc >> 32),
+//        (unsigned long)(trap_cx->sepc & 0xFFFFFFFF));
+// printk("kernel_satp = 0x%lx%08lx\n",
+//        (unsigned long)(trap_cx->kernel_satp >> 32),
+//        (unsigned long)(trap_cx->kernel_satp & 0xFFFFFFFF));
+// printk("kernel_sp = 0x%lx%08lx\n",
+//        (unsigned long)(trap_cx->kernel_sp >> 32),
+//        (unsigned long)(trap_cx->kernel_sp & 0xFFFFFFFF));
+// printk("trap_handler = 0x%lx%08lx\n",
+//        (unsigned long)(trap_cx->trap_handler >> 32),
+//        (unsigned long)(trap_cx->trap_handler & 0xFFFFFFFF));
+//   }
 }
 
 
 struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s) {
-  return (struct TaskContext **)(&(s->task_cx));
+  return (struct TaskContext **)(&(s->task_cx_ptr));
 }

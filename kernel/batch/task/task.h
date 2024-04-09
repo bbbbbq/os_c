@@ -18,22 +18,23 @@ enum TaskStatus
 struct TaskContext
 {
     uint64_t ra;
-    uint64_t sp;
     uint64_t x[12];
 };
 
 struct TaskControlBlock
 {
-    struct TaskContext task_cx;
+    struct TaskContext *task_cx_ptr;
     enum TaskStatus task_status;
     MemorySet memory_set;
     PhysPageNum trap_cx_ppn;
-    size_t base_size;
+    uint64_t base_size;
+    uint64_t priority;
+    uint64_t stride;
 };
 
 struct TaskManager
 {
-    TaskControlBlock tasks[MAX_APP_NUM];
+    struct TaskControlBlock tasks[MAX_APP_NUM];
     uint64_t current_task;
     uint64_t num_app;
 };
@@ -45,8 +46,6 @@ extern struct TaskManager TASK_MANAGER;
 void task_manager_init(void);
 void run_next_task(uint64_t status);
 void run_first_task(void);
-void init_taskcontrolblock(struct TaskControlBlock *s, uint8_t *elf_data,
-                            size_t elf_size,uint64_t app_id);
 uint64_t task_manager_get_current_token();
 uint64_t get_user_token(struct TaskControlBlock *s);
 

@@ -65,6 +65,8 @@ struct TrapContext *get_trap_cx(struct TaskControlBlock *s)
 
 void run_first_app()
 {
+    extern void __switch(const struct TaskContext **current_task_cx_ptr2,
+                     const struct TaskContext **next_task_cx_ptr2);
     TASK_MANAGER.tasks[0].task_status = Running;
   const struct TaskContext **next_task_cx_ptr2 =
       get_task_cx_ptr2(&(TASK_MANAGER.tasks[0]));

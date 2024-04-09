@@ -23,6 +23,7 @@ void timer_init()
 
 void intr_timer_handle()
 {
+    printk("intr_timer_handle\n");
     run_next_task(1);
     ticks++;
     clock_set_next_event();

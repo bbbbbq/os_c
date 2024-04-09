@@ -135,56 +135,52 @@ static inline void memory_set_map_trampoline(MemorySet *memory_set) {
 }
 
 static MemorySet KERNEL_SPACE;
-
-static void memory_set_new_kernel() 
-{
+static void memory_set_new_kernel() {
   MemorySet *memory_set = &KERNEL_SPACE;
   memory_set_new_bare(memory_set);
 
   // map trampoline
   memory_set_map_trampoline(memory_set);
 
+  // map kernel sections
+  // info(".text      [0x%llx, 0x%llx)\n", &stext, &etext);
+  // info(".rodata    [0x%llx, 0x%llx)\n", &srodata, &erodata);
+  // info(".data      [0x%llx, 0x%llx)\n", &sdata, &edata);
+  // info("boot_stack [0x%llx, 0x%llx)\n", &sbss_with_stack, &ebss);
+
   MapArea map_area;
+
+  // info("mapping .text section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&stext);
   map_area.vpn_range.r = page_ceil((PhysAddr)&etext);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_X;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
-
+  // info("mapping .rodata section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&srodata);
   map_area.vpn_range.r = page_ceil((PhysAddr)&erodata);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R;
   memory_set_push(memory_set, &map_area, NULL, 0);
+
+  // info("mapping .data section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&sdata);
   map_area.vpn_range.r = page_ceil((PhysAddr)&edata);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
+  // info("mapping .bss section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&sbss_with_stack);
   map_area.vpn_range.r = page_ceil((PhysAddr)&ebss);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
+  // info("mapping physical memory\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&ekernel);
   map_area.vpn_range.r = page_ceil((PhysAddr)MEMORY_END);
-  map_area.map_type = MAP_IDENTICAL;
-  map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
-  memory_set_push(memory_set, &map_area, NULL, 0);
-
-  for (uint64_t i = 0; i < MMIO_NUM; i++) {
-    map_area.vpn_range.l = page_floor((PhysAddr)MMIO[i][0]);
-    map_area.vpn_range.r = page_ceil((PhysAddr)(MMIO[i][0] + MMIO[i][1]));
-    map_area.map_type = MAP_IDENTICAL;
-    map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
-    memory_set_push(memory_set, &map_area, NULL, 0);
-  }
-
-  map_area.vpn_range.l = page_floor((PhysAddr)PLIC);
-  map_area.vpn_range.r = page_ceil((PhysAddr)(PLIC + 0x400000));
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);

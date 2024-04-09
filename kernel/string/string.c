@@ -43,7 +43,8 @@ void memset_t(void *dest, u8 val, u32 len)
 {
     u8 *dst = (u8 *)dest;
 
-    for (; len != 0; len--) {
+    for (; len != 0; len--) 
+    {
         *dst++ = val;
     }
 }

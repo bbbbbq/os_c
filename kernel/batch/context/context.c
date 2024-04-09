@@ -23,7 +23,8 @@ void set_sp(struct TrapContext *ctx, uint64_t sp) {
 
 void app_init_context(uint64_t entry, uint64_t sp, uint64_t kernel_satp,
                       uint64_t kernel_sp, uint64_t trap_handler,
-                      struct TrapContext *c) {
+                      struct TrapContext *c) 
+{
   uint64_t sstatus = r_sstatus();
   sstatus &= ~SSTATUS_SPP;
 

@@ -94,8 +94,8 @@ struct TrapContext* trap_handler(struct TrapContext* cx)
             //run_next_app();
             break;
         case 0x08: // 环境调用来自U模式
-            cx->sepc += 4; // 跳过环境调用指令
-            uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
+            //cx->sepc += 4; // 跳过环境调用指令
+            ;uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
             cx->x[10] = syscall(cx->x[17], args); // 执行系统调用
             break;
         case 0x09: // 环境调用来自S模式
@@ -147,6 +147,7 @@ uint64_t task_current_user_token() {
 
 void trap_return() 
 {
+  printk("trap_return\n");
   set_user_trap_entry();
   uint64_t trap_cx_ptr = TRAP_CONTEXT;
   uint64_t user_satp = task_current_user_token();
@@ -169,11 +170,104 @@ void init_trap()
 }
 
 
-void trap_from_kernel() 
+void trap_from_kernel()
 {
     printk("a trap from kernel!\n");
     uint64_t tmp = r_sepc();
     printk("trap_from_kernel : sepc : %d\n",tmp);
+    uint64_t scause = READ_CSR(scause);
+    uint64_t stval = READ_CSR(stval);
+    switch (scause)
+    {
+        case 0x00: // 指令地址错位
+            print_str("[kernel] Instruction Address Misaligned.\n");
+            break;
+        case 0x01: // 指令访问故障
+            print_str("[kernel] Instruction Access Fault.\n");
+            run_next_task(3);
+            break;
+        case 0x02: // 非法指令
+            //print_sepc();
+            print_str("kernel] Illegal Instruction.\n");
+            ASSERT(0);
+            run_next_task(3);
+            break;
+        case 0x03: // 断点
+            print_str("[kernel] Breakpoint.\n");
+            // 特定的调试处理或直接运行下一个应用
+            ASSERT(0);
+            //cx->sepc +=2;
+            ASSERT(0);
+            //run_next_app();
+            break;
+        case 0x04: // 加载地址错位
+            print_str("[kernel] Load Address Misaligned.\n");
+            ASSERT(0);
+            run_next_task(3);
+            break;
+        case 0x05: // 加载访问故障
+            //print_sepc();
+            print_str("[kernel] Load Access Fault.\n");
+            ASSERT(0);
+            run_next_task(3);
+            break;
+        case 0x06: // 存储地址错位
+            //print_sepc();
+            print_str("[kernel] Store/AMO Address Misaligned.\n");
+            ASSERT(0);
+            run_next_task(3);
+            break;
+        case 0x07: // 存储/AMO访问故障
+            print_str("[kernel] Store/AMO Access Fault.\n");
+            //print_sepc();
+            ASSERT(0);
+            uint64_t cnt=10000000000;
+            while(cnt--){}
+            //run_next_app();
+            break;
+        case 0x08: // 环境调用来自U模式
+            //cx->sepc += 4; // 跳过环境调用指令
+            //uint64_t args[3] = {cx->x[10], cx->x[11], cx->x[12]};
+            //cx->x[10] = syscall(cx->x[17], args); // 执行系统调用
+            ASSERT(0);
+            break;
+        case 0x09: // 环境调用来自S模式
+            print_str("[kernel] Environment Call from S-mode.\n");
+            uint64_t cnt1=10000000000;
+            while(cnt1--){}
+            ASSERT(0);
+            run_next_task(3);
+            break;
+        case 0x0B: // 环境调用来自M模式
+            print_str("[kernel] Environment Call from M-mode.\n");
+            // 处理或运行下一个应用
+            run_next_task(3);
+            break;
+        case 0x0C: // 指令页面错误
+            print_str("[kernel] Instruction Page Fault.\n");
+            ASSERT(0);
+            //run_next_task(3);
+            break;
+        case 0x0D: // 加载页面错误
+            print_str("[kernel] Load Page Fault.\n");
+            ASSERT(0);
+            //run_next_task(3);
+            break;
+        case 0x0F: // 存储页面错误
+            print_str("[kernel] Store/AMO Page Fault.\n");
+            ASSERT(0);
+            //run_next_task(3);
+            break;
+        case 0x8000000000000005: 
+            //print_str("intr_timer_handle\n");
+            intr_timer_handle();
+            ASSERT(0);
+            break;
+        default:
+            print_str("[kernel] Unsupported trap.\n");
+            print_uint64(scause);
+            exit(1);
+    }
     ASSERT(0);
 }
 
