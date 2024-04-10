@@ -119,7 +119,7 @@ void task_manager_mark_current_exited()
 {
   uint64_t current = TASK_MANAGER.current_task;
   task_control_block_free(&TASK_MANAGER.tasks[current]);
-  TASK_MANAGER.tasks[current].task_status = Ready;
+  TASK_MANAGER.tasks[current].task_status = Exited;
 }
 
 int64_t task_manager_find_next_task()
