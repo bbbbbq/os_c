@@ -29,4 +29,5 @@ struct TrapContext *task_manager_get_current_trap_cx();
 void task_exit_current_and_run_next();
 void task_manager_mark_current_exited();
 int64_t task_manager_find_next_task();
+void task_suspend_current_and_run_next();
 #endif

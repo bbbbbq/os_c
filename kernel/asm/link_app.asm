@@ -13,19 +13,19 @@ _num_app:
   .global app_0_start
   .global app_0_end
 app_0_start:
-  .incbin "../../user/target/00power_3.elf"
+  .incbin "../../user/target/00t.elf"
 app_0_end:
 
   .section .data
   .global app_1_start
   .global app_1_end
 app_1_start:
-  .incbin "../../user/target/01power_5.elf"
+  .incbin "../../user/target/01t.elf"
 app_1_end:
 
   .section .data
   .global app_2_start
   .global app_2_end
 app_2_start:
-  .incbin "../../user/target/02power_7.elf"
+  .incbin "../../user/target/02t.elf"
 app_2_end:

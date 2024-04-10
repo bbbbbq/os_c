@@ -119,26 +119,29 @@ void task_manager_mark_current_exited()
 {
   uint64_t current = TASK_MANAGER.current_task;
   task_control_block_free(&TASK_MANAGER.tasks[current]);
-  TASK_MANAGER.tasks[current].task_status = Exited;
+  TASK_MANAGER.tasks[current].task_status = Ready;
 }
 
-
-int64_t task_manager_find_next_task() 
+int64_t task_manager_find_next_task()
 {
   uint64_t num_app = TASK_MANAGER.num_app;
   uint64_t min_stride = __UINT64_MAX__;
-  uint64_t min_id = -1;
-  for (uint64_t i = 0; i < num_app; i++) 
-  {
+  int64_t min_id = -1;
+  uint64_t start_id = (TASK_MANAGER.current_task + 1) % num_app; // Start from the next task of the current task.
+  uint64_t checked = 0; // Number of tasks checked.
+
+  for (uint64_t i = start_id; checked < num_app; i = (i + 1) % num_app) {
     if (TASK_MANAGER.tasks[i].task_status == Ready) {
       uint64_t current_stride = TASK_MANAGER.tasks[i].stride;
-      if (current_stride < min_stride) 
-      {
+      if (current_stride < min_stride) {
         min_stride = current_stride;
         min_id = i;
+        break; // Stop the loop once the first ready task is found.
       }
     }
+    checked++;
   }
+
   return min_id;
 }
 
@@ -168,5 +171,18 @@ void task_manager_run_next_task()
 void task_exit_current_and_run_next() 
 {
   task_manager_mark_current_exited();
+  task_manager_run_next_task();
+}
+
+void task_manager_mark_current_suspended() 
+{
+  uint64_t current = TASK_MANAGER.current_task;
+  TASK_MANAGER.tasks[current].task_status = Ready;
+}
+
+
+void task_suspend_current_and_run_next() 
+{
+  task_manager_mark_current_suspended();
   task_manager_run_next_task();
 }

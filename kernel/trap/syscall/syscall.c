@@ -5,8 +5,8 @@
 #include "debug.h"
 #include "task.h"
 #include "sbi.h"
-
-
+#include "mem.h"
+#include "stdint.h"
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -15,26 +15,28 @@ int32_t exit(int32_t value)
     return value;
 }
 
-int64_t write(uint64_t fd, char* buf, uint64_t count)
-{
-    printk("\n\nwrite\n\n");
-    if(fd==1)
+int64_t write(uint64_t fd, char *buf, uint64_t len) {
+  static uint8_t sys_write_buf[1024];
+
+  switch (fd) {
+  case 1:
+    copy_byte_buffer(task_current_user_token(), sys_write_buf, (uint8_t *)buf,
+                     len, FROM_USER);
+    for (uint64_t i = 0; i < len; i++) 
     {
-        for (uint64_t i = 0; i < count; i++) 
-        {
-            console_putchar(buf[i]);
-        }
-    }else 
-    {
-        ASSERT(0);
+      console_putchar(sys_write_buf[i]);
     }
-    return count;
+    return (int64_t)len;
+  default:
+    break;
+  }
+  return -1;
 }
 
 int64_t yield()
 {
     print_str("\n-------yield------\n");
-    run_next_task(1);
+    task_suspend_current_and_run_next();
     return 1;
 }
 
@@ -56,14 +58,16 @@ int64_t sys_yield()
 // 系统调用处理函数
 int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
 {   
-    printk("syscall\n");
+    //printk("syscall\n");
     switch (syscall_id)
     {
         case SYSCALL_WRITE:
             return sys_write(a0, (char *)a1, a2);
         case SYSCALL_EXIT:
             sys_exit((int32_t)a0);
+            task_exit_current_and_run_next();
         case SYSCALL_YIELD:
+            // task_exit_current_and_run_next();
             return sys_yield();
         default:
             print_str("unsupportable syscall_id\n");
