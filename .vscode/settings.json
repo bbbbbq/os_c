@@ -20,6 +20,7 @@
         "mem.h": "c",
         "batch.h": "c",
         "loader.h": "c",
-        "trap.h": "c"
+        "trap.h": "c",
+        "syscall.h": "c"
     }
 }

@@ -9,7 +9,7 @@
 #include "trap.h"
 #include "loader.h" 
 struct TaskManager TASK_MANAGER;
-extern void __switch(struct TaskContext*,struct TaskContext*);
+extern void __switch(struct TaskContext**,struct TaskContext**);
 extern uint64_t _num_app[];
 
 void task_manager_init()
@@ -46,20 +46,18 @@ void run_next_task(uint64_t status)
     current_task_tcb->task_status = status;
     target_task_tcb->task_status = Running;
     TASK_MANAGER.current_task = target_task_num;
-
-    /* 交换TaskContext */
     __switch(&(current_task_tcb->task_cx_ptr), &(target_task_tcb->task_cx_ptr));
 }
 
 
-void run_first_task(void) 
-{
-    static struct TaskContext temp;
-    TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_status = Running;
-    print_str("[kernel] ready to run first app\n");
-    __switch(&temp, &TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_cx_ptr);
-    ASSERT(0);
-}
+// void run_first_task(void) 
+// {
+//     static struct TaskContext temp;
+//     TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_status = Running;
+//     print_str("[kernel] ready to run first app\n");
+//     __switch(&temp, &TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_cx_ptr);
+//     ASSERT(0);
+// }
 
 
 uint64_t task_manager_get_current_token() 
@@ -107,7 +105,8 @@ void task_control_block_new(uint8_t *elf_data, size_t elf_size, uint64_t app_id,
   struct TrapContext *trap_cx = get_trap_cx(s);
   app_init_context(entry_point, user_sp, kernel_space_token(), kernel_stack_top,
                    (uint64_t)trap_handler, trap_cx);
-
+  s->priority = DEFAULT_PRIORITY;
+  s->stride = 0;
 
 //   if(app_id==0)
 //   {
@@ -135,7 +134,12 @@ void task_control_block_new(uint8_t *elf_data, size_t elf_size, uint64_t app_id,
 //   }
 }
 
+struct TrapContext *task_current_trap_cx()
+{
+  return task_manager_get_current_trap_cx();
+}
 
-struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s) {
+struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s) 
+{
   return (struct TaskContext **)(&(s->task_cx_ptr));
 }

@@ -18,9 +18,15 @@ extern struct AppManager app_manager;
 extern uint64_t _num_app[];
 extern void __restore(uint64_t);
 void init_appmanager();
-void run_next_app();
+// void run_next_app();
 void print_app_info(struct AppManager *manager);
 void run_first_app();
-void load_app_test();
+// void load_app_test();
 struct TrapContext *get_trap_cx(struct TaskControlBlock *s);
+void task_manager_run_next_task();
+void task_control_block_free(struct TaskControlBlock *s);
+struct TrapContext *task_manager_get_current_trap_cx(); 
+void task_exit_current_and_run_next();
+void task_manager_mark_current_exited();
+int64_t task_manager_find_next_task();
 #endif

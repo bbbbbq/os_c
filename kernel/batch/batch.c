@@ -65,13 +65,14 @@ struct TrapContext *get_trap_cx(struct TaskControlBlock *s)
 
 void run_first_app()
 {
-    extern void __switch(const struct TaskContext **current_task_cx_ptr2,
-                     const struct TaskContext **next_task_cx_ptr2);
+    extern void __switch(struct TaskContext **current_task_cx_ptr2,
+                       struct TaskContext **next_task_cx_ptr2);
     TASK_MANAGER.tasks[0].task_status = Running;
-  const struct TaskContext **next_task_cx_ptr2 =
+  struct TaskContext **next_task_cx_ptr2 =
       get_task_cx_ptr2(&(TASK_MANAGER.tasks[0]));
   uint64_t _unused = 0;
-  __switch((const struct TaskContext **)&_unused, next_task_cx_ptr2);
+  printk("run_fisrt_app_end\n");
+  __switch((struct TaskContext **)&_unused, next_task_cx_ptr2);
 }
 
 
@@ -102,3 +103,70 @@ void run_first_app()
 //         __asm__ volatile ("fence.i");
 //     }
 // }
+
+
+struct TrapContext *task_manager_get_current_trap_cx() 
+{
+  uint64_t current = TASK_MANAGER.current_task;
+  return get_trap_cx(&TASK_MANAGER.tasks[current]);
+}
+
+void task_control_block_free(struct TaskControlBlock *s) {
+  memory_set_free(&s->memory_set);
+}
+
+void task_manager_mark_current_exited() 
+{
+  uint64_t current = TASK_MANAGER.current_task;
+  task_control_block_free(&TASK_MANAGER.tasks[current]);
+  TASK_MANAGER.tasks[current].task_status = Exited;
+}
+
+
+int64_t task_manager_find_next_task() 
+{
+  uint64_t num_app = TASK_MANAGER.num_app;
+  uint64_t min_stride = __UINT64_MAX__;
+  uint64_t min_id = -1;
+  for (uint64_t i = 0; i < num_app; i++) 
+  {
+    if (TASK_MANAGER.tasks[i].task_status == Ready) {
+      uint64_t current_stride = TASK_MANAGER.tasks[i].stride;
+      if (current_stride < min_stride) 
+      {
+        min_stride = current_stride;
+        min_id = i;
+      }
+    }
+  }
+  return min_id;
+}
+
+void task_manager_run_next_task() 
+{
+    extern void __switch(struct TaskContext **current_task_cx_ptr2,
+                     struct TaskContext **next_task_cx_ptr2);
+  int64_t next = task_manager_find_next_task();
+  if (next >= 0)
+  {
+    uint64_t current = TASK_MANAGER.current_task;
+    TASK_MANAGER.tasks[next].task_status = Running;
+    uint64_t pass = BIG_STRIDE / TASK_MANAGER.tasks[next].priority;
+    TASK_MANAGER.tasks[next].stride += pass;
+    TASK_MANAGER.current_task = next;
+    struct TaskContext **current_task_cx_ptr2 =
+        get_task_cx_ptr2(&(TASK_MANAGER.tasks[current]));
+    struct TaskContext **next_task_cx_ptr2 =
+        get_task_cx_ptr2(&(TASK_MANAGER.tasks[next]));
+    __switch(current_task_cx_ptr2, next_task_cx_ptr2);
+  } else {
+    mm_free();
+    panic("All applications completed!\n");
+  }
+}
+
+void task_exit_current_and_run_next() 
+{
+  task_manager_mark_current_exited();
+  task_manager_run_next_task();
+}

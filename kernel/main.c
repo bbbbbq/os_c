@@ -7,6 +7,14 @@
 #include "timer.h"
 #include "buddy.h"
 #include "mem.h"
+
+extern uint8_t sbss, ebss;
+
+void clear_bss() {
+  for (uint8_t *i = &sbss; i < &ebss; i++) {
+    *i = 0;
+  }
+}
 int main_os()
 {
     mm_init();

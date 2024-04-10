@@ -1,7 +1,8 @@
 #include "console.h"
 #include "sbi.h"
 void print_str(const char* str) {
-    while (*str) {
+    while (*str) 
+    {
         console_putchar((uint64_t)(*str));
         str++;
     }
@@ -35,13 +36,16 @@ void print_uint32(uint32_t value) {
     print_str(buffer);
 }
 
-void print_uint64(uint64_t value) {
+void print_uint64(uint64_t value) 
+{
     char buffer[21]; // uint64_t的最大值需要20个字符加上一个终止符
     int i = 0;
-    if (value == 0) {
+    if (value == 0) 
+    {
         buffer[i++] = '0';
     }
-    while (value != 0) {
+    while (value != 0) 
+    {
         int digit = value % 10;
         buffer[i++] = digit + '0';
         value /= 10;

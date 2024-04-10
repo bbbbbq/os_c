@@ -4,6 +4,7 @@
 #include "console.h"
 #include "debug.h"
 #include "task.h"
+#include "sbi.h"
 
 
 int32_t exit(int32_t value)
@@ -14,13 +15,15 @@ int32_t exit(int32_t value)
     return value;
 }
 
-int64_t write(uint64_t fd, const void *buf, uint64_t count)
+int64_t write(uint64_t fd, char* buf, uint64_t count)
 {
+    printk("\n\nwrite\n\n");
     if(fd==1)
     {
-        buf = (char*) buf;
-        print_str(buf);
-        print_str("\n");
+        for (uint64_t i = 0; i < count; i++) 
+        {
+            console_putchar(buf[i]);
+        }
     }else 
     {
         ASSERT(0);
@@ -35,7 +38,7 @@ int64_t yield()
     return 1;
 }
 
-int64_t sys_write(uint64_t fd, const void *buf, uint64_t count) 
+int64_t sys_write(uint64_t fd, char *buf, uint64_t count) 
 {
     return write(fd, buf, count); // 使用POSIX write
 }
@@ -51,18 +54,16 @@ int64_t sys_yield()
 }
 
 // 系统调用处理函数
-int64_t syscall(uint64_t syscall_id, uint64_t args[3]) 
-{
+int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
+{   
+    printk("syscall\n");
     switch (syscall_id)
     {
         case SYSCALL_WRITE:
-            //print_str("------sys_write-----\n");
-            return sys_write(args[0], (const void*)args[1], args[2]);
+            return sys_write(a0, (char *)a1, a2);
         case SYSCALL_EXIT:
-            sys_exit((int)args[0]);
-            return 0;
+            sys_exit((int32_t)a0);
         case SYSCALL_YIELD:
-            //print_str("----sys_yield----\n");
             return sys_yield();
         default:
             print_str("unsupportable syscall_id\n");
