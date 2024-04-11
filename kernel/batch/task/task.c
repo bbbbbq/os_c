@@ -143,3 +143,34 @@ struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s)
 {
   return (struct TaskContext **)(&(s->task_cx_ptr));
 }
+
+enum TaskStatus get_status(struct TaskControlBlock* self) {
+    return self->task_status;
+}
+
+int is_zombie(struct TaskControlBlock* self) 
+{
+    return get_status(self) == Zombie;
+}
+
+
+uint64_t getpid(struct TaskControlBlock* self) 
+{
+    return self->pid.pid;
+}
+
+
+
+void task_context_zero_init(struct TaskContext *cx) 
+{
+  cx->ra = 0;
+  cx->sp = 0;
+  for (int i = 0; i < 12; i++) {
+    cx->x[i] = 0;
+  }
+}
+
+
+uint64_t task_control_block_get_user_token(struct TaskControlBlock *s) {
+  return memory_set_token(&s->memory_set);
+}

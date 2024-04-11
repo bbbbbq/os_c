@@ -14,6 +14,12 @@ struct AppManager
     uintptr_t app_start[MAX_APP_NUM];
     uintptr_t app_end[MAX_APP_NUM];
 };
+
+
+typedef struct
+{
+    
+}TaskManager;
 extern struct AppManager app_manager;
 extern uint64_t _num_app[];
 extern void __restore(uint64_t);
