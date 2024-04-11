@@ -19,7 +19,7 @@ int main_os()
 {
     mm_init();
     printk("123%d\n",123);
-    init_interrupt();
+    //init_interrupt();
     init_trap();
     timer_init(); 
     task_manager_init();

@@ -21,20 +21,20 @@ void print_sepc()
     print_str("\n");    
 }
 
-void init_interrupt()
-{
-    uint64_t stvec_value = (uint64_t)(__alltraps);
-    asm volatile("csrw stvec, %0" :: "r"(stvec_value));
-    uint64_t mask = 0x202;
-    WRITE_CSR(sie,mask);
-    uint64_t sstatus = READ_CSR(sstatus);
-    sstatus |= SSTATUS_SIE_BIT;
-    WRITE_CSR(sstatus, sstatus);
-    uint64_t sie = READ_CSR(sie);
-    sie |= SIE_SSIE_BIT | SIE_STIE_BIT | SIE_SEIE_BIT;
-    WRITE_CSR(sie, sie);
-    WRITE_CSR(sscratch,Trap_Stack);
-}
+// void init_interrupt()
+// {
+//     uint64_t stvec_value = (uint64_t)(__alltraps);
+//     asm volatile("csrw stvec, %0" :: "r"(stvec_value));
+//     uint64_t mask = 0x202;
+//     WRITE_CSR(sie,mask);
+//     uint64_t sstatus = READ_CSR(sstatus);
+//     sstatus |= SSTATUS_SIE_BIT;
+//     WRITE_CSR(sstatus, sstatus);
+//     uint64_t sie = READ_CSR(sie);
+//     sie |= SIE_SSIE_BIT | SIE_STIE_BIT | SIE_SEIE_BIT;
+//     WRITE_CSR(sie, sie);
+//     WRITE_CSR(sscratch,Trap_Stack);
+// }
 
 void trap_handler() 
 {

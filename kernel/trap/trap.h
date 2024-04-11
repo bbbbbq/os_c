@@ -25,7 +25,7 @@
 #define StorePageFault 15
 void init_trap();
 void set_user_trap_entry();
-void init_interrupt();
+// void init_interrupt();
 void trap_handler();
 void print_sepc();
 void trap_return();
