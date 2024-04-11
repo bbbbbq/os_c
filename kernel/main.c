@@ -19,12 +19,9 @@ int main_os()
 {
     mm_init();
     printk("123%d\n",123);
-    //init_interrupt();
     init_trap();
     timer_init(); 
     task_manager_init();
-    //asm("ebreak");
-    // while(1){}
     loader_init_and_list_apps();
     list_apps();
     run_first_app();

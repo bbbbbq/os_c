@@ -16,7 +16,7 @@ typedef struct
     struct vector recycled;
 } PidAllocator;
 
-PidAllocator PID_ALLOCATOR;
+extern PidAllocator PID_ALLOCATOR;
 
 void PidAllocator_init(PidAllocator* allocator);
 PidHandle PidAllocator_alloc();

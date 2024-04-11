@@ -4,6 +4,7 @@
 #include "batch.h"
 #include "context.h"
 #include "mem.h"
+#include "pid.h"
 // uint8_t UserStack[USER_STACK_SIZE];
 // uint8_t Kernelstack[KERNEL_STACK_SIZE];
 // uint8_t Trap_Stack[1024];
@@ -33,4 +34,30 @@ void kernel_stack_position(uint64_t app_id, uint64_t *bottom, uint64_t *top)
 {
     *top = TRAMPOLINE - app_id * (KERNEL_STACK_SIZE + PAGE_SIZE);
     *bottom = *top - KERNEL_STACK_SIZE;
+}
+
+void* kernel_stack_push_on_top(KernelStack stack, void* value)
+{
+    uint64_t kernel_stack_top = kernel_stack_get_top(stack);
+    void* ptr = (void*)(kernel_stack_top - sizeof(void*));
+    *(void**)ptr = value;
+    return ptr;
+}
+
+uint64_t kernel_stack_get_top(KernelStack stack)
+{
+    uint64_t bottom, top;
+    kernel_stack_position(stack.pid.pid, &bottom, &top);
+    return top;
+}
+
+KernelStack kernel_stack_new(PidHandle pid)
+{
+    KernelStack stack;
+    stack.pid = pid;
+    uint64_t bottom, top;
+    kernel_stack_position(stack.pid.pid, &bottom, &top);
+    kernel_space_insert_framed_area(bottom,top,MAP_PERM_R | MAP_PERM_W);
+    stack.pid = pid;
+    return stack;
 }

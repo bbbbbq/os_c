@@ -1,7 +1,7 @@
 #include "pid.h"
 #include "stdint.h"
 #include "debug.h"
-
+PidAllocator PID_ALLOCATOR;
 void PidAllocator_init(PidAllocator* allocator) 
 {
     allocator->current.pid = 0;
