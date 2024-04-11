@@ -7,6 +7,7 @@
 #include "config.h"
 #define MAX_APP_NUM 20
 #define BIG_STRIDE 100000
+#define MAX_APP_NAME_LENGTH 64
 #define DEFAULT_PRIORITY 16
 struct TaskContext;
 enum TaskStatus 
@@ -16,7 +17,6 @@ enum TaskStatus
     Running, // 正在运行
     Exited, // 已退出
 };
-
 struct TaskContext
 {
     uint64_t ra;

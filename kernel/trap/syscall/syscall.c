@@ -7,6 +7,7 @@
 #include "sbi.h"
 #include "mem.h"
 #include "stdint.h"
+#include "trap.h"
 int32_t exit(int32_t value)
 {
     print_str("exit : ");

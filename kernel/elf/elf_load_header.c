@@ -16,12 +16,10 @@
 */
 static int elf_load_ident(t_elf *elf) 
 {
-  printk("elf_load_ident start\n");
   if (elf->size < EI_NIDENT || memcmp(elf->raw_data, ELFMAG, 4)) {
     return (-1);
   }
   elf->ident = elf->raw_data;
-  printk("elf_load_ident end\n");
   return (0);
 }
 

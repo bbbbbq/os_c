@@ -71,7 +71,7 @@ void run_first_app()
   struct TaskContext **next_task_cx_ptr2 =
       get_task_cx_ptr2(&(TASK_MANAGER.tasks[0]));
   uint64_t _unused = 0;
-  printk("run_fisrt_app_end\n");
+  //printk("run_fisrt_app_end\n");
   __switch((struct TaskContext **)&_unused, next_task_cx_ptr2);
 }
 

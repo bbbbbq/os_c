@@ -9,6 +9,12 @@ _num_app:
   .quad app_2_start
   .quad app_2_end
 
+  .global _app_names
+_app_names:
+  .string "00t"
+  .string "01t"
+  .string "02t"
+
   .section .data
   .global app_0_start
   .global app_0_end

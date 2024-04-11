@@ -30,4 +30,5 @@ void trap_handler();
 void print_sepc();
 void trap_return();
 void set_kernel_trap_entry();
+uint64_t task_current_user_token();
 #endif

@@ -7,7 +7,7 @@
 #include "timer.h"
 #include "buddy.h"
 #include "mem.h"
-
+#include "loader.h"
 extern uint8_t sbss, ebss;
 
 void clear_bss() {
@@ -25,6 +25,8 @@ int main_os()
     task_manager_init();
     //asm("ebreak");
     // while(1){}
+    loader_init_and_list_apps();
+    list_apps();
     run_first_app();
     ASSERT(0);
 }

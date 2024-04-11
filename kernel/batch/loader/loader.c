@@ -1,9 +1,13 @@
 #include "config.h"
 #include "debug.h"
+#include "task.h"
+#include "string.h"
+#include "loader.h"
+char APP_NAMES[MAX_APP_NUM][MAX_APP_NAME_LENGTH];
 uint64_t loader_get_num_app() 
 {
-  extern uint64_t _num_app;
-  return _num_app;
+  extern uint64_t _num_app[];
+  return _num_app[0];
 }
 
 uint8_t *loader_get_app_data(uint64_t app_id) 
@@ -47,6 +51,42 @@ size_t loader_get_app_size(uint64_t app_id)
     
     // printk("App ID: %d Size: %d\n", app_id, app_size);
     //ASSERT(0);
-    printk("App ID: %d Size: %d\n", app_id, app_size);
+    //printk("App ID: %d Size: %d\n", app_id, app_size);
     return app_size;
+}
+
+
+void loader_init_and_list_apps() 
+{
+  extern uint64_t _app_names;
+  uint64_t num_app = loader_get_num_app();
+  uint8_t *ptr = (uint8_t *)&_app_names;
+  for (uint64_t i = 0; i < num_app; i++) 
+  {
+    strcpy_t(APP_NAMES[i], (char *)ptr);
+    ptr += (strlen_t((char *)ptr) + 1);
+  }
+}
+
+void list_apps() 
+{
+    printk("/**** APPS ****\n");
+    int num_app = loader_get_num_app();
+    for (int i = 0; i < num_app; i++) {
+        printk("%s\n", APP_NAMES[i]);
+    }
+    printk("**************/\n");
+}
+
+uint8_t* get_app_data_by_name(char* name) 
+{
+    int num_app = loader_get_num_app();
+    for (int i = 0; i < num_app; i++) 
+    {
+        if (strcmp_t(APP_NAMES[i], name) == 0) 
+        {
+            return loader_get_app_data(i);
+        }
+    }
+    return NULL; // Return NULL if no match is found
 }

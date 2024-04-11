@@ -20,7 +20,7 @@ void task_manager_init()
     task_control_block_new(loader_get_app_data(i), loader_get_app_size(i), i,
                            &TASK_MANAGER.tasks[i]);
   }
-  printk("task_manager_init_end\n");
+  //printk("task_manager_init_end\n");
   TASK_MANAGER.current_task = 0;
 }
 

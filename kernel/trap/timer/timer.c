@@ -17,7 +17,7 @@ void clock_set_next_event()
 void timer_init()
 {
     clock_set_next_event();
-    print_str("----timer_init----\n");
+    //print_str("----timer_init----\n");
 }
 
 
