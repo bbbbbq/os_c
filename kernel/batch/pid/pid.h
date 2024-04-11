@@ -18,7 +18,7 @@ typedef struct
 
 PidAllocator PID_ALLOCATOR;
 
-void PidAllocator_init();
-void PidAllocator_alloc();
-void PidAllocator_dealloc();
+void PidAllocator_init(PidAllocator* allocator);
+PidHandle PidAllocator_alloc();
+void PidAllocator_dealloc(PidHandle pid);
 #endif

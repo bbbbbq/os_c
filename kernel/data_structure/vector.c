@@ -24,7 +24,8 @@ void vector_push(struct vector *v, void *d) {
   memcpy((uint8_t*)(v->buffer + (v->size++) * v->dsize), d, v->dsize);
 }
 
-void vector_pop(struct vector *v) {
+void vector_pop(struct vector *v) 
+{
   if (v->size == 0)
     panic("empty vector pop\n");
   v->size--;
@@ -48,4 +49,17 @@ void vector_remove(struct vector *v, uint64_t idx) {
   memmove(v->buffer + idx * v->dsize, v->buffer + (idx + 1) * v->dsize,
           (v->size - idx - 1) * v->dsize);
   v->size--;
+}
+
+
+void *vector_get(struct vector *v, uint64_t index) {
+    if (index >= v->size) {
+        return NULL;
+    }
+    return (void *)(v->buffer + (index * v->dsize));
+}
+
+uint64_t vector_size(struct vector *v)
+{
+    return v->size;
 }
