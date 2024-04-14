@@ -38,9 +38,10 @@ void app_init_context(uint64_t entry, uint64_t sp, uint64_t kernel_satp,
   c->x[2] = sp;
 }
 
-void task_context_goto_trap_return(struct TaskContext *cx) 
-{
+void task_context_goto_trap_return(struct TaskContext *cx, uint64_t kstack_ptr) {
   cx->ra = (uint64_t)trap_return;
+  cx->sp = kstack_ptr;
   for (int i = 0; i < 12; i++)
     cx->x[i] = 0;
 }
+

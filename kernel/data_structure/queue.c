@@ -1,29 +1,22 @@
 // queue.c
 #include "queue.h"
-#include "stdint.h"
 #include "mem.h"
 #include "kernel_heap.h"
-Queue* createQueue() {
-    Queue* q = (Queue*)malloc(sizeof(Queue));
-    q->head = q->tail = NULL;
+void queue_init(Queue* q) {
+    q->head = NULL;
+    q->tail = NULL;
     q->size = 0;
-    return q;
 }
 
-int queue_empty(Queue* q) {
-    return q->size == 0;
-}
-
-int queue_size(Queue* q) {
-    return q->size;
-}
-
-void queue_push(Queue* q, void* element) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->data = element;
+void queue_enqueue(Queue* q, void* data) {
+    Node* newNode = (Node*)bd_malloc(sizeof(Node));
+    if (newNode == NULL) {
+        ASSERT(0);
+    }
+    newNode->data = data;
     newNode->next = NULL;
-    
-    if (q->tail == NULL) {
+
+    if (q->tail == NULL) { // Empty queue
         q->head = q->tail = newNode;
     } else {
         q->tail->next = newNode;
@@ -32,35 +25,39 @@ void queue_push(Queue* q, void* element) {
     q->size++;
 }
 
-void* queue_pop(Queue* q) {
-    if (queue_empty(q)) {
-        return NULL;
+void* queue_dequeue(Queue* q) {
+    if (q->head == NULL) {
+        return NULL; // Empty queue
     }
-    
+
     Node* temp = q->head;
     void* data = temp->data;
     q->head = q->head->next;
-    
+
     if (q->head == NULL) {
-        q->tail = NULL;
+        q->tail = NULL; // Queue is now empty
     }
-    
+
     free(temp);
     q->size--;
     return data;
 }
 
-void* queue_front(Queue* q) {
-    if (queue_empty(q)) {
-        return NULL;
+void queue_clear(Queue* q) {
+    Node* current = q->head;
+    Node* next;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
     }
-    return q->head->data;
+
+    q->head = NULL;
+    q->tail = NULL;
+    q->size = 0;
 }
 
-void* queue_back(Queue* q) 
-{
-    if (queue_empty(q)) {
-        return NULL;
-    }
-    return q->tail->data;
+int queue_is_empty(const Queue* q) {
+    return q->size == 0;
 }

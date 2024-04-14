@@ -13,17 +13,19 @@ ELF = $(OBJDIR)/os_kernel.elf
 INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/debug -I$(KERNEL_DIR)/console \
 				-I$(KERNEL_DIR)/batch -I$(KERNEL_DIR)/string  \
-				-I$(KERNEL_DIR)/trap/syscall -I$(KERNEL_DIR)/trap \
-				-I$(KERNEL_DIR)/batch/context  -I$(KERNEL_DIR)/batch/stack \
+				-I$(KERNEL_DIR)/batch/stack  -I$(KERNEL_DIR)/trap/syscall -I$(KERNEL_DIR)/trap \
+				-I$(KERNEL_DIR)/batch/context  \
 				-I$(KERNEL_DIR)/batch/task   -I$(KERNEL_DIR)/trap/timer \
 				-I$(KERNEL_DIR)/memory/kernel_heap  -I$(KERNEL_DIR)/memory/address \
 				-I$(KERNEL_DIR)/data_structure   -I$(KERNEL_DIR)/memory/address/fram_allocator \
 				-I$(KERNEL_DIR)/memory/pagetable   -I$(KERNEL_DIR)/memory/pagetable/pte  \
-				-I$(KERNEL_DIR)/memory/task_memory  -I$(KERNEL_DIR)/lib  \
+				-I$(KERNEL_DIR)/memory/task_memory  -I$(KERNEL_DIR)/batch/stack -I$(KERNEL_DIR)/lib  \
 				-I$(KERNEL_DIR)/memory  -I$(KERNEL_DIR)/memory/buddy   \
 				-I$(KERNEL_DIR)/memory/kernel_address -I$(KERNEL_DIR)/elf \
 				-I$(KERNEL_DIR)/memory/mem  -I$(KERNEL_DIR)/memory/buddy \
-				-I$(KERNEL_DIR)/batch/loader -I$(KERNEL_DIR)/batch/pid
+				-I$(KERNEL_DIR)/batch/loader -I$(KERNEL_DIR)/batch/pid  \
+				-I$(KERNEL_DIR)/batch/processor 
+
 
 
 # Compilation and linking flags

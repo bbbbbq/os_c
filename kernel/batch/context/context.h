@@ -1,7 +1,6 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 #include "task.h"
-
 struct TaskContext;
 
 struct TrapContext
@@ -17,6 +16,7 @@ struct TrapContext
 void app_init_context(uint64_t entry, uint64_t sp, uint64_t kernel_satp,
                       uint64_t kernel_sp, uint64_t trap_handler,
                       struct TrapContext *c);
-void task_context_goto_trap_return(struct TaskContext *cx);
+
+void task_context_goto_trap_return(struct TaskContext *cx, uint64_t kstack_ptr);
 
 #endif

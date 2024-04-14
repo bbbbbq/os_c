@@ -8,7 +8,8 @@ extern void __switch(struct TaskContext *current_task_cx_ptr,
                      struct TaskContext *next_task_cx_ptr);
 
 
-void processor_init(Processor *processor) {
+void processor_init(Processor *processor) 
+{
   processor->current = NULL;
   task_context_zero_init(&processor->idle_task_cx);
 }
@@ -35,8 +36,6 @@ struct TaskControlBlock *processor_current_task() {
 }
 
 
-
-
 void processor_run_tasks() 
 {
   processor_init(&PROCESSOR);
@@ -47,7 +46,7 @@ void processor_run_tasks()
     task = task_manager_fetch_task();
     if (task) {
       idle_task_cx_ptr = processor_get_idle_task_cx_ptr(&PROCESSOR);
-      next_task_cx_ptr = &task->task_cx_ptr;
+      next_task_cx_ptr = &task->task_cx;
       task->task_status = Running;
       PROCESSOR.current = task;
       __switch(idle_task_cx_ptr, next_task_cx_ptr);

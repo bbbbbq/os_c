@@ -78,7 +78,7 @@ void list_apps()
     printk("**************/\n");
 }
 
-uint8_t* get_app_data_by_name(char* name) 
+uint8_t* loader_get_app_data_by_name(char* name) 
 {
     int num_app = loader_get_num_app();
     for (int i = 0; i < num_app; i++) 
@@ -89,4 +89,16 @@ uint8_t* get_app_data_by_name(char* name)
         }
     }
     return NULL; // Return NULL if no match is found
+}
+
+
+
+size_t loader_get_app_size_by_name(char *name) {
+  uint64_t num_app = loader_get_num_app();
+  for (uint64_t i = 0; i < num_app; i++) {
+    if (strcmp_t(APP_NAMES[i], name) == 0) {
+      return loader_get_app_size(i);
+    }
+  }
+  return 0;
 }

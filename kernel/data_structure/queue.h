@@ -1,25 +1,27 @@
+// queue.h
 #ifndef QUEUE_H
 #define QUEUE_H
 
-// 队列节点结构体
+#include "mem.h"
+
+// Node structure
 typedef struct Node {
     void* data;
     struct Node* next;
 } Node;
 
-// 队列结构体
+// Queue structure
 typedef struct {
     Node* head;
     Node* tail;
     int size;
 } Queue;
 
-Queue* createQueue();
-int queue_empty(Queue* q);
-int queue_size(Queue* q);
-void queue_push(Queue* q, void* element);
-void* queue_pop(Queue* q);
-void* queue_front(Queue* q);
-void* queue_back(Queue* q);
+// Function declarations
+void queue_init(Queue* q);
+void queue_enqueue(Queue* q, void* data);
+void* queue_dequeue(Queue* q);
+void queue_clear(Queue* q);
+int queue_is_empty(const Queue* q);
 
 #endif // QUEUE_H

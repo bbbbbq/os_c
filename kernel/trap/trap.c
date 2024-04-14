@@ -96,6 +96,7 @@ uint64_t task_current_user_token() {
 
 void trap_return() 
 {
+  printk("trap_return\n");
   set_user_trap_entry();
   uint64_t trap_cx_ptr = TRAP_CONTEXT;
   uint64_t user_satp = task_current_user_token();

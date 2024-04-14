@@ -23,6 +23,8 @@
         "trap.h": "c",
         "syscall.h": "c",
         "sbi.h": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "stack.h": "c",
+        "taskmanager.h": "c"
     }
 }

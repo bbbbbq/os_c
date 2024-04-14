@@ -36,7 +36,7 @@ void kernel_stack_position(uint64_t app_id, uint64_t *bottom, uint64_t *top)
     *bottom = *top - KERNEL_STACK_SIZE;
 }
 
-void* kernel_stack_push_on_top(KernelStack stack, void* value)
+void* kernel_stack_push_on_top(struct KernelStack stack, void* value)
 {
     uint64_t kernel_stack_top = kernel_stack_get_top(stack);
     void* ptr = (void*)(kernel_stack_top - sizeof(void*));
@@ -44,20 +44,17 @@ void* kernel_stack_push_on_top(KernelStack stack, void* value)
     return ptr;
 }
 
-uint64_t kernel_stack_get_top(KernelStack stack)
+uint64_t kernel_stack_get_top(struct KernelStack stack)
 {
     uint64_t bottom, top;
     kernel_stack_position(stack.pid.pid, &bottom, &top);
     return top;
 }
 
-KernelStack kernel_stack_new(PidHandle pid)
-{
-    KernelStack stack;
-    stack.pid = pid;
-    uint64_t bottom, top;
-    kernel_stack_position(stack.pid.pid, &bottom, &top);
-    kernel_space_insert_framed_area(bottom,top,MAP_PERM_R | MAP_PERM_W);
-    stack.pid = pid;
-    return stack;
+void kernel_stack_new(struct KernelStack *ks, PidHandle pid) {
+  uint64_t kernel_stack_bottom = kernel_stack_position_bottom(pid.pid);
+  uint64_t kernel_stack_top = kernel_stack_position_top(pid.pid);
+  kernel_space_insert_framed_area(kernel_stack_bottom, kernel_stack_top,
+                                  MAP_PERM_R | MAP_PERM_W);
+  ks->pid = pid;
 }
