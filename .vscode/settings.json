@@ -25,6 +25,7 @@
         "sbi.h": "c",
         "task.h": "c",
         "stack.h": "c",
-        "taskmanager.h": "c"
+        "taskmanager.h": "c",
+        "processor.h": "c"
     }
 }

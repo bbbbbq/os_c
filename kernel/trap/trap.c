@@ -10,6 +10,7 @@
 #include "task.h"
 #include "riscv.h"
 #include "mem.h"
+#include "processor.h"
 extern void __alltraps();
 extern void __restore();
 
@@ -94,15 +95,13 @@ uint64_t task_current_user_token() {
   return task_manager_get_current_token();
 }
 
-void trap_return() 
-{
+void trap_return() {
   printk("trap_return\n");
   set_user_trap_entry();
   uint64_t trap_cx_ptr = TRAP_CONTEXT;
-  uint64_t user_satp = task_current_user_token();
+  uint64_t user_satp = processor_current_user_token();
   uint64_t restore_va = (uint64_t)__restore - (uint64_t)__alltraps + TRAMPOLINE;
   asm volatile("fence.i");
-  asm volatile("");
   asm volatile("mv x10, %1\n"
                "mv x11, %2\n"
                "jr %0\n"
@@ -111,6 +110,7 @@ void trap_return()
                : "memory", "x10", "x11");
   panic("Unreachable in back_to_user!\n");
 }
+
 
 
 void init_trap()

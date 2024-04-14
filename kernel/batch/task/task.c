@@ -37,26 +37,27 @@ struct TrapContext *task_control_block_get_trap_cx(struct TaskControlBlock *s) {
 
 void run_next_task(uint64_t status) 
 {
-    // 寻找ready的task
-    uint64_t target_task_num;
-    for (target_task_num = (TASK_MANAGER.current_task + 1) % MAX_APP_NUM; target_task_num != TASK_MANAGER.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
-        if (TASK_MANAGER.tasks[target_task_num].task_status == Ready) {
-            break;
-        }
-    }
-    // 没有ready的任务
-    if ((target_task_num == TASK_MANAGER.current_task) && (TASK_MANAGER.tasks[target_task_num].task_status != Ready)) {
-        ASSERT(0);
-    }
+  ASSERT(0);
+    // // 寻找ready的task
+    // uint64_t target_task_num;
+    // for (target_task_num = (TASK_MANAGER.current_task + 1) % MAX_APP_NUM; target_task_num != TASK_MANAGER.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
+    //     if (TASK_MANAGER.tasks[target_task_num].task_status == Ready) {
+    //         break;
+    //     }
+    // }
+    // // 没有ready的任务
+    // if ((target_task_num == TASK_MANAGER.current_task) && (TASK_MANAGER.tasks[target_task_num].task_status != Ready)) {
+    //     ASSERT(0);
+    // }
 
-    struct TaskControlBlock* target_task_tcb = &TASK_MANAGER.tasks[target_task_num];
-    struct TaskControlBlock* current_task_tcb = &TASK_MANAGER.tasks[TASK_MANAGER.current_task];
+    // struct TaskControlBlock* target_task_tcb = &TASK_MANAGER.tasks[target_task_num];
+    // struct TaskControlBlock* current_task_tcb = &TASK_MANAGER.tasks[TASK_MANAGER.current_task];
 
-    // 改变状态
-    current_task_tcb->task_status = status;
-    target_task_tcb->task_status = Running;
-    TASK_MANAGER.current_task = target_task_num;
-    __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
+    // // 改变状态
+    // current_task_tcb->task_status = status;
+    // target_task_tcb->task_status = Running;
+    // TASK_MANAGER.current_task = target_task_num;
+    // __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
 }
 
 

@@ -7,7 +7,7 @@ typedef struct {
   struct TaskContext idle_task_cx;
 } Processor;
 extern Processor PROCESSOR;
-
+uint64_t processor_current_user_token();
 void processor_init(Processor *processor);
 struct TaskControlBlock *processor_take_current(Processor *processor);
 struct TaskContext *processor_get_idle_task_cx_ptr(Processor *processor);

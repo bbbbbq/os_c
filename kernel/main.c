@@ -17,6 +17,8 @@ void clear_bss() {
     *i = 0;
   }
 }
+
+
 int main_os()
 {
     mm_init();

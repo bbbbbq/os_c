@@ -67,11 +67,10 @@ PageTableEntry *page_table_find_pte(PageTable *pt, VirtPageNum vpn) {
 }
 
 void page_table_map(PageTable *pt, VirtPageNum vpn, PhysPageNum ppn,
-                    PTEFlags flags) {
+                    PTEFlags flags) 
+{
   PageTableEntry *pte = page_table_find_pte_create(pt, vpn);
-  if (pte_is_valid(*pte)) {
-    panic("VPN 0x is mapped before mapping.\n");
-  }
+  ASSERT(!pte_is_valid(*pte));
   *pte = pte_new(ppn, flags | PTE_V);
 }
 
