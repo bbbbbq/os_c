@@ -126,8 +126,8 @@ void page_table_map(PageTable *pt, VirtPageNum vpn, PhysPageNum ppn,
 void page_table_unmap(PageTable *pt, VirtPageNum vpn); // 取消VPN的映射
 PageTableEntry *page_table_translate(PageTable *pt, VirtPageNum vpn); // 翻译VPN到PTE
 uint64_t page_table_token(PageTable *pt); // 获取页表的SATP令牌
-int64_t copy_byte_buffer(uint64_t token, uint8_t *kernel, uint8_t *user,
-                         uint64_t len, uint64_t direction); // 在内核和用户空间之间复制字节缓冲区
+void copy_byte_buffer(uint64_t token, uint8_t *kernel, uint8_t *user,
+                      uint64_t len, uint64_t direction);// 在内核和用户空间之间复制字节缓冲区
 
 // memory_set.c
 uint64_t memory_set_token(MemorySet *memory_set); // 获取内存集的SATP令牌

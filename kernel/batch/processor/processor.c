@@ -8,6 +8,16 @@ extern void __switch(struct TaskContext *current_task_cx_ptr,
                      struct TaskContext *next_task_cx_ptr);
 
 
+
+static struct TaskControlBlock *processor_current(Processor *processor) {
+  return processor->current;
+}
+
+struct TaskControlBlock *processor_current_task() 
+{
+  return processor_current(&PROCESSOR);
+}
+
 void processor_init(Processor *processor) 
 {
   processor->current = NULL;
@@ -23,17 +33,6 @@ struct TaskContext *processor_get_idle_task_cx_ptr(Processor *processor) {
   return &processor->idle_task_cx;
 }
 
-
-uint64_t processor_current_user_token() {
-  struct TaskControlBlock *task = processor_current_task();
-  return task_control_block_get_user_token(task);
-}
-
-
-
-struct TaskControlBlock *processor_current_task() {
-  return processor_current_task(&PROCESSOR);
-}
 
 
 void processor_run_tasks() 
@@ -52,4 +51,12 @@ void processor_run_tasks()
       __switch(idle_task_cx_ptr, next_task_cx_ptr);
     }
   }
+}
+
+
+
+uint64_t processor_current_user_token() 
+{
+  struct TaskControlBlock *task = processor_current_task();
+  return task_control_block_get_user_token(task);
 }

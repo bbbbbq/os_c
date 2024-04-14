@@ -73,10 +73,10 @@ $(OBJDIR)/%.d: %.c
 	$(CC) $(CFLAGS) -MM -MT '$(@:.d=.o)' $< -MF $@
 
 run: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios bootloader/rustsbi-qemu.bin -m 512M
 
 qemu_debug: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M -S -s 
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios bootloader/rustsbi-qemu.bin -m 512M -S -s 
 
 elf: $(ELF)
 

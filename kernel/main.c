@@ -19,13 +19,15 @@ void clear_bss() {
 }
 
 
-int main_os()
+void main_os()
 {
+    printk("1111\n");
     mm_init();
-    printk("123%d\n",123);
+    printk("2222\n");
     init_trap();
     timer_init();
     loader_init_and_list_apps();
+    list_apps();
     taks_init();
     task_manager_add_2_initproc();
     processor_run_tasks();

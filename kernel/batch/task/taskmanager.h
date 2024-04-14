@@ -9,7 +9,7 @@ extern TaskManager_2 TASK_MANAGER_2;
 void task_manager_init_2();
 void task_manager_add_2(TaskManager_2* manager, void* task);
 void* task_manager_fetch_2(TaskManager_2* manager);
-
+struct TrapContext *processor_current_trap_cx();
 struct TaskControlBlock *task_manager_fetch_task();
 
 #endif

@@ -21,7 +21,8 @@ int64_t write(uint64_t fd, char *buf, uint64_t len) {
 
   switch (fd) {
   case 1:
-    copy_byte_buffer(task_current_user_token(), sys_write_buf, (uint8_t *)buf,
+    ;uint64_t tmp = task_current_user_token();
+    copy_byte_buffer(tmp, sys_write_buf, (uint8_t *)buf,
                      len, FROM_USER);
     for (uint64_t i = 0; i < len; i++) 
     {
@@ -59,7 +60,7 @@ int64_t sys_yield()
 // 系统调用处理函数
 int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
 {   
-    //printk("syscall\n");
+    printk("syscall\n");
     switch (syscall_id)
     {
         case SYSCALL_WRITE:

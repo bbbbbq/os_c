@@ -54,7 +54,6 @@ struct TaskManager
     uint64_t num_app;
 };
 
-
 extern struct TaskManager TASK_MANAGER;
 void taks_init();
 void task_manager_add_2_initproc();

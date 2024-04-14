@@ -2,10 +2,12 @@
 #include "mem.h"
 
 void vpn_indexes(VirtPageNum vpn, uint64_t *idx) {
+  printk("vpn_indexes start \n");
   for (int i = 2; i >= 0; i--) {
     idx[i] = vpn & 0x1ff;
     vpn >>= 9;
   }
+  printk("vpn_indexes end \n");
 }
 
 PageTableEntry *ppn_get_pte_array(PhysPageNum ppn) {

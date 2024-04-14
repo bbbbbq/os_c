@@ -33,10 +33,12 @@ static void map_area_unmap_one(MapArea *map_area, PageTable *pt,
 }
 
 static void map_area_map(MapArea *map_area, PageTable *pt) {
+  printk("map_area_map start\n");
   for (VirtPageNum vpn = map_area->vpn_range.l; vpn < map_area->vpn_range.r;
        vpn++) {
     map_area_map_one(map_area, pt, vpn);
   }
+  printk("map_area_map end\n");
 }
 
 static void map_area_unmap(MapArea *map_area, PageTable *pt, bool dealloc) {
@@ -136,7 +138,8 @@ static inline void memory_set_map_trampoline(MemorySet *memory_set) {
 
 static MemorySet KERNEL_SPACE;
 static void memory_set_new_kernel() {
-  MemorySet *memory_set = &KERNEL_SPACE;
+  printk("memory_set_new_kernel start \n");
+   MemorySet *memory_set = &KERNEL_SPACE;
   memory_set_new_bare(memory_set);
 
   // map trampoline
@@ -157,33 +160,34 @@ static void memory_set_new_kernel() {
   map_area.map_perm = MAP_PERM_R | MAP_PERM_X;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
-  // info("mapping .rodata section\n");
+  //info("mapping .rodata section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&srodata);
   map_area.vpn_range.r = page_ceil((PhysAddr)&erodata);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
-  // info("mapping .data section\n");
+  //info("mapping .data section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&sdata);
   map_area.vpn_range.r = page_ceil((PhysAddr)&edata);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
-  // info("mapping .bss section\n");
+  //info("mapping .bss section\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&sbss_with_stack);
   map_area.vpn_range.r = page_ceil((PhysAddr)&ebss);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
-  // info("mapping physical memory\n");
+  //info("mapping physical memory\n");
   map_area.vpn_range.l = page_floor((PhysAddr)&ekernel);
   map_area.vpn_range.r = page_ceil((PhysAddr)MEMORY_END);
   map_area.map_type = MAP_IDENTICAL;
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
+  printk("memory_set_new_kernel end \n");
 }
 
 void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,
