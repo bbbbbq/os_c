@@ -14,6 +14,6 @@ struct TaskControlBlock *processor_take_current(Processor *processor);
 struct TaskContext *processor_get_idle_task_cx_ptr(Processor *processor);
 struct TaskControlBlock *processor_current_task();
 void processor_run_tasks();
-
 struct TrapContext *processor_current_trap_cx();
+void processor_schedule(struct TaskContext *switched_task_cx_ptr);
 #endif

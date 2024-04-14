@@ -7,6 +7,7 @@
 #include "loader.h"
 #include "mem.h"
 #include "task.h"
+#include "processor.h"
 struct AppManager app_manager;
 extern struct TaskManager TASK_MANAGER;
 void init_appmanager()
@@ -183,6 +184,9 @@ void task_manager_mark_current_suspended()
 
 void task_suspend_current_and_run_next() 
 {
-  task_manager_mark_current_suspended();
-  task_manager_run_next_task();
+  struct TaskControlBlock *task = processor_current_task();
+  struct TaskContext *task_cx_ptr = &task->task_cx;
+  task->task_status = Ready;
+  task_manager_add_2(&TASK_MANAGER_2,task);
+  processor_schedule(task_cx_ptr);
 }

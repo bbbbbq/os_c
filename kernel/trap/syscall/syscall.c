@@ -8,6 +8,7 @@
 #include "mem.h"
 #include "stdint.h"
 #include "trap.h"
+#include "processor.h"
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -21,9 +22,9 @@ int64_t write(uint64_t fd, char *buf, uint64_t len) {
 
   switch (fd) {
   case 1:
-    copy_byte_buffer(task_current_user_token(), sys_write_buf, (uint8_t *)buf,
+    copy_byte_buffer(processor_current_user_token(), sys_write_buf, (uint8_t *)buf,
                      len, FROM_USER);
-    for (uint64_t i = 0; i < len; i++) 
+    for (uint64_t i = 0; i < len; i++)
     {
       console_putchar(sys_write_buf[i]);
     }

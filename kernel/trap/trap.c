@@ -39,7 +39,7 @@ void print_sepc()
 
 void trap_handler() 
 {
-  printk("trap_handler \n");
+  //printk("trap_handler \n");
   set_kernel_trap_entry();
 
   struct TrapContext *cx = processor_current_trap_cx();
@@ -97,7 +97,7 @@ uint64_t task_current_user_token() {
 }
 
 void trap_return() {
-  printk("trap_return\n");
+  //printk("trap_return\n");
   set_user_trap_entry();
   uint64_t trap_cx_ptr = TRAP_CONTEXT;
   uint64_t user_satp = processor_current_user_token();
