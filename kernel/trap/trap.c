@@ -39,9 +39,10 @@ void print_sepc()
 
 void trap_handler() 
 {
+  printk("trap_handler \n");
   set_kernel_trap_entry();
 
-  struct TrapContext *cx = task_current_trap_cx();
+  struct TrapContext *cx = processor_current_trap_cx();
   uint64_t scause = r_scause();
 
   if (scause & (1ULL << 63)) {
