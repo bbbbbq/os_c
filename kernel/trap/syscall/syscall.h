@@ -19,4 +19,7 @@ int64_t write(uint64_t fd, char *buf, uint64_t count);
 int64_t yield();
 size_t read(int32_t fd, uint8_t *buf, size_t len);
 int64_t sys_waitpid(int64_t pid, int *exit_code_ptr);
+int64_t sys_fork();
+int64_t sys_exec(char *path);
+int64_t sys_getpid();
 #endif // SYSCALL_H

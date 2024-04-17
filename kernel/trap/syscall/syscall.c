@@ -191,3 +191,31 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
     ASSERT(0);
     return -1;
 }
+
+int64_t sys_getpid()
+{
+    struct TaskControlBlock *task = processor_current_task();
+    return (int64_t)task->pid;
+}
+
+int64_t sys_exec(char *path)
+{
+    char app_name[MAX_APP_NAME_LENGTH];
+    copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
+                     (uint8_t *)path, MAX_APP_NAME_LENGTH, FROM_USER);
+
+    uint8_t *data = loader_get_app_data_by_name(app_name);
+    size_t size = loader_get_app_size_by_name(app_name);
+    struct TaskControlBlock *task;
+
+    if (data)
+    {
+        task = processor_current_task();
+        task_control_block_exec(task, data, size);
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
+}
