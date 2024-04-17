@@ -15,11 +15,10 @@ struct AppManager
     uintptr_t app_end[MAX_APP_NUM];
 };
 
-
 typedef struct
 {
-    
-}TaskManager;
+
+} TaskManager;
 extern struct AppManager app_manager;
 extern uint64_t _num_app[];
 extern void __restore(uint64_t);
@@ -31,9 +30,13 @@ void run_first_app();
 struct TrapContext *get_trap_cx(struct TaskControlBlock *s);
 void task_manager_run_next_task();
 void task_control_block_free(struct TaskControlBlock *s);
-struct TrapContext *task_manager_get_current_trap_cx(); 
+struct TrapContext *task_manager_get_current_trap_cx();
 void task_exit_current_and_run_next();
 void task_manager_mark_current_exited();
 int64_t task_manager_find_next_task();
 void task_suspend_current_and_run_next();
+struct TaskControlBlock *task_control_block_fork(struct TaskControlBlock *parent);
+
+void task_control_block_exec(struct TaskControlBlock *s, uint8_t *elf_data,
+                             size_t elf_size);
 #endif

@@ -7,46 +7,49 @@ Processor PROCESSOR;
 extern void __switch(struct TaskContext *current_task_cx_ptr,
                      struct TaskContext *next_task_cx_ptr);
 
-
-void processor_init(Processor *processor) 
+void processor_init(Processor *processor)
 {
   processor->current = NULL;
   task_context_zero_init(&processor->idle_task_cx);
 }
 
-struct TaskControlBlock *processor_take_current(Processor *processor) {
+struct TaskControlBlock *processor_take_current(Processor *processor)
+{
   return processor->current;
 }
 
-
-struct TaskContext *processor_get_idle_task_cx_ptr(Processor *processor) {
+struct TaskContext *processor_get_idle_task_cx_ptr(Processor *processor)
+{
   return &processor->idle_task_cx;
 }
 
-
-static struct TaskControlBlock *processor_current(Processor *processor) {
+static struct TaskControlBlock *processor_current(Processor *processor)
+{
   return processor->current;
 }
 
-struct TaskControlBlock *processor_current_task() {
+struct TaskControlBlock *processor_current_task()
+{
   return processor_current(&PROCESSOR);
 }
 
-uint64_t processor_current_user_token() {
+uint64_t processor_current_user_token()
+{
   struct TaskControlBlock *task = processor_current_task();
   return task_control_block_get_user_token(task);
 }
 
-
-void processor_run_tasks() 
+void processor_run_tasks()
 {
   processor_init(&PROCESSOR);
   struct TaskControlBlock *task;
   struct TaskContext *idle_task_cx_ptr;
   struct TaskContext *next_task_cx_ptr;
-  while (1) {
+  while (1)
+  {
     task = task_manager_fetch_task();
-    if (task) {
+    if (task)
+    {
       idle_task_cx_ptr = processor_get_idle_task_cx_ptr(&PROCESSOR);
       next_task_cx_ptr = &task->task_cx;
       task->task_status = Running;
@@ -56,15 +59,14 @@ void processor_run_tasks()
   }
 }
 
-
-struct TrapContext *processor_current_trap_cx() {
+struct TrapContext *processor_current_trap_cx()
+{
   struct TaskControlBlock *task = processor_current_task();
   return task_control_block_get_trap_cx(task);
 }
 
-
-
-void processor_schedule(struct TaskContext *switched_task_cx_ptr) {
+void processor_schedule(struct TaskContext *switched_task_cx_ptr)
+{
   struct TaskContext *idle_task_cx_ptr = processor_get_idle_task_cx_ptr(&PROCESSOR);
   __switch(switched_task_cx_ptr, idle_task_cx_ptr);
 }

@@ -27,5 +27,7 @@
         "stack.h": "c",
         "taskmanager.h": "c",
         "processor.h": "c"
-    }
+    },
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
 }

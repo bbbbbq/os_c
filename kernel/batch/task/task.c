@@ -7,25 +7,22 @@
 #include "string.h"
 #include "mem.h"
 #include "trap.h"
-#include "loader.h" 
+#include "loader.h"
 #include "taskmanager.h"
 struct TaskManager TASK_MANAGER;
-static struct TaskControlBlock INITPROC;
-extern void __switch(struct TaskContext**,struct TaskContext**);
+struct TaskControlBlock INITPROC;
+extern void __switch(struct TaskContext **, struct TaskContext **);
 extern uint64_t _num_app[];
 
-
-
-struct TrapContext *task_control_block_get_trap_cx(struct TaskControlBlock *s) {
+struct TrapContext *task_control_block_get_trap_cx(struct TaskControlBlock *s)
+{
   return (struct TrapContext *)pn2addr(s->trap_cx_ppn);
 }
-
-
 
 // void task_manager_init()
 // {
 //    TASK_MANAGER.num_app = loader_get_num_app();
-//   for (unsigned i = 0; i < TASK_MANAGER.num_app; i++) 
+//   for (unsigned i = 0; i < TASK_MANAGER.num_app; i++)
 //   {
 //     task_control_block_new(loader_get_app_data(i), loader_get_app_size(i), i,
 //                            &TASK_MANAGER.tasks[i]);
@@ -34,34 +31,32 @@ struct TrapContext *task_control_block_get_trap_cx(struct TaskControlBlock *s) {
 //   TASK_MANAGER.current_task = 0;
 // }
 
-
-void run_next_task(uint64_t status) 
+void run_next_task(uint64_t status)
 {
   ASSERT(0);
-    // // 寻找ready的task
-    // uint64_t target_task_num;
-    // for (target_task_num = (TASK_MANAGER.current_task + 1) % MAX_APP_NUM; target_task_num != TASK_MANAGER.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
-    //     if (TASK_MANAGER.tasks[target_task_num].task_status == Ready) {
-    //         break;
-    //     }
-    // }
-    // // 没有ready的任务
-    // if ((target_task_num == TASK_MANAGER.current_task) && (TASK_MANAGER.tasks[target_task_num].task_status != Ready)) {
-    //     ASSERT(0);
-    // }
+  // // 寻找ready的task
+  // uint64_t target_task_num;
+  // for (target_task_num = (TASK_MANAGER.current_task + 1) % MAX_APP_NUM; target_task_num != TASK_MANAGER.current_task; target_task_num = (target_task_num + 1) % MAX_APP_NUM) {
+  //     if (TASK_MANAGER.tasks[target_task_num].task_status == Ready) {
+  //         break;
+  //     }
+  // }
+  // // 没有ready的任务
+  // if ((target_task_num == TASK_MANAGER.current_task) && (TASK_MANAGER.tasks[target_task_num].task_status != Ready)) {
+  //     ASSERT(0);
+  // }
 
-    // struct TaskControlBlock* target_task_tcb = &TASK_MANAGER.tasks[target_task_num];
-    // struct TaskControlBlock* current_task_tcb = &TASK_MANAGER.tasks[TASK_MANAGER.current_task];
+  // struct TaskControlBlock* target_task_tcb = &TASK_MANAGER.tasks[target_task_num];
+  // struct TaskControlBlock* current_task_tcb = &TASK_MANAGER.tasks[TASK_MANAGER.current_task];
 
-    // // 改变状态
-    // current_task_tcb->task_status = status;
-    // target_task_tcb->task_status = Running;
-    // TASK_MANAGER.current_task = target_task_num;
-    // __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
+  // // 改变状态
+  // current_task_tcb->task_status = status;
+  // target_task_tcb->task_status = Running;
+  // TASK_MANAGER.current_task = target_task_num;
+  // __switch(&(current_task_tcb->task_cx), &(target_task_tcb->task_cx));
 }
 
-
-// void run_first_task(void) 
+// void run_first_task(void)
 // {
 //     static struct TaskContext temp;
 //     TASK_MANAGER.tasks[TASK_MANAGER.current_task].task_status = Running;
@@ -70,23 +65,20 @@ void run_next_task(uint64_t status)
 //     ASSERT(0);
 // }
 
-
-uint64_t task_manager_get_current_token() 
+uint64_t task_manager_get_current_token()
 {
   uint64_t current = TASK_MANAGER.current_task;
   return get_user_token(&TASK_MANAGER.tasks[current]);
 }
 
-
-uint64_t get_user_token(struct TaskControlBlock *s) 
+uint64_t get_user_token(struct TaskControlBlock *s)
 {
   return memory_set_token(&s->memory_set);
 }
 
-
-
 void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
-                            size_t elf_size) {
+                            size_t elf_size)
+{
   uint64_t user_sp;
   uint64_t entry_point;
   memory_set_from_elf(&s->memory_set, elf_data, elf_size, &user_sp,
@@ -116,60 +108,55 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   s->stride = 0;
 }
 
-
 struct TrapContext *task_current_trap_cx()
 {
   return task_manager_get_current_trap_cx();
 }
 
-struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s) 
+struct TaskContext **get_task_cx_ptr2(struct TaskControlBlock *s)
 {
   return (struct TaskContext **)(&(s->task_cx));
 }
 
-enum TaskStatus get_status(struct TaskControlBlock* self) {
-    return self->task_status;
-}
-
-int is_zombie(struct TaskControlBlock* self) 
+enum TaskStatus get_status(struct TaskControlBlock *self)
 {
-    return get_status(self) == Zombie;
+  return self->task_status;
 }
 
-
-uint64_t getpid(struct TaskControlBlock* self) 
+int is_zombie(struct TaskControlBlock *self)
 {
-    return self->pid.pid;
+  return get_status(self) == Zombie;
 }
 
+uint64_t getpid(struct TaskControlBlock *self)
+{
+  return self->pid.pid;
+}
 
-
-void task_context_zero_init(struct TaskContext *cx) 
+void task_context_zero_init(struct TaskContext *cx)
 {
   cx->ra = 0;
   cx->sp = 0;
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 12; i++)
+  {
     cx->x[i] = 0;
   }
 }
 
-
-uint64_t task_control_block_get_user_token(struct TaskControlBlock *s) {
+uint64_t task_control_block_get_user_token(struct TaskControlBlock *s)
+{
   return memory_set_token(&s->memory_set);
 }
 
-
 void taks_init()
 {
-    PidAllocator_init(&PID_ALLOCATOR);
-    task_manager_init_2();
-    task_control_block_new(&INITPROC, loader_get_app_data_by_name("initproc"),
+  PidAllocator_init(&PID_ALLOCATOR);
+  task_manager_init_2();
+  task_control_block_new(&INITPROC, loader_get_app_data_by_name("initproc"),
                          loader_get_app_size_by_name("initproc"));
 }
 
-
-
 void task_manager_add_2_initproc()
 {
-  task_manager_add_2(&TASK_MANAGER_2,&INITPROC);
+  task_manager_add_2(&TASK_MANAGER_2, &INITPROC);
 }

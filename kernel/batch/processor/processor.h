@@ -2,7 +2,8 @@
 #define PROCESSOR_H
 #include "task.h"
 #include "taskmanager.h"
-typedef struct {
+typedef struct
+{
   struct TaskControlBlock *current;
   struct TaskContext idle_task_cx;
 } Processor;

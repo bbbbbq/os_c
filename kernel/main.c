@@ -29,13 +29,6 @@ int main_os()
     taks_init();
     task_manager_add_2_initproc();
     processor_run_tasks();
-    //task_manager_init();
-    // loader_init_and_list_apps();
-    // list_apps();
-    // processor_init(&PROCESSOR);
-    // task_manager_init_2();
-    // task_manager_add_2_initproc();
-    // //run_first_app();
-    // processor_run_tasks();
     ASSERT(0);
+    return 0;
 }

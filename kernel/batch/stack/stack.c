@@ -58,3 +58,12 @@ void kernel_stack_new(struct KernelStack *ks, PidHandle pid) {
                                   MAP_PERM_R | MAP_PERM_W);
   ks->pid = pid;
 }
+
+
+void kernel_stack_free(struct KernelStack* ks)
+{
+    VirtAddr kernel_stack_bottom_va =
+      (VirtAddr)kernel_stack_position_bottom(ks->pid.pid);
+    VirtPageNum kernel_stack_bottom_vpn = addr2pn(kernel_stack_bottom_va);
+    kernel_space_remove_area_with_start_vpn(kernel_stack_bottom_vpn);
+}
