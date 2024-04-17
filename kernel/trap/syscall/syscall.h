@@ -22,4 +22,5 @@ int64_t sys_waitpid(int64_t pid, int *exit_code_ptr);
 int64_t sys_fork();
 int64_t sys_exec(char *path);
 int64_t sys_getpid();
+
 #endif // SYSCALL_H
