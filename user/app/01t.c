@@ -1,17 +1,18 @@
+#include "syscall.h"
+#include "lib/string.h"
+#include "lib/stdio.h" // Make sure this header supports file operations if needed
 
-#include "lib/stdio.h"
-#include "user_lib.h"
-#include "type.h"
-
-
-i64 main( void ){
-    printf("01t yield\n");
-    //sys_yield();
-    printf("01t yield success\n");
-    for(u64 i = 0; i < 100000000; i ++){
-        if(i % 10000000 == 0){
-            printf("01t: %d\n", i / 10000000);
-        }
+int main()
+{
+    const char *text = "Hello, world from write syscall!\n";
+    const char *filename = "output.txt";
+    printf("Hello, world from write syscall!\n");
+    for (int i = 0; i < 1000000; i++)
+    {
+        if (i % 100000 == 0)
+            sys_yield();
+        if (i % 10000 == 0)
+            printf("[01t] : %d\n", i);
     }
     return 0;
 }

@@ -3,9 +3,7 @@
 #include "user_lib.h"
 #include "syscall.h"
 
-
-extern i64 main( void );
-
+extern int64_t main(void);
 
 /**
  *  @brief: user_lib总入口

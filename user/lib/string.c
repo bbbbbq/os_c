@@ -10,14 +10,14 @@ int strlen(const char *src)
     return i;
 }
 
-void memcpy(u8 *dest, const u8 *src, u32 len)
+void memcpy(uint8_t *dest, const uint8_t *src, uint32_t len)
 {
     for (; len != 0; len--) {
         *dest++ = *src++;
     }
 }
 
-int memcmp(const void *ptr1, const void *ptr2, u32 num)
+int memcmp(const void *ptr1, const void *ptr2, uint32_t num)
 {
     for (int i = 0; i < num; ++i) {
         if (((char*)ptr1)[i] != ((char*)ptr2)[i]) {
@@ -27,10 +27,10 @@ int memcmp(const void *ptr1, const void *ptr2, u32 num)
     return 0;
 }
 
-void memmove(u8 *dest, const u8 *src, u32 len)
+void memmove(uint8_t *dest, const uint8_t *src, uint32_t len)
 {
-    u8 temp[len];
-    i32 i;
+    uint8_t temp[len];
+    int32_t i;
     for (i = 0; len != 0; len--) {
         temp[i] = *src++;
     }
@@ -39,16 +39,16 @@ void memmove(u8 *dest, const u8 *src, u32 len)
     }
 }
 
-void memset(void *dest, u8 val, u32 len)
+void memset(void *dest, uint8_t val, uint32_t len)
 {
-    u8 *dst = (u8 *)dest;
+    uint8_t *dst = (uint8_t *)dest;
 
     for (; len != 0; len--) {
         *dst++ = val;
     }
 }
 
-void bzero(void *dest, u32 len) { memset(dest, 0, len); }
+void bzero(void *dest, uint32_t len) { memset(dest, 0, len); }
 
 int strcmp(const char *str1, const char *str2)
 {

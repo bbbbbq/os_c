@@ -10,17 +10,24 @@ TARGET_DIR = ./target
 APP_DIR = ./app
 LIB_DIR = ./lib
 
-# 自动寻找 app 目录下的所有 c 文件
+# Auto-find C files in app directory
 APP_SRCS = $(wildcard $(APP_DIR)/*.c)
-# 将每个 c 文件名映射到 target 目录下的 elf 文件
+# Map each C file to an ELF file in the target directory
 APP_TARGETS = $(patsubst $(APP_DIR)/%.c,$(TARGET_DIR)/%.elf,$(APP_SRCS))
 
-# 其他源文件
+# Other source files
 COMMON_SRCS = ./start.s ./main.c ./syscall.c $(LIB_DIR)/printf.c $(LIB_DIR)/string.c
 
-build: $(APP_TARGETS)
+# Ensure the target directory exists before building anything
+.PHONY: all build clean dump
+all: build
 
-# 通用规则，用于生成每个应用程序的 ELF 文件
+build: $(TARGET_DIR) $(APP_TARGETS)
+
+$(TARGET_DIR):
+	mkdir -p $(TARGET_DIR)
+
+# Rule to create each ELF file
 $(TARGET_DIR)/%.elf: $(APP_DIR)/%.c $(COMMON_SRCS)
 	$(CC) $^ -o $@ -T$(SRC_LINKER) -I$(INC_DIR) -nostdinc -nostdlib -mcmodel=medany -fno-builtin
 	$(OBJCOPY) --strip-all $@ -O binary $@.bin
@@ -29,4 +36,4 @@ dump:
 	$(OBJDUMP) -h $(APP_TARGETS)
 
 clean:
-	rm -f $(TARGET_DIR)/*
+	rm -rf $(TARGET_DIR)/*

@@ -1,7 +1,7 @@
 
 #include "lib/stdio.h"
 #include "syscall.h"
-
+#include "lib/string.h"
 #define SYSCALL_WRITE      64
 #define SYSCALL_EXIT       93
 #define SYSCALL_YIELD     124
@@ -12,7 +12,7 @@
  *  @brief: 调用sbi输出函数，参数为固定要求，由_vprintk & _vprints调用
  */
 void port_write(char *buf) {
-    sys_write(FD_STDOUT, buf);
+    sys_write(FD_STDOUT, buf, strlen(buf));
 }
 
 
@@ -303,9 +303,9 @@ int vprintk_port(const char *fmt, va_list _va)
     return _vprintk_port(fmt, _va, port_write);
 }
 
-u32 printk_port(const char *fmt, ...)
+uint32_t printk_port(const char *fmt, ...)
 {
-    u32 ret = 0;
+    uint32_t ret = 0;
     va_list va;
 
     va_start(va, fmt);

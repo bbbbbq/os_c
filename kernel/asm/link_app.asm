@@ -11,15 +11,15 @@ _num_app:
 
   .global _app_names
 _app_names:
-  .string "initproc"
+  .string "00t"
   .string "01t"
-  .string "02t"
+  .string "initproc"
 
   .section .data
   .global app_0_start
   .global app_0_end
 app_0_start:
-  .incbin "../../user/target/initproc.elf"
+  .incbin "../../user/target/00t.elf"
 app_0_end:
 
   .section .data
@@ -33,5 +33,5 @@ app_1_end:
   .global app_2_start
   .global app_2_end
 app_2_start:
-  .incbin "../../user/target/02t.elf"
+  .incbin "../../user/target/initproc.elf"
 app_2_end:

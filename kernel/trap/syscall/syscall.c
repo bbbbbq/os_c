@@ -9,6 +9,7 @@
 #include "stdint.h"
 #include "trap.h"
 #include "processor.h"
+#include "timer.h"
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -17,7 +18,7 @@ int32_t exit(int32_t value)
     return value;
 }
 
-int64_t write(uint64_t fd, char *buf, uint64_t len)
+int64_t write(uint64_t fd, char *buf, size_t count)
 {
     static uint8_t sys_write_buf[1024];
 
@@ -25,12 +26,12 @@ int64_t write(uint64_t fd, char *buf, uint64_t len)
     {
     case 1:
         copy_byte_buffer(processor_current_user_token(), sys_write_buf, (uint8_t *)buf,
-                         len, FROM_USER);
-        for (uint64_t i = 0; i < len; i++)
+                         count, FROM_USER);
+        for (uint64_t i = 0; i < count; i++)
         {
             console_putchar(sys_write_buf[i]);
         }
-        return (int64_t)len;
+        return (int64_t)count;
     default:
         break;
     }
@@ -44,9 +45,9 @@ int64_t yield()
     return 1;
 }
 
-int64_t sys_write(uint64_t fd, char *buf, uint64_t count)
+int64_t sys_write(uint64_t fd, char *buf, size_t count)
 {
-    return write(fd, buf, count); // 使用POSIX write
+    return write(fd, buf, count);
 }
 
 void sys_exit(int32_t status)
@@ -131,6 +132,7 @@ int64_t sys_waitpid(int64_t pid, int *exit_code_ptr)
 }
 int64_t sys_fork()
 {
+    printk("[kernel] sys_fork \n\n");
     struct TaskControlBlock *current_task = processor_current_task();
     struct TaskControlBlock *new_task = task_control_block_fork(current_task);
     PidHandle new_pid = new_task->pid;
@@ -149,6 +151,12 @@ int64_t sys_fork()
     return (int64_t)new_pid.pid;
 }
 
+int64_t sys_getpid()
+{
+    struct TaskControlBlock *task = processor_current_task();
+    return (int64_t)task->pid.pid;
+}
+
 int64_t sys_exec(char *path)
 {
     char app_name[MAX_APP_NAME_LENGTH];
@@ -169,53 +177,57 @@ int64_t sys_exec(char *path)
     {
         return -1;
     }
+}
+
+int64_t sys_get_time(TimeVal *ts, int64_t tz)
+{
+    TimeVal sys_ts;
+    int64_t time_us = timer_get_time_us();
+    sys_ts.sec = time_us / USEC_PER_SEC;
+    sys_ts.usec = time_us % USEC_PER_SEC;
+    copy_byte_buffer(processor_current_user_token(), (uint8_t *)&sys_ts,
+                     (uint8_t *)ts, sizeof(TimeVal), TO_USER);
+    return 0;
 }
 
 int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
 {
-    // printk("syscall\n");
     switch (syscall_id)
     {
+    case SYSCALL_WAITPID:
+        return sys_waitpid((int64_t)a0, (int *)a1);
+    case SYSCALL_READ:
+        return read(a0, (char *)a1, a2);
     case SYSCALL_WRITE:
         return sys_write(a0, (char *)a1, a2);
     case SYSCALL_EXIT:
-        sys_exit((int32_t)a0);
-        task_exit_current_and_run_next();
-    case SYSCALL_YIELD:
-        // task_exit_current_and_run_next();
-        return sys_yield();
-    default:
-        print_str("unsupportable syscall_id\n");
-        ASSERT(0);
-    }
-    ASSERT(0);
-    return -1;
-}
-
-int64_t sys_getpid()
-{
-    struct TaskControlBlock *task = processor_current_task();
-    return (int64_t)task->pid;
-}
-
-int64_t sys_exec(char *path)
-{
-    char app_name[MAX_APP_NAME_LENGTH];
-    copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
-                     (uint8_t *)path, MAX_APP_NAME_LENGTH, FROM_USER);
-
-    uint8_t *data = loader_get_app_data_by_name(app_name);
-    size_t size = loader_get_app_size_by_name(app_name);
-    struct TaskControlBlock *task;
-
-    if (data)
-    {
-        task = processor_current_task();
-        task_control_block_exec(task, data, size);
-        return 0;
-    }
-    else
-    {
+        sys_exit((int)a0);
         return -1;
+    case SYSCALL_YIELD:
+        return yield();
+    // case SYSCALL_SET_PRIORITY:
+    //     return set_priority((int64_t)a0);
+    case SYSCALL_GET_TIME:
+        return sys_get_time((TimeVal *)a0, (int64_t)a1);
+    case SYSCALL_GETPID:
+        return sys_getpid();
+    // case SYSCALL_MUNMAP:
+    //     return sys_munmap(a0, a1);
+    case SYSCALL_FORK:
+        printk("[kernel] sys_fork \n\n");
+        return sys_fork();
+    case SYSCALL_EXEC:
+        return sys_exec((char *)a0);
+    // case SYSCALL_MMAP:
+    //     return sys_mmap(a0, a1, a2);
+    // case SYSCALL_WAITPID:
+    //     return sys_waitpid((int64_t)a0, (int *)a1);
+    // case SYSCALL_SPAWN:
+    //     return sys_spawn((char *)a0);
+    default:
+        printk("unsopport_sys_id %d", syscall_id);
+        ASSERT(0);
+        break;
     }
+    return -1;
 }

@@ -39,3 +39,20 @@ void intr_timer_handle()
     //     print_str("\n");
     // }else if(ticks==200) ticks=0;
 }
+
+uint64_t timer_get_time()
+{
+    uint64_t time;
+    asm volatile("rdtime %0" : "=r"(time));
+    return time;
+}
+
+uint64_t timer_get_time_us()
+{
+    return timer_get_time() / (CLOCK_FREQ / USEC_PER_SEC);
+}
+
+void timer_set_next_trigger()
+{
+    sbi_set_timer(timer_get_time() + CLOCK_FREQ / TICKS_PER_SEC);
+}

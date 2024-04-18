@@ -44,14 +44,6 @@ size_t loader_get_app_size(uint64_t app_id)
 
     // 计算并返回应用程序的大小
     size_t app_size = app_starts_ends[app_id + 1] - app_starts_ends[app_id];
-    
-    // for (uint64_t i = 0; i < num_app; i++) {
-    //     printk("App %d Start/End Address: %d\n", i, (uint64_t)app_starts_ends[i]);
-    // }
-    
-    // printk("App ID: %d Size: %d\n", app_id, app_size);
-    //ASSERT(0);
-    //printk("App ID: %d Size: %d\n", app_id, app_size);
     return app_size;
 }
 
@@ -80,14 +72,17 @@ void list_apps()
 
 uint8_t* loader_get_app_data_by_name(char* name) 
 {
-    int num_app = loader_get_num_app();
-    for (int i = 0; i < num_app; i++) 
+  print_str("current task: ");
+  print_str(name);
+  print_str("\n");
+  int num_app = loader_get_num_app();
+  for (int i = 0; i < num_app; i++)
+  {
+    if (strcmp_t(APP_NAMES[i], name) == 0)
     {
-        if (strcmp_t(APP_NAMES[i], name) == 0) 
-        {
-            return loader_get_app_data(i);
-        }
+      return loader_get_app_data(i);
     }
+  }
     return NULL; // Return NULL if no match is found
 }
 

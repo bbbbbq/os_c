@@ -7,4 +7,4 @@ obj/kernel/trap/syscall/syscall.o: kernel/trap/syscall/syscall.c \
  kernel/string/string.h kernel/batch/pid/pid.h kernel/batch/batch.h \
  kernel/batch/context/context.h kernel/sbi/sbi.h kernel/trap/trap.h \
  kernel/batch/processor/processor.h kernel/batch/task/taskmanager.h \
- kernel/data_structure/queue.h
+ kernel/data_structure/queue.h kernel/trap/timer/timer.h
