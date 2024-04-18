@@ -14,7 +14,8 @@
 /*
 ** Get the section type.
 */
-uint32_t elf_section_get_type(t_elf *elf, t_elf_section *section) {
+uint32_t elf_section_get_type(t_elf *elf, t_elf_section *section)
+{
   uint32_t type;
 
   if (ELF_IS_32(elf))
@@ -27,7 +28,8 @@ uint32_t elf_section_get_type(t_elf *elf, t_elf_section *section) {
 /*
 ** Get the section offset (from the begin of the file)
 */
-size_t elf_section_get_offset(t_elf *elf, t_elf_section *section) {
+size_t elf_section_get_offset(t_elf *elf, t_elf_section *section)
+{
   size_t offset;
 
   if (ELF_IS_32(elf))
@@ -40,7 +42,8 @@ size_t elf_section_get_offset(t_elf *elf, t_elf_section *section) {
 /*
 ** Get the size of the section
 */
-size_t elf_section_get_size(t_elf *elf, t_elf_section *section) {
+size_t elf_section_get_size(t_elf *elf, t_elf_section *section)
+{
   size_t size;
 
   if (ELF_IS_32(elf))

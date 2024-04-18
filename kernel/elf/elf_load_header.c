@@ -14,9 +14,10 @@
 /*
 ** Load the identity of the file.
 */
-static int elf_load_ident(t_elf *elf) 
+static int elf_load_ident(t_elf *elf)
 {
-  if (elf->size < EI_NIDENT || memcmp(elf->raw_data, ELFMAG, 4)) {
+  if (elf->size < EI_NIDENT || memcmp(elf->raw_data, ELFMAG, 4))
+  {
     return (-1);
   }
   elf->ident = elf->raw_data;
@@ -28,19 +29,22 @@ static int elf_load_ident(t_elf *elf)
 ** The identity is loaded first. Then, when the file class has been
 ** reconized, the entire header is loaded in the field 'elf->header'
 */
-int elf_load_header(t_elf *elf) {
-  //printk("eld load_header\n");
+int elf_load_header(t_elf *elf)
+{
+  // printk("eld load_header\n");
   if (elf_load_ident(elf) == -1)
     return (-1);
   if ((elf->class = elf->ident[EI_CLASS]) != ELFCLASS32 &&
-      elf->class != ELFCLASS64) {
+      elf->class != ELFCLASS64)
+  {
     return (-1);
   }
   elf->header = (t_elf_header *)elf->raw_data;
   if ((elf->class == ELFCLASS32 && elf->size < sizeof(Elf32_Ehdr)) ||
-      (elf->class == ELFCLASS64 && elf->size < sizeof(Elf64_Ehdr))) {
+      (elf->class == ELFCLASS64 && elf->size < sizeof(Elf64_Ehdr)))
+  {
     return (-1);
   }
-  //printk("eld load end\n");
+  // printk("eld load end\n");
   return (0);
 }

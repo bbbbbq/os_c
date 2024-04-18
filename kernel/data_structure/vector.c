@@ -6,32 +6,36 @@
 #include "debug.h"
 #define VECTOR_INIT_CAPACITY 8
 
-void vector_new(struct vector *v, uint64_t dsize) {
+void vector_new(struct vector *v, uint64_t dsize)
+{
   v->size = 0;
   v->capacity = VECTOR_INIT_CAPACITY;
   v->dsize = dsize;
   v->buffer = bd_malloc(v->capacity * v->dsize);
 }
 
-void vector_push(struct vector *v, void *d) {
-  if (v->size == v->capacity) {
+void vector_push(struct vector *v, void *d)
+{
+  if (v->size == v->capacity)
+  {
     v->capacity <<= 1;
     char *t = bd_malloc(v->capacity * v->dsize);
-    memcpy((uint8_t*)t, (uint8_t*)v->buffer, v->size * v->dsize);
+    memcpy((uint8_t *)t, (uint8_t *)v->buffer, v->size * v->dsize);
     bd_free(v->buffer);
     v->buffer = t;
   }
-  memcpy((uint8_t*)(v->buffer + (v->size++) * v->dsize), d, v->dsize);
+  memcpy((uint8_t *)(v->buffer + (v->size++) * v->dsize), d, v->dsize);
 }
 
-void vector_pop(struct vector *v) 
+void vector_pop(struct vector *v)
 {
   if (v->size == 0)
     panic("empty vector pop\n");
   v->size--;
 }
 
-void *vector_back(struct vector *v) {
+void *vector_back(struct vector *v)
+{
   if (!v->size)
     panic("empty vector back\n");
   return v->buffer + (v->size - 1) * v->dsize;
@@ -41,7 +45,8 @@ int vector_empty(struct vector *v) { return !v->size; }
 
 void vector_free(struct vector *v) { bd_free(v->buffer); }
 
-void vector_remove(struct vector *v, uint64_t idx) {
+void vector_remove(struct vector *v, uint64_t idx)
+{
   if (idx >= v->size)
   {
     panic("invalid idx in vector remove\n");
@@ -51,15 +56,16 @@ void vector_remove(struct vector *v, uint64_t idx) {
   v->size--;
 }
 
-
-void *vector_get(struct vector *v, uint64_t index) {
-    if (index >= v->size) {
-        return NULL;
-    }
-    return (void *)(v->buffer + (index * v->dsize));
+void *vector_get(struct vector *v, uint64_t index)
+{
+  if (index >= v->size)
+  {
+    return NULL;
+  }
+  return (void *)(v->buffer + (index * v->dsize));
 }
 
 uint64_t vector_size(struct vector *v)
 {
-    return v->size;
+  return v->size;
 }

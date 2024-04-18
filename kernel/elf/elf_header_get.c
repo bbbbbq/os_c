@@ -11,7 +11,8 @@
 
 #include "elfparse.h"
 
-size_t elf_header_get_entry(t_elf *elf) {
+size_t elf_header_get_entry(t_elf *elf)
+{
   size_t entry;
 
   if (ELF_IS_32(elf))

@@ -17,17 +17,18 @@ typedef unsigned long int uint64_t;
 typedef long int intptr_t;
 typedef unsigned long int uintptr_t;
 typedef uint64_t size_t;
-typedef enum {
+typedef enum
+{
     false, // 0
     true   // 1
 } bool;
 
-#define NULL ((void*)0)
+#define NULL ((void *)0)
 // 最小和最大值
 #define INT8_MIN (-128)
-#define INT16_MIN (-32767-1)
-#define INT32_MIN (-2147483647-1)
-#define INT64_MIN (-9223372036854775807L-1)
+#define INT16_MIN (-32767 - 1)
+#define INT32_MIN (-2147483647 - 1)
+#define INT64_MIN (-9223372036854775807L - 1)
 
 #define INT8_MAX (127)
 #define INT16_MAX (32767)
@@ -39,20 +40,20 @@ typedef enum {
 #define UINT32_MAX (4294967295U)
 #define UINT64_MAX (18446744073709551615UL)
 
-#define READ_CSR(reg) ({ \
-    unsigned long __val; \
-    asm volatile ("csrr %0, " #reg : "=r"(__val)); \
-    __val; \
+#define READ_CSR(reg) ({                          \
+    unsigned long __val;                          \
+    asm volatile("csrr %0, " #reg : "=r"(__val)); \
+    __val;                                        \
 })
 
-#define WRITE_CSR(reg, val) ({ \
-    asm volatile ("csrw " #reg ", %0" :: "rK"(val)); \
+#define WRITE_CSR(reg, val) ({                     \
+    asm volatile("csrw " #reg ", %0" ::"rK"(val)); \
 })
 
 #define SSTATUS_SIE_BIT (1UL << 1) // Supervisor Interrupt Enable bit in sstatus
 #define SIE_SSIE_BIT (1UL << 1)    // Software Interrupt Enable for S-mode
 #define SIE_STIE_BIT (1UL << 5)    // Timer Interrupt Enable for S-mode
 #define SIE_SEIE_BIT (1UL << 9)    // External Interrupt Enable for S-mode
-#define SSTATUS_SPP (1L << 8)  // Previous mode, 1=Supervisor, 0=User
+#define SSTATUS_SPP (1L << 8)      // Previous mode, 1=Supervisor, 0=User
 
 #endif // _STDINT_H

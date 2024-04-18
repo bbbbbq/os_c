@@ -5,7 +5,8 @@
 /*
 ** Get the program type.
 */
-uint32_t elf_program_get_type(t_elf *elf, t_elf_program *program) {
+uint32_t elf_program_get_type(t_elf *elf, t_elf_program *program)
+{
   uint32_t type;
 
   if (ELF_IS_32(elf))
@@ -18,7 +19,8 @@ uint32_t elf_program_get_type(t_elf *elf, t_elf_program *program) {
 /*
 ** Get the program offset (from the begin of the file)
 */
-size_t elf_program_get_offset(t_elf *elf, t_elf_program *program) {
+size_t elf_program_get_offset(t_elf *elf, t_elf_program *program)
+{
   size_t offset;
 
   if (ELF_IS_32(elf))
@@ -31,7 +33,8 @@ size_t elf_program_get_offset(t_elf *elf, t_elf_program *program) {
 /*
 ** Get the flags of the program
 */
-uint64_t elf_program_get_flags(t_elf *elf, t_elf_program *program) {
+uint64_t elf_program_get_flags(t_elf *elf, t_elf_program *program)
+{
   uint64_t flags;
 
   if (ELF_IS_32(elf))
@@ -44,7 +47,8 @@ uint64_t elf_program_get_flags(t_elf *elf, t_elf_program *program) {
 /*
 ** Get the virtual address of the program
 */
-uint64_t elf_program_get_vaddr(t_elf *elf, t_elf_program *program) {
+uint64_t elf_program_get_vaddr(t_elf *elf, t_elf_program *program)
+{
   uint64_t addr;
 
   if (ELF_IS_32(elf))
@@ -57,7 +61,8 @@ uint64_t elf_program_get_vaddr(t_elf *elf, t_elf_program *program) {
 /*
 ** Get the memory size of the program
 */
-uint64_t elf_program_get_memsz(t_elf *elf, t_elf_program *program) {
+uint64_t elf_program_get_memsz(t_elf *elf, t_elf_program *program)
+{
   uint64_t addr;
 
   if (ELF_IS_32(elf))
@@ -70,7 +75,8 @@ uint64_t elf_program_get_memsz(t_elf *elf, t_elf_program *program) {
 /*
 ** Get the file size of the program
 */
-uint64_t elf_program_get_filesz(t_elf *elf, t_elf_program *program) {
+uint64_t elf_program_get_filesz(t_elf *elf, t_elf_program *program)
+{
   uint64_t addr;
 
   if (ELF_IS_32(elf))

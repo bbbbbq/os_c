@@ -2,7 +2,7 @@
 #define TIMER_H
 #include "stdint.h"
 #include "console.h"
-static uint64_t ticks=0;
+static uint64_t ticks = 0;
 #define TIMEBASE 1000
 
 #define TICKS_PER_SEC 100
@@ -13,7 +13,7 @@ typedef struct
     uint64_t usec;
 } TimeVal;
 
-void timer_init(); 
+void timer_init();
 void intr_timer_handle();
 uint64_t timer_get_time();
 uint64_t timer_get_time_us();

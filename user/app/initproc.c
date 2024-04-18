@@ -8,9 +8,9 @@ int64_t main(void)
 
     // Demonstrating the use of the fork system call
     int64_t pid = sys_fork();
-    int64_t pid_01t = sys_exec("01t");
+    // int64_t pid_01t = sys_exec("01t");
 
-    printf("[user] pid_01t pid : %d\n", pid_01t);
+    // printf("[user] pid_01t pid : %d\n", pid_01t);
     printf("children pid : %d \n", pid);
     if (pid == 0)
     { // Child process

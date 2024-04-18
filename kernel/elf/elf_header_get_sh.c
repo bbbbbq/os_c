@@ -14,7 +14,8 @@
 /*
 ** Get the section header table offset
 */
-size_t elf_header_get_shoff(t_elf *elf) {
+size_t elf_header_get_shoff(t_elf *elf)
+{
   size_t shoff;
 
   if (ELF_IS_32(elf))
@@ -27,7 +28,8 @@ size_t elf_header_get_shoff(t_elf *elf) {
 /*
 ** Get the size of one section header
 */
-size_t elf_header_get_shentsize(t_elf *elf) {
+size_t elf_header_get_shentsize(t_elf *elf)
+{
   size_t shentsize;
 
   if (ELF_IS_32(elf))
@@ -40,7 +42,8 @@ size_t elf_header_get_shentsize(t_elf *elf) {
 /*
 ** Get the number of entry in the section header table
 */
-size_t elf_header_get_shnum(t_elf *elf) {
+size_t elf_header_get_shnum(t_elf *elf)
+{
   size_t shum;
 
   if (ELF_IS_32(elf))

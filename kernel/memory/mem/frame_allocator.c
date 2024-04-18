@@ -3,7 +3,8 @@
 #include "mem.h"
 #include "string.h"
 #include "debug.h"
-typedef struct {
+typedef struct
+{
   PhysPageNum current;
   PhysPageNum end;
   struct vector recycled;
@@ -11,7 +12,8 @@ typedef struct {
 
 static StackFrameAllocator FRAME_ALLOCATOR;
 
-void frame_allocator_init() {
+void frame_allocator_init()
+{
   extern uint8_t ekernel;
   FRAME_ALLOCATOR.current = page_ceil((PhysAddr)&ekernel);
   FRAME_ALLOCATOR.end = page_floor(MEMORY_END);
@@ -20,17 +22,22 @@ void frame_allocator_init() {
 
 void frame_allocator_free() { vector_free(&FRAME_ALLOCATOR.recycled); }
 
-PhysPageNum frame_alloc() 
+PhysPageNum frame_alloc()
 {
   PhysPageNum ppn = 0;
-  if (!vector_empty(&FRAME_ALLOCATOR.recycled)) 
+  if (!vector_empty(&FRAME_ALLOCATOR.recycled))
   {
     ppn = *(PhysPageNum *)vector_back(&FRAME_ALLOCATOR.recycled);
     vector_pop(&FRAME_ALLOCATOR.recycled);
-  } else {
-    if (FRAME_ALLOCATOR.current == FRAME_ALLOCATOR.end) {
+  }
+  else
+  {
+    if (FRAME_ALLOCATOR.current == FRAME_ALLOCATOR.end)
+    {
       panic("No empty physical page.\n");
-    } else {
+    }
+    else
+    {
       ppn = FRAME_ALLOCATOR.current;
       FRAME_ALLOCATOR.current++;
     }
@@ -39,32 +46,39 @@ PhysPageNum frame_alloc()
   return ppn;
 }
 
-void frame_dealloc(PhysPageNum ppn) {
+void frame_dealloc(PhysPageNum ppn)
+{
   bool in_recycled = false;
   PhysPageNum *x = (PhysPageNum *)(FRAME_ALLOCATOR.recycled.buffer);
-  for (uint64_t i = 0; i < FRAME_ALLOCATOR.recycled.size; i++) {
-    if (x[i] == ppn) {
+  for (uint64_t i = 0; i < FRAME_ALLOCATOR.recycled.size; i++)
+  {
+    if (x[i] == ppn)
+    {
       in_recycled = true;
       break;
     }
   }
-  if (ppn >= FRAME_ALLOCATOR.current || in_recycled) {
+  if (ppn >= FRAME_ALLOCATOR.current || in_recycled)
+  {
     panic("Frame ppn= has not been allocated!\n");
   }
   vector_push(&FRAME_ALLOCATOR.recycled, &ppn);
 }
 
-uint64_t frame_remaining_pages() {
+uint64_t frame_remaining_pages()
+{
   uint64_t x = (uint64_t)(FRAME_ALLOCATOR.end - FRAME_ALLOCATOR.current);
   uint64_t y = (uint64_t)FRAME_ALLOCATOR.recycled.size;
   return x + y;
 }
 
-void frame_allocator_print() {
+void frame_allocator_print()
+{
   PhysPageNum *x = (PhysPageNum *)(FRAME_ALLOCATOR.recycled.buffer);
   printk("FRAME_ALLOCATOR current = %llx, recycled = [ ",
          FRAME_ALLOCATOR.current);
-  for (uint64_t i = 0; i < FRAME_ALLOCATOR.recycled.size; i++) {
+  for (uint64_t i = 0; i < FRAME_ALLOCATOR.recycled.size; i++)
+  {
     printk("%llx ", x[i]);
   }
   printk("]\n");

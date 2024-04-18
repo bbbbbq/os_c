@@ -14,7 +14,8 @@
 /*
 ** Get the program header table offset
 */
-size_t elf_header_get_phoff(t_elf *elf) {
+size_t elf_header_get_phoff(t_elf *elf)
+{
   size_t phoff;
 
   if (ELF_IS_32(elf))
@@ -27,7 +28,8 @@ size_t elf_header_get_phoff(t_elf *elf) {
 /*
 ** Get the size of one program header
 */
-size_t elf_header_get_phentsize(t_elf *elf) {
+size_t elf_header_get_phentsize(t_elf *elf)
+{
   size_t phentsize;
 
   if (ELF_IS_32(elf))
@@ -40,7 +42,8 @@ size_t elf_header_get_phentsize(t_elf *elf) {
 /*
 ** Get the number of entry in the program header table
 */
-size_t elf_header_get_phnum(t_elf *elf) {
+size_t elf_header_get_phnum(t_elf *elf)
+{
   size_t phnum;
 
   if (ELF_IS_32(elf))

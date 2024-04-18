@@ -12,23 +12,24 @@
 #include "taskmanager.h"
 extern uint8_t sbss, ebss;
 
-void clear_bss() {
-  for (uint8_t *i = &sbss; i < &ebss; i++) {
+void clear_bss()
+{
+  for (uint8_t *i = &sbss; i < &ebss; i++)
+  {
     *i = 0;
   }
 }
 
-
 int main_os()
 {
-    mm_init();
-    printk("123%d\n",123);
-    init_trap();
-    timer_init();
-    loader_init_and_list_apps();
-    taks_init();
-    task_manager_add_2_initproc();
-    processor_run_tasks();
-    ASSERT(0);
-    return 0;
+  mm_init();
+  printk("123%d\n", 123);
+  init_trap();
+  timer_init();
+  loader_init_and_list_apps();
+  taks_init();
+  task_manager_add_2_initproc();
+  processor_run_tasks();
+  ASSERT(0);
+  return 0;
 }

@@ -9,31 +9,37 @@
 #define ELF_IS_32(e) ((e)->class == ELFCLASS32)
 #define ELF_IS_64(e) ((e)->class == ELFCLASS64)
 
-typedef union {
+typedef union
+{
   Elf32_Ehdr _32;
   Elf64_Ehdr _64;
 } t_elf_header;
 
-typedef struct {
-  union u_elf_sh {
+typedef struct
+{
+  union u_elf_sh
+  {
     Elf32_Shdr _32;
     Elf64_Shdr _64;
-  } * header;
+  } *header;
   uint8_t *content;
 } t_elf_section;
 
-typedef struct {
-  union u_elf_ph {
+typedef struct
+{
+  union u_elf_ph
+  {
     Elf32_Phdr _32;
     Elf64_Phdr _64;
-  } * header;
+  } *header;
   uint8_t *content;
 } t_elf_program;
 
 #define MAX_SECTION_NUM 64
 #define MAX_PROGRAM_NUM 64
 
-typedef struct {
+typedef struct
+{
   size_t size;
   uint8_t *raw_data;
   uint8_t *ident;

@@ -4,9 +4,9 @@
 #include "stdint.h"
 
 // 类型定义
-typedef uint8_t u8; // 保证u8是无符号8位整数
+typedef uint8_t u8;   // 保证u8是无符号8位整数
 typedef uint32_t u32; // 保证u32是无符号32位整数
-typedef int32_t i32; // 保证i32是有符号32位整数
+typedef int32_t i32;  // 保证i32是有符号32位整数
 
 int strlen_t(const char *src);
 void memcpy_t(u8 *dest, const u8 *src, u32 len);
