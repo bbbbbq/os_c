@@ -7,4 +7,5 @@ obj/kernel/main.o: kernel/main.c kernel/console/console.h \
  kernel/string/string.h kernel/batch/pid/pid.h kernel/trap/timer/timer.h \
  kernel/batch/loader/loader.h kernel/batch/processor/processor.h \
  kernel/batch/task/taskmanager.h kernel/data_structure/queue.h \
- kernel/virtio/virtio.h
+ kernel/virtio/virtio.h kernel/fs/block_cache/block_cache.h \
+ kernel/data_structure/list.h
