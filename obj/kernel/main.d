@@ -6,4 +6,5 @@ obj/kernel/main.o: kernel/main.c kernel/console/console.h \
  kernel/data_structure/vector.h kernel/memory/buddy/buddy.h \
  kernel/string/string.h kernel/batch/pid/pid.h kernel/trap/timer/timer.h \
  kernel/batch/loader/loader.h kernel/batch/processor/processor.h \
- kernel/batch/task/taskmanager.h kernel/data_structure/queue.h
+ kernel/batch/task/taskmanager.h kernel/data_structure/queue.h \
+ kernel/virtio/virtio.h

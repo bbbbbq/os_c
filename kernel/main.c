@@ -10,6 +10,7 @@
 #include "loader.h"
 #include "processor.h"
 #include "taskmanager.h"
+#include "virtio.h"
 extern uint8_t sbss, ebss;
 
 void clear_bss()
@@ -23,6 +24,7 @@ void clear_bss()
 int main_os()
 {
   mm_init();
+  virtio_disk_init();
   printk("123%d\n", 123);
   init_trap();
   timer_init();

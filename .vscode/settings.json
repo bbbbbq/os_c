@@ -27,7 +27,12 @@
         "stack.h": "c",
         "taskmanager.h": "c",
         "processor.h": "c",
-        "vector": "c"
+        "vector": "c",
+        "assert.h": "c",
+        "list.h": "c",
+        "blockdevice.h": "c",
+        "block_cache.h": "c",
+        "block_device.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

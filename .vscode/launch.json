@@ -5,7 +5,7 @@
             "name": "QEMU Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/caigoubencai/Desktop/os_c/obj/os_kernel.bin",
+            "program": "/home/caigoubencai/Desktop/os_c-ch6/obj/os_kernel.bin",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
