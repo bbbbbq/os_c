@@ -31,6 +31,11 @@ struct BlockCache
   uint64_t ref; // 引用计数
 };
 
+int alloc3_desc(int *idx);
+void free_chain(int i);
+void free_desc(int i);
+int alloc_desc();
+void virtio_disk_rw(BlockCache *b, int write);
 void BlockCache_manager_init();
 BlockCache *BlockCache_find_block_by_index(BlockDevice *blockdevice, uint64_t index);
 void block_cache_release(BlockCache *b);
