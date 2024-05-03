@@ -1,5 +1,5 @@
-#ifndef _STDINT_H
-#define _STDINT_H
+#ifndef STDINT_H
+#define STDINT_H
 
 // 定义有符号整数
 typedef signed char int8_t;

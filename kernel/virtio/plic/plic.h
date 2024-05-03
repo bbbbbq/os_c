@@ -14,5 +14,8 @@
 #define PLIC_REG32(address) (*(volatile uint32_t *)(address))
 #define PLIC_PRIORITY(irq) (PLIC_BASE + PLIC_PRIORITY_OFFSET + (irq) * 4)
 
+void plic_init();
+int plic_claim();
+void plic_complete(int irq);
 
 #endif

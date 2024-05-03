@@ -11,6 +11,9 @@
 #include "processor.h"
 #include "taskmanager.h"
 #include "virtio.h"
+#include "plic.h"
+#include "string.h"
+#include "riscv.h"
 extern uint8_t sbss, ebss;
 
 void clear_bss()
@@ -24,10 +27,17 @@ void clear_bss()
 int main_os()
 {
   mm_init();
-  virtio_disk_init();
-  printk("123%d\n", 123);
   init_trap();
-  timer_init();
+  plic_init();
+  // printk("Before ebreak\n");
+  // __asm__ volatile("ebreak");
+  // printk("After ebreak\n");
+  BLOCK_DEVICE = *virtio_block_device_init();
+  BlockCache_manager_init();
+  virtio_block_device_init();
+  BlockCache *test;
+  block_cache_new(test, 1, &BLOCK_DEVICE);
+  BLOCK_DEVICE.write_block(test);
   loader_init_and_list_apps();
   taks_init();
   task_manager_add_2_initproc();

@@ -2,7 +2,7 @@
 #define _CONFIG_H_
 
 #include "stdint.h"
-
+#define UART0_IRQ 10
 #define USER_STACK_SIZE (4096 * 2)
 #define KERNEL_STACK_SIZE (4096 * 2)
 #define KERNEL_HEAP_SIZE 0x300000

@@ -11,6 +11,7 @@
 #include "riscv.h"
 #include "mem.h"
 #include "processor.h"
+#include "plic.h"
 extern void __alltraps();
 extern void __restore();
 
@@ -38,7 +39,7 @@ void print_sepc()
 
 void trap_handler()
 {
-  // printk("trap_handler \n");
+  printk("trap_handler \n");
   set_kernel_trap_entry();
 
   struct TrapContext *cx = processor_current_trap_cx();
@@ -119,63 +120,44 @@ void trap_return()
 void init_trap()
 {
   set_kernel_trap_entry();
+  w_sie(r_sie() | SIE_SEIE | SIE_SSIE);
 }
 
-void trap_from_kernel()
+void trap_from_kernel(uint64_t cause)
 {
-  set_kernel_trap_entry();
-
-  struct TrapContext *cx = task_current_trap_cx();
-  uint64_t scause = r_scause();
-
-  if (scause & (1ULL << 63))
+  printk("trap_from_kernel\n");
+  int irq;
+  printk("cause : %d\n", cause);
+  switch (cause)
   {
-    scause &= ~(1ULL << 63);
-    switch (scause)
+  case SupervisorTimer:
+    timer_set_next_trigger();
+    break;
+  case SupervisorExternal:
+    irq = plic_claim();
+    printk("irq : %d\n", irq);
+    if (irq == VIRTIO0_IRQ)
     {
-    case SupervisorTimer:
-      intr_timer_handle();
-      task_exit_current_and_run_next();
-      break;
-    default:
-      ASSERT("Unsupported interrupt 0x%llx, stval = 0x%llx\n");
-      break;
+      virtio_disk_intr();
     }
-  }
-  else
-  {
-    switch (scause)
+    else if (irq)
     {
-    case UserEnvCall:
-      cx->sepc += 4;
-      cx->x[10] = syscall(cx->x[17], cx->x[10], cx->x[11], cx->x[12]);
-      break;
-    case StoreFault:
-    case StorePageFault:
-    case InstructionFault:
-    case InstructionPageFault:
-    case LoadFault:
-    case LoadPageFault:
-      ASSERT("Exception %lld in application, bad addr = %llx, bad instruction = ");
-      ASSERT("LoadPageFault\n");
-      task_exit_current_and_run_next();
-      break;
-    case IllegalInstruction:
-      ASSERT("IllegalInstruction in application, core dumped.\n");
-      task_exit_current_and_run_next();
-      break;
-    default:
+      printk("unexpected interrupt irq=%d\n", irq);
       ASSERT(0);
-      break;
     }
+    if (irq)
+      plic_complete(irq);
+    break;
+  default:
+    ASSERT(0);
+    break;
   }
-
-  trap_return();
 }
 
+extern void kernelvec();
 void set_kernel_trap_entry()
 {
-  w_stvec((uint64_t)trap_from_kernel);
+  w_stvec((uint64_t)kernelvec);
 }
 // void set_user_trap_entry() {
 //     w_stvec(TRAMPOLINE);

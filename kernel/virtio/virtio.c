@@ -3,14 +3,16 @@
 #include "config.h"
 #include "virtio_disk.h"
 #include "riscv.h"
+
 void virtio_disk_init()
 {
     uint32_t status = 0;
+
     if (*R(VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||
         *R(VIRTIO_MMIO_VERSION) != 1 || *R(VIRTIO_MMIO_DEVICE_ID) != 2 ||
         *R(VIRTIO_MMIO_VENDOR_ID) != 0x554d4551)
     {
-        panic("无法找到 virtio 磁盘\n");
+        panic("could not find virtio disk\n");
     }
 
     status |= VIRTIO_CONFIG_S_ACKNOWLEDGE;
@@ -19,6 +21,7 @@ void virtio_disk_init()
     status |= VIRTIO_CONFIG_S_DRIVER;
     *R(VIRTIO_MMIO_STATUS) = status;
 
+    // negotiate features
     uint64_t features = *R(VIRTIO_MMIO_DEVICE_FEATURES);
     features &= ~(1 << VIRTIO_BLK_F_RO);
     features &= ~(1 << VIRTIO_BLK_F_SCSI);
@@ -29,37 +32,38 @@ void virtio_disk_init()
     features &= ~(1 << VIRTIO_RING_F_INDIRECT_DESC);
     *R(VIRTIO_MMIO_DRIVER_FEATURES) = features;
 
-    // 通知设备特性协商完成
+    // tell device that feature negotiation is complete.
     status |= VIRTIO_CONFIG_S_FEATURES_OK;
     *R(VIRTIO_MMIO_STATUS) = status;
 
-    // 通知设备驱动已完全准备好
+    // tell device we're completely ready.
     status |= VIRTIO_CONFIG_S_DRIVER_OK;
     *R(VIRTIO_MMIO_STATUS) = status;
 
     *R(VIRTIO_MMIO_GUEST_PAGE_SIZE) = PAGE_SIZE;
 
-    // 初始化队列0
+    // initialize queue 0.
     *R(VIRTIO_MMIO_QUEUE_SEL) = 0;
     uint32_t max = *R(VIRTIO_MMIO_QUEUE_NUM_MAX);
     if (max == 0)
-        panic("virtio 磁盘没有队列0\n");
+        panic("virtio disk has no queue 0\n");
     if (max < NUM)
-        panic("virtio 磁盘的最大队列长度太短\n");
+        panic("virtio disk max queue too short\n");
     *R(VIRTIO_MMIO_QUEUE_NUM) = NUM;
     memset(disk.pages, 0, sizeof(disk.pages));
     *R(VIRTIO_MMIO_QUEUE_PFN) = ((uint64_t)disk.pages) >> PAGE_SHIFT;
 
-    // 设置描述符、可用环和已用环的位置
     disk.desc = (struct virtq_desc *)disk.pages;
-    disk.avail = (struct virtq_avail *)(disk.pages + NUM * sizeof(struct virtq_desc));
+    disk.avail =
+        (struct virtq_avail *)(disk.pages + NUM * sizeof(struct virtq_desc));
     disk.used = (struct virtq_used *)(disk.pages + PAGE_SIZE);
 
-    // 初始化所有 NUM 描述符为未使用状态
+    // all NUM descriptors start out unused.
     for (int i = 0; i < NUM; i++)
         disk.free[i] = 1;
-}
 
+    // plic.c and trap.c arrange for interrupts from VIRTIO0_IRQ.
+}
 int alloc3_desc(int *idx)
 {
     for (int i = 0; i < 3; i++)
@@ -117,11 +121,8 @@ int alloc_desc()
 
 void virtio_disk_rw(BlockCache *b, int write)
 {
+    printk("virtio_disk_rw_start\n");
     uint64_t sector = b->block_id * (BLOCK_SZ / 512);
-    // the spec's Section 5.2 says that legacy block operations use
-    // three descriptors: one for type/reserved/sector, one for the
-    // data, one for a 1-byte status result.
-    // allocate the three descriptors.
     int idx[3];
     while (1)
     {
@@ -129,10 +130,7 @@ void virtio_disk_rw(BlockCache *b, int write)
         {
             break;
         }
-        // yield();
     }
-    // format the three descriptors.
-    // qemu's virtio-blk.c reads them.
     struct virtio_blk_req *buf0 = &disk.ops[idx[0]];
 
     if (write)
@@ -156,23 +154,21 @@ void virtio_disk_rw(BlockCache *b, int write)
     disk.desc[idx[1]].flags |= VRING_DESC_F_NEXT;
     disk.desc[idx[1]].next = idx[2];
 
-    disk.info[idx[0]].status = 0xfb; // device writes 0 on success
+    disk.info[idx[2]].status = 0xfb; // device writes 0 on success
     disk.desc[idx[2]].addr = (uint64_t)&disk.info[idx[0]].status;
     disk.desc[idx[2]].len = 1;
     disk.desc[idx[2]].flags = VRING_DESC_F_WRITE; // device writes the status
     disk.desc[idx[2]].next = 0;
 
-    // record BlockCache for virtio_disk_intr().
     b->disk = true;
     disk.info[idx[0]].b = b;
 
-    // tell the device the first index in our chain of descriptors.
     disk.avail->ring[disk.avail->idx % NUM] = idx[0];
 
     __sync_synchronize();
 
     // tell the device another avail ring entry is available.
-    disk.avail->idx += 1; // not % NUM ...
+    disk.avail->idx += 1; // not % NUM
 
     __sync_synchronize();
 
@@ -183,8 +179,7 @@ void virtio_disk_rw(BlockCache *b, int write)
     intr_on();
     while (_b->disk)
     {
-        // WARN: No kernel concurrent support, DO NOT allow kernel yield
-        // yield();
+        // printk("123");
     }
     intr_off();
     disk.info[idx[0]].b = 0;
@@ -197,8 +192,38 @@ void virtio_write_block(BlockCache *b) { virtio_disk_rw(b, 1); }
 
 BlockDevice *virtio_block_device_init()
 {
+    printk("virtio_block_device_init_start\n");
     virtio_disk_init();
     BLOCK_DEVICE.read_block = virtio_read_block;
     BLOCK_DEVICE.write_block = virtio_write_block;
     return &BLOCK_DEVICE;
+}
+
+void virtio_disk_intr()
+{
+    // the device won't raise another interrupt until we tell it
+    // we've seen this interrupt, which the following line does.
+    // this may race with the device writing new entries to
+    // the "used" ring, in which case we may process the new
+    // completion entries in this interrupt, and have nothing to do
+    // in the next interrupt, which is harmless.
+    *R(VIRTIO_MMIO_INTERRUPT_ACK) = *R(VIRTIO_MMIO_INTERRUPT_STATUS) & 0x3;
+
+    __sync_synchronize();
+
+    // the device increments disk.used->idx when it
+    // adds an entry to the used ring.
+
+    while (disk.used_idx != disk.used->idx)
+    {
+        __sync_synchronize();
+        int id = disk.used->ring[disk.used_idx % NUM].id;
+
+        if (disk.info[id].status != 0)
+            panic("virtio_disk_intr status\n");
+
+        BlockCache *b = disk.info[id].b;
+        b->disk = false;
+        disk.used_idx += 1;
+    }
 }

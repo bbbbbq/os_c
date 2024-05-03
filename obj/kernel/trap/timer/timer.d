@@ -5,4 +5,4 @@ obj/kernel/trap/timer/timer.o: kernel/trap/timer/timer.c \
  kernel/globle/config.h kernel/globle/stdint.h \
  kernel/data_structure/vector.h kernel/memory/buddy/buddy.h \
  kernel/string/string.h kernel/batch/pid/pid.h kernel/batch/batch.h \
- kernel/batch/context/context.h
+ kernel/batch/context/context.h kernel/globle/riscv.h

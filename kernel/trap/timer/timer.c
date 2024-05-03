@@ -1,6 +1,7 @@
 #include "timer.h"
 #include "sbi.h"
 #include "task.h"
+#include "riscv.h"
 static inline uint64_t read_time(void)
 {
     uint64_t time;
@@ -53,4 +54,10 @@ uint64_t timer_get_time_us()
 void timer_set_next_trigger()
 {
     sbi_set_timer(timer_get_time() + CLOCK_FREQ / TICKS_PER_SEC);
+}
+
+void trap_enable_timer_interrupt()
+{
+    // Trap enable timer interrupt
+    w_sie(r_sie() | SIE_STIE_BIT);
 }

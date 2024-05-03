@@ -1,6 +1,7 @@
 #include "block_cache.h"
 #include "debug.h"
 #include "virtio.h"
+#include "buddy.h"
 BlockCache_Manager BLOCKCACHE_MANAGER;
 
 void BlockCache_manager_init()
@@ -30,12 +31,21 @@ void block_cache_sync(BlockCache *block_cache)
 
 void block_cache_new(BlockCache *block_cache, uint64_t block_id, BlockDevice *block_device)
 {
+    printk("1.1\n");
+    block_cache = (BlockCache *)bd_malloc(sizeof(BlockCache));
+    printk("1.2\n");
     memset(block_cache->cache, 0, BLOCK_SZ);
+    printk("1.3\n");
     block_cache->block_id = block_id;
+    printk("1.4\n");
     block_cache->block_device = block_device;
+    printk("1.5\n");
     block_cache->modified = false;
+    printk("1.6\n");
     block_cache->ref = 0;
+    printk("1.7\n");
     block_cache->block_device->read_block(block_cache);
+    printk("1.8\n");
 }
 
 BlockCache *BlockCache_find_block_by_index(BlockDevice *blockdevice, uint64_t index)

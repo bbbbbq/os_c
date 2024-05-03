@@ -24,6 +24,13 @@
 #define VIRTIO_MMIO_INTERRUPT_ACK 0x064    // 中断确认，仅写
 #define VIRTIO_MMIO_STATUS 0x070           // 状态，读/写
 
+#define VIRTIO_MMIO_QUEUE_DESC_LOW 0x080 // physical address for descriptor table, write-only
+#define VIRTIO_MMIO_QUEUE_DESC_HIGH 0x084
+#define VIRTIO_MMIO_DRIVER_DESC_LOW 0x090 // physical address for available ring, write-only
+#define VIRTIO_MMIO_DRIVER_DESC_HIGH 0x094
+#define VIRTIO_MMIO_DEVICE_DESC_LOW 0x0a0 // physical address for used ring, write-only
+#define VIRTIO_MMIO_DEVICE_DESC_HIGH 0x0a4
+
 // 状态寄存器位，来自 qemu virtio_config.h
 #define VIRTIO_CONFIG_S_ACKNOWLEDGE 1
 #define VIRTIO_CONFIG_S_DRIVER 2
@@ -108,4 +115,5 @@ void free_chain(int i);
 void free_desc(int i);
 int alloc_desc();
 void virtio_disk_rw(BlockCache *b, int write);
+void virtio_disk_intr();
 #endif

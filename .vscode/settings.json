@@ -32,7 +32,10 @@
         "list.h": "c",
         "blockdevice.h": "c",
         "block_cache.h": "c",
-        "block_device.h": "c"
+        "block_device.h": "c",
+        "string_view": "c",
+        "virtio.h": "c",
+        "virtio_disk.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

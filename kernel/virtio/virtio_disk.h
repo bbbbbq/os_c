@@ -28,7 +28,6 @@ static struct disk
     // 指向 pages[]。
     struct virtq_used *used;
 
-    // 我们自己的记录。
     char free[NUM];    // 描述符是否空闲？
     uint16_t used_idx; // 我们已经查看到 used[2..NUM] 这么远。
 
