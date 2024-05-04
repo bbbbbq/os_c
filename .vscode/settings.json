@@ -35,7 +35,10 @@
         "block_device.h": "c",
         "string_view": "c",
         "virtio.h": "c",
-        "virtio_disk.h": "c"
+        "virtio_disk.h": "c",
+        "uart.h": "c",
+        "ring_buffer.h": "c",
+        "cstddef": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

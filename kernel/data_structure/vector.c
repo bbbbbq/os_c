@@ -1,5 +1,3 @@
-// ref: TestOS by Ziming Yuan (https://github.com/ZimingYuan/testos)
-
 #include "vector.h"
 #include "string.h"
 #include "buddy.h"

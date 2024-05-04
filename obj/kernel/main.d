@@ -9,4 +9,5 @@ obj/kernel/main.o: kernel/main.c kernel/console/console.h \
  kernel/batch/task/taskmanager.h kernel/data_structure/queue.h \
  kernel/virtio/virtio.h kernel/fs/block_cache/block_cache.h \
  kernel/data_structure/list.h kernel/virtio/plic/plic.h \
- kernel/globle/riscv.h
+ kernel/globle/riscv.h kernel/virtio/uart/uart.h \
+ kernel/virtio/uart/uart.h kernel/data_structure/ring_buffer.h

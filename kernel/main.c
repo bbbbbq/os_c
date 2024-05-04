@@ -14,6 +14,7 @@
 #include "plic.h"
 #include "string.h"
 #include "riscv.h"
+#include "uart.h"
 extern uint8_t sbss, ebss;
 
 void clear_bss()
@@ -34,7 +35,7 @@ int main_os()
   // printk("After ebreak\n");
   BLOCK_DEVICE = *virtio_block_device_init();
   BlockCache_manager_init();
-  virtio_block_device_init();
+  uart_init();
   BlockCache *test1;
   BlockCache *test2;
   block_cache_new(test1, 1, &BLOCK_DEVICE);

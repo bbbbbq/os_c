@@ -39,7 +39,7 @@ void print_sepc()
 
 void trap_handler()
 {
-  printk("trap_handler \n");
+  // printk("trap_handler \n");
   set_kernel_trap_entry();
 
   struct TrapContext *cx = processor_current_trap_cx();
