@@ -24,9 +24,11 @@
 #define UART_REG(offset) (*(volatile uint8_t *)(UART_BASE + (offset)))
 #define UART_write(reg, val) (*(volatile uint32_t *)(reg) = (val))
 
+void uart_irq_handler();
 void uart_init();
 void uart_send_one_byte(char byte);
 void uart_write_byte_to_buffer(char *byte, size_t cnt);
 void uart_clear_buffer();
 void uart_send_all_byte();
+void uart_irq_handler();
 #endif

@@ -3,7 +3,7 @@
 #include "uart.h"
 #include "buddy.h"
 #include "ring_buffer.h"
-
+#include "debug.h"
 ring_buffer_t uart_ring_buffer;
 
 void uart_init()
@@ -24,7 +24,6 @@ void uart_init()
     UART_REG(UART_LCR) = 0x03;
 
     // 配置 Modem Control Register
-    // RTS and DTR are high
     UART_REG(UART_MCR) = 0x03;
 
     // 启用接收数据可用中断
@@ -80,5 +79,17 @@ void uart_send_all_byte()
         {
             uart_send_one_byte(data);
         }
+    }
+}
+
+void uart_irq_handler()
+{
+    if (UART_REG(UART_LSR) & 0x01)
+    {
+        char received_byte = UART_REG(UART_RBR);
+        // 将接收到的数据存入缓冲区或处理
+        // process_received_byte(received_byte);
+        print_str(&received_byte);
+        print_str("\n");
     }
 }

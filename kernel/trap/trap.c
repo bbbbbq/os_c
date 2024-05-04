@@ -12,6 +12,7 @@
 #include "mem.h"
 #include "processor.h"
 #include "plic.h"
+#include "uart.h"
 extern void __alltraps();
 extern void __restore();
 
@@ -144,6 +145,10 @@ void trap_from_kernel(uint64_t cause)
     if (irq == VIRTIO0_IRQ)
     {
       virtio_disk_intr();
+    }
+    else if (irq == UART0_IRQ)
+    {
+      uart_irq_handler();
     }
     else if (irq)
     {
