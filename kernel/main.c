@@ -35,9 +35,11 @@ int main_os()
   BLOCK_DEVICE = *virtio_block_device_init();
   BlockCache_manager_init();
   virtio_block_device_init();
-  BlockCache *test;
-  block_cache_new(test, 1, &BLOCK_DEVICE);
-  BLOCK_DEVICE.write_block(test);
+  BlockCache *test1;
+  BlockCache *test2;
+  block_cache_new(test1, 1, &BLOCK_DEVICE);
+  block_cache_new(test2, 1, &BLOCK_DEVICE);
+  // BLOCK_DEVICE.write_block(test);
   loader_init_and_list_apps();
   taks_init();
   task_manager_add_2_initproc();

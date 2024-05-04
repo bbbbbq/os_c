@@ -13,11 +13,8 @@ void plic_init()
     *(uint32_t *)(PLIC + VIRTIO0_IRQ * 4) = 1;
     int hart = cpuid();
 
-    // set enable bits for this hart's S-mode
-    // for the uart and virtio disk.
     *(uint32_t *)PLIC_SENABLE(hart) = (1 << UART0_IRQ) | (1 << VIRTIO0_IRQ);
 
-    // set this hart's S-mode priority threshold to 0.
     *(uint32_t *)PLIC_SPRIORITY(hart) = 0;
     printk("plic_init_end\n");
 }

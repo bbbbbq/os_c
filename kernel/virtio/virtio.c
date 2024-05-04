@@ -119,8 +119,10 @@ int alloc_desc()
     return -1;
 }
 
+static uint32_t virtio_disk_rw_cnt = 1;
 void virtio_disk_rw(BlockCache *b, int write)
 {
+    printk("virtio_disk_rw_cnt : %d\n", virtio_disk_rw_cnt++);
     printk("virtio_disk_rw_start\n");
     uint64_t sector = b->block_id * (BLOCK_SZ / 512);
     int idx[3];

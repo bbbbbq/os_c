@@ -26,7 +26,7 @@
   (kernel_stack_position_top(x) - KERNEL_STACK_SIZE)
 
 // clock freq for qemu
-#define CLOCK_FREQ 10000000
+#define CLOCK_FREQ 1000000000
 
 // virtio mmio interface
 #define VIRTIO0 0x10001000
@@ -46,4 +46,4 @@ const static uint64_t MMIO[MMIO_NUM][2] = {{VIRTIO0, 0x1000}};
 #define PLIC_MCLAIM(hart) (PLIC + 0x200004 + (hart) * 0x2000)
 #define PLIC_SCLAIM(hart) (PLIC + 0x201004 + (hart) * 0x2000)
 
-#endif // _CONFIG_H_
+#endif

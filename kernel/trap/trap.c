@@ -127,7 +127,12 @@ void trap_from_kernel(uint64_t cause)
 {
   printk("trap_from_kernel\n");
   int irq;
-  printk("cause : %d\n", cause);
+  if (cause > 0x8000000000000000)
+    cause -= (uint64_t)0x8000000000000000;
+  printk("cause: ");
+  print_uint64(cause);
+  printk("\n");
+  print_sepc();
   switch (cause)
   {
   case SupervisorTimer:
@@ -157,7 +162,7 @@ void trap_from_kernel(uint64_t cause)
 extern void kernelvec();
 void set_kernel_trap_entry()
 {
-  w_stvec((uint64_t)kernelvec);
+  w_stvec((uint64_t)kernelvec & ~0x3);
 }
 // void set_user_trap_entry() {
 //     w_stvec(TRAMPOLINE);

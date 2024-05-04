@@ -21,6 +21,7 @@ kernelvec:
     SAVE_GP %n
     .set n, n+1
   .endr
+  csrr a0, scause
 
   # call the C trap handler in trap.c
   call trap_from_kernel
