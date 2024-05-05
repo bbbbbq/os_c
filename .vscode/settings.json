@@ -38,7 +38,8 @@
         "virtio_disk.h": "c",
         "uart.h": "c",
         "ring_buffer.h": "c",
-        "cstddef": "c"
+        "cstddef": "c",
+        "user_lib.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

@@ -1,7 +1,7 @@
 #include "lib/stdio.h"
 #include "user_lib.h"
 #include "type.h"
-
+#include "thread.h"
 int64_t main(void)
 {
     int64_t pid = sys_fork(); // Perform the fork
