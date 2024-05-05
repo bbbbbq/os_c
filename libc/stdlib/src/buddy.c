@@ -1,5 +1,5 @@
-#include "buddy.h"
-#include "debug.h"
+#include "stdlib.h"
+#include "assert.h"
 #include "list.h"
 #include "string.h"
 // Buddy内存分配器

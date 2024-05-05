@@ -1,6 +1,6 @@
 #include "list.h"
 #include "stdint.h"
-#include "debug.h"
+#include "assert.h"
 // double-linked, circular list. double-linked makes remove
 // fast. circular simplifies code, because don't have to check for
 // empty list in insert and remove.
