@@ -1,7 +1,5 @@
-#include "syscall.h"
-#include "lib/string.h"
-#include "lib/stdio.h" // Make sure this header supports file operations if needed
-
+#include "stdint.h"
+#include "stdio.h"
 int main()
 {
     const char *text = "Hello, world from write syscall!\n";

@@ -1,1 +1,5 @@
 disk_image.img
+fs.img
+riscv64-virt.dtb
+riscv64-virt.dts
+fs/raw_image.img

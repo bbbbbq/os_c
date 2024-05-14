@@ -1,14 +1,16 @@
 CROSS_PREFIX = riscv64-unknown-elf-
 CC = $(CROSS_PREFIX)gcc
-
-OBJCOPY = rust-objcopy
-OBJDUMP = rust-objdump
+OBJCOPY = $(CROSS_PREFIX)objcopy
+OBJDUMP = $(CROSS_PREFIX)objdump
 
 INC_DIR = ./include
 SRC_LINKER = ./linker/linker.ld
 TARGET_DIR = ./target
 APP_DIR = ./app
-LIB_DIR = ./lib
+LIB_DIR = -L/home/caigoubencai/Desktop/os_c-ch6/libc/build -lmylibc
+
+# Include the library path and link against libc.a
+LIB_FLAGS = -l$(LIB_DIR) -lc
 
 # Auto-find C files in app directory
 APP_SRCS = $(wildcard $(APP_DIR)/*.c)
@@ -16,7 +18,7 @@ APP_SRCS = $(wildcard $(APP_DIR)/*.c)
 APP_TARGETS = $(patsubst $(APP_DIR)/%.c,$(TARGET_DIR)/%.elf,$(APP_SRCS))
 
 # Other source files
-COMMON_SRCS = ./start.s ./main.c ./syscall.c $(LIB_DIR)/printf.c $(LIB_DIR)/string.c
+COMMON_SRCS = ./start.s ./main.c
 
 # Ensure the target directory exists before building anything
 .PHONY: all build clean dump
@@ -29,7 +31,7 @@ $(TARGET_DIR):
 
 # Rule to create each ELF file
 $(TARGET_DIR)/%.elf: $(APP_DIR)/%.c $(COMMON_SRCS)
-	$(CC) $^ -o $@ -T$(SRC_LINKER) -I$(INC_DIR) -nostdinc -nostdlib -mcmodel=medany -fno-builtin
+	$(CC) $^ -o $@ -T$(SRC_LINKER) -I$(INC_DIR) -nostdinc -nostdlib -mcmodel=medany -fno-builtin $(LIB_FLAGS)
 	$(OBJCOPY) --strip-all $@ -O binary $@.bin
 
 dump:

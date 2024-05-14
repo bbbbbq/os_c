@@ -39,7 +39,10 @@
         "uart.h": "c",
         "ring_buffer.h": "c",
         "cstddef": "c",
-        "user_lib.h": "c"
+        "user_lib.h": "c",
+        "type.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

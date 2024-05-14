@@ -1,6 +1,5 @@
-#include "lib/stdio.h"
-#include "user_lib.h"
-#include "type.h"
+#include "stdint.h"
+#include "stdio.h"
 
 int64_t main(void)
 {
