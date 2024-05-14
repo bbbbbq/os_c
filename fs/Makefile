@@ -1,25 +1,17 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -g
-
+FS_DIR = .
 # Source directories
-SRC_BLOCK_CACHE = block_cache
-SRC_DRIVER = dirver
-SRC_FS_GLOBLE = fs_globle
 
 # Object directories
-OBJ_DIR = obj
+OBJ_DIR = build
+INCLUDE_DIRS = -I$(FS_DIR)/driver -I$(FS_DIR)/fs_globle \
+			   -I$(FS_DIR)
 
+C_SOURCES = $(shell find $(FS_DIR)/ -name "*.c")
 # Sources and objects
-SOURCES_DRIVER = $(wildcard $(SRC_DRIVER)/*.c)
-SOURCES_FS_GLOBLE = $(wildcard $(SRC_FS_GLOBLE)/*.c)
-SOURCES_MAIN = main.c
-
-OBJECTS = $(SOURCES_DRIVER:.c=.o) $(SOURCES_FS_GLOBLE:.c=.o) $(SOURCES_MAIN:.c=.o)
-
-# Include directories
-INCLUDES = -I$(SRC_DRIVER) -I$(SRC_FS_GLOBLE)
-
+OBJECTS = $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 # Executable
 EXEC = myfs
 
@@ -27,10 +19,14 @@ EXEC = myfs
 all: $(EXEC)
 
 $(EXEC): $(OBJECTS)
-	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $< -o $@
 
 clean:
 	rm -f $(OBJECTS) $(EXEC)
+
+run:
+	./myfs
