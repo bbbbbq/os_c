@@ -1,17 +1,27 @@
 #ifndef FS_GLOBLE_H
 #define FS_GLOBLE_H
 #include <stdint.h>
-
+#include "driver/driver.h"
+extern Device myDevice;
 #define SECTOR_SIZE 512
 #define BPB_LOCATION_SECTOR 0
-
+#define FATSz 8176
+#define BPB_Num_FATs 2
+#define BPB_ResvdSecCnt 32
 #define BPB_BACK_LOCATION_SECTOR 6
 #define DISK_MEMORY_SUM 4294967296
 #define SECTORS_PER_CLUSTER 8
-
+#define FirstDataSector BPB_ResvdSecCnt + (BPB_Num_FATs * FATSz) - 1
 // 宏定义：根据簇号计算LBA地址
+#define FAT1_start_sector 32
+#define FAT2_start_sector FAT1_start_sector + FATSz - 1
+
 #define CLUSTER_TO_LBA(cluster_number) (cluster_begin_lba + ((cluster_number - 2) * SECTORS_PER_CLUSTER))
 
+
+
+uint64_t FAT_VALID_ENTRY_OFFSET = 4;
+uint64_t FAT_VALID_ENYRT_SECTOR = FirstDataSector;
 extern struct BPB_common bpb_commen;
 // BIOS Parameter Block
 // BS_jmpBoot：包含了一个 3 个字节的 riscv 格式的无条件跳转指令，用于跳转到操作系统的 bootstrap code。boot code 通常位于 boot sector 的尾部，跟在 BPB 后面。两种常见的 jump instruction 的格式为：
@@ -45,36 +55,36 @@ struct BPB_common
 {
     char BS_jmpBoot[3];
     char BS_OEMName[8];
-    uint16_t BPB_BytsPerSec;
-    uint8_t BPB_SecPerClus;
-    uint16_t BPB_RsvdSecCnt;
-    uint8_t BPB_NumFATs;
-    uint16_t BPB_RootEntCnt;
-    uint16_t BPB_TotSec16;
-    uint8_t BPB_Media;
-    uint16_t BPB_FATSz16;
-    uint16_t BPB_SecPerTrk;
-    uint16_t BPB_NumHeads;
-    uint32_t BPB_HiddSec;
-    uint32_t BPB_TotSec32;
+    uint16_t BPB_BytsPerSec;     //512 
+    uint8_t BPB_SecPerClus;      //8
+    uint16_t BPB_RsvdSecCnt;     //32
+    uint8_t BPB_NumFATs;//2
+    uint16_t BPB_RootEntCnt;//0
+    uint16_t BPB_TotSec16;//0
+    uint8_t BPB_Media;//0xf8
+    uint16_t BPB_FATSz16;//0
+    uint16_t BPB_SecPerTrk;//63
+    uint16_t BPB_NumHeads;//255
+    uint32_t BPB_HiddSec;//0
+    uint32_t BPB_TotSec32;//8388576
 } __attribute__((__packed__));
-void initialize_BPB();
+void initialize_BPB_common();
 
 struct BPB_32bit
 {
-    uint32_t BPB_FATSz32;    // FAT表大小（以扇区计）（在FAT32中，该值用来存储FAT表的扇区数）
-    uint16_t BPB_ExtFlags;   // 扩展属性标志
-    uint16_t BPB_FSVer;      // 文件系统版本
-    uint32_t BPB_RootClus;   // 根目录簇号
-    uint16_t BPB_FSInfo;     // FSINFO扇区的扇区号
-    uint16_t BPB_BkBootSec;  // 备份引导扇区的扇区号
-    char BPB_Reserved[12];   // 保留字段
-    uint8_t BS_DrvNum;       // 中断13调用时的驱动器号
-    uint8_t BS_Reserved1;    // 保留字段
-    uint8_t BS_BootSig;      // 扩展引导标志
-    uint32_t BS_VolID;       // 卷ID号
-    char BS_VolLab[11];      // 卷标
-    char BS_FilSysType[8];   // 文件系统类型
+    uint32_t BPB_FATSz32;    // FAT表大小（以扇区计）（在FAT32中，该值用来存储FAT表的扇区数）//8176
+    uint16_t BPB_ExtFlags;   // 扩展属性标志 0
+    uint16_t BPB_FSVer;      // 文件系统版本 0
+    uint32_t BPB_RootClus;   // 根目录簇号 2
+    uint16_t BPB_FSInfo;     // FSINFO扇区的扇区号 1
+    uint16_t BPB_BkBootSec;  // 备份引导扇区的扇区号 6
+    char BPB_Reserved[12];   // 保留字段 0
+    uint8_t BS_DrvNum;       // 中断13调用时的驱动器号 128
+    uint8_t BS_Reserved1;    // 保留字段 0
+    uint8_t BS_BootSig;      // 扩展引导标志 41
+    uint32_t BS_VolID;       // 卷ID号 593555941
+    char BS_VolLab[11];      // 卷标 NO NAME
+    char BS_FilSysType[8];   // 文件系统类型 FAT32
     uint8_t __padding[420];  // 对齐填充字节
     uint16_t Signature_word; // 标识字（固定为0xAA55）
 } __attribute__((__packed__));
@@ -186,4 +196,11 @@ struct LongDirent
     char LDIR_Name3[4];      /* 28 */
 } __attribute__((__packed__));
 
+typedef struct fat_entry
+{
+    uint32_t status : 28;  // 簇的状态
+    uint32_t reserved : 4; // 保留位
+} FAT32Entry;
+
+void init_fat32();
 #endif
