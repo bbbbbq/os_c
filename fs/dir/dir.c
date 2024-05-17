@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "driver.h"
 #include "fs_globle.h"
+#include "fat_table.h"
 extern Device fat_device;
 void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr, uint16_t crt_time,
                      uint16_t crt_date, uint16_t wrt_time, uint16_t wrt_date,
@@ -36,10 +37,14 @@ void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr, uint16_t crt_t
 
 void init_root_entry()
 {
+    printf("init_root_entry_start\n");
     memset(&root_dir_entry, 0, sizeof(Dirent));
     strncpy(root_dir_entry.DIR_Name, "ROOT     ", 11);
     root_dir_entry.DIR_Attr = 0x10;
-    write_by_cluster(&fat_device,2,&root_dir_entry);
+    write_by_cluster(&fat_device,2,&root_dir_entry,sizeof(Dirent));
+    uint64_t index = find_first_valid_cluster();
+    convert_cluster_valid(index);
+    printf("init_root_entry_end\n");
 }
 
 
@@ -82,4 +87,35 @@ void read_and_parse_root_entry(Device *device)
 
     // 释放缓冲区
     free(buffer);
+}
+
+uint32_t get_file_or_dir_size(const Dirent *entry)
+{
+    return entry->DIR_FileSize;
+}
+
+uint64_t get_creation_time(const Dirent *entry)
+{
+    uint64_t creation_time = entry->DIR_CrtDate;
+    creation_time <<= 16;
+    creation_time |= entry->DIR_CrtTime;
+    return creation_time;
+}
+
+uint64_t get_last_modified_time(const Dirent *entry)
+{
+    uint64_t modified_time = entry->DIR_WrtDate;
+    modified_time <<= 16;
+    modified_time |= entry->DIR_WrtTime;
+    return modified_time;
+}
+
+uint64_t get_last_access_time(const Dirent *entry)
+{
+    return entry->DIR_LstAccDate;
+}
+
+void set_file_or_dir_attribute(Dirent *entry, uint8_t attribute)
+{
+    entry->DIR_Attr = attribute;
 }

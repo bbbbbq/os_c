@@ -101,12 +101,18 @@ int read_multiple_blocks(Device *device, uint64_t start_block_id, void *buffer, 
 
 int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *buffer, size_t buffer_size)
 {
+    // 计算要写入的块数
     uint64_t num_blocks_to_write = buffer_size / SECTOR_SIZE;
+    if(buffer_size % SECTOR_SIZE!=0)num_blocks_to_write++;
+    // 初始化当前块号
     uint64_t current_block_id = start_block_id;
+    // 初始化已写入的字节数
     size_t bytes_written = 0;
 
+    // 循环写入每个块的数据
     while (bytes_written < buffer_size && num_blocks_to_write > 0)
     {
+        // 每次只写入一个块的数据
         int result = write_block(device, current_block_id, buffer);
         if (result != 0)
         {
@@ -114,11 +120,14 @@ int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *b
             return -1; // 写入失败
         }
 
+        // 更新已写入的字节数、缓冲区指针和当前块号
         bytes_written += SECTOR_SIZE;
         buffer += SECTOR_SIZE;
         current_block_id++;
         num_blocks_to_write--;
     }
+    if(bytes_written > buffer_size) bytes_written -= SECTOR_SIZE - buffer_size%SECTOR_SIZE;
+    // 返回已写入的总字节数
     return bytes_written;
 }
 
@@ -131,10 +140,9 @@ int read_by_cluster(Device *device, uint64_t cluser_num, void *buffer)
 
 
 
-int write_by_cluster(Device *device, uint64_t cluser_num, const void *buffer)
+int write_by_cluster(Device *device, uint64_t cluser_num, const void *buffer,size_t buffer_size)
 {
     uint64_t start_block_id = CLUSTER_TO_LBA(cluser_num);
-    size_t buffer_size = CLUSER_SIZE;
     return write_multiple_blocks(device, start_block_id, buffer, buffer_size);
 }
 

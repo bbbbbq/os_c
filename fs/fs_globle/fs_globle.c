@@ -151,10 +151,10 @@ void formate_fat32(Device *device)
         return;
     }
 
-    result = write_multiple_blocks(device, 7, &fs_info, sizeof(fs_info));
+    result = write_multiple_blocks(device, 6, &fs_info, sizeof(fs_info));
     if (result != sizeof(fs_info))
     {
-        printf("Error writing FSInfo to sector 1\n");
+        printf("Error writing FSInfo to sector 7\n");
         return;
     }
 
@@ -166,4 +166,5 @@ void formate_fat32(Device *device)
     }
 
     printf("FAT32 formatted successfully\n");
+    
 }

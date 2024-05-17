@@ -26,8 +26,8 @@ int main()
         return 1;
     }
     BlockCache_manager_init();
-    //formate_fat32(&fat_device);
+    formate_fat32(&fat_device);
     char *buf = malloc(512);
     read_block(&fat_device,CLUSTER_TO_LBA(2),buf);
-    print_block_data(buf,512);
+    init_root_entry();
 }

@@ -27,4 +27,9 @@ void creat_dir_entry(Dirent* dir, const char* name, uint8_t attr, uint16_t crt_t
 void init_root_entry();
 void read_and_parse_root_entry(Device *device);
 
+uint32_t get_file_or_dir_size(const Dirent *entry);
+uint64_t get_creation_time(const Dirent *entry);
+uint64_t get_last_modified_time(const Dirent *entry);
+uint64_t get_last_access_time(const Dirent *entry);
+void set_file_or_dir_attribute(Dirent *entry, uint8_t attribute);
 #endif

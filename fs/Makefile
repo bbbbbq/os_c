@@ -7,7 +7,9 @@ FS_DIR = .
 # Object directories
 OBJ_DIR = build
 INCLUDE_DIRS = -I$(FS_DIR)/driver -I$(FS_DIR)/block_cache \
-			   -I$(FS_DIR)/fs_globle
+			   -I$(FS_DIR)/fs_globle -I$(FS_DIR)/fat_table \
+			   -I$(FS_DIR)/dir \
+
 
 C_SOURCES = $(shell find $(FS_DIR)/ -name "*.c")
 # Sources and objects

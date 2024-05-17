@@ -4,6 +4,7 @@
         "block_cache.h": "c",
         "vector": "c",
         "stdlib.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "driver.h": "c"
     }
 }

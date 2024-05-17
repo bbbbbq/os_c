@@ -19,7 +19,7 @@ int write_block(Device *device, uint64_t block_num, const void *buffer);
 int read_multiple_blocks(Device *device, uint64_t start_block_id, void *buffer, size_t buffer_size);
 int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *buffer, size_t buffer_size);
 int read_by_cluster(Device *device, uint64_t cluser_num, void *buffer);
-int write_by_cluster(Device *device, uint64_t cluser_num, const void *buffer);
+int write_by_cluster(Device *device, uint64_t cluser_num, const void *buffer, size_t buffer_size);
 int read_by_byte(Device *device, uint64_t block_num, uint64_t offset, uint64_t size_byte, void *buffer);
 int write_by_byte(Device *device, uint64_t block_num, uint64_t offset, uint64_t size_byte, const void *buffer);
 int copy_block(Device *device, uint64_t src_block_num, uint64_t dest_block_num);
