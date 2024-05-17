@@ -187,3 +187,29 @@ int write_by_byte(Device *device, uint64_t block_num, uint64_t offset, uint64_t 
 
     return 0; // 表示成功
 }
+
+// 将一个指定块号的块复制到指定的块
+int copy_block(Device *device, uint64_t src_block_num, uint64_t dest_block_num)
+{
+    if (device == NULL || src_block_num >= device->total_blocks || dest_block_num >= device->total_blocks)
+    {
+        return -1;
+    }
+    void *buffer = malloc(SECTOR_SIZE);
+    if (buffer == NULL)
+    {
+        return -1;
+    }
+    if (read_block(device, src_block_num, buffer) != 0)
+    {
+        free(buffer);
+        return -1;
+    }
+    if (write_block(device, dest_block_num, buffer) != 0)
+    {
+        free(buffer);
+        return -1;
+    }
+    free(buffer);
+    return 0;
+}
