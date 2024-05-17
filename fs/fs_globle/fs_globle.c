@@ -1,15 +1,10 @@
 #include "fs_globle.h"
 #include <string.h>
-#include <stdlib.h>
-#include <string.h>
-#include "driver.h"
-#include <assert.h>
-#include <stdio.h>
-Device myDevice;
 struct BPB_32bit bpb_32bit;
 struct FSInfo fs_info;
 struct BPB_common bpb_commen;
-void initialize_BPB_common()
+#include "driver.h"
+void initialize_BPB()
 {
     bpb_commen.BS_jmpBoot[0] = 0xEB;
     bpb_commen.BS_jmpBoot[1] = 0x58;
@@ -33,15 +28,15 @@ void initialize_BPB_common()
     bpb_commen.BPB_TotSec16 = 0;
     bpb_commen.BPB_TotSec32 = 8388576;
 
-    // 设置磁盘类型，对于SD卡
-    bpb_commen.BPB_Media = 0xF0;
+    // 设置磁盘类型，对于不可移动的固定磁盘
+    bpb_commen.BPB_Media = 0xF8;
 
     // 对于FAT32，该字段必须是0
     bpb_commen.BPB_FATSz16 = 0;
 
     // 可以设为0，表示不使用
-    bpb_commen.BPB_SecPerTrk = 63;
-    bpb_commen.BPB_NumHeads = 255;
+    bpb_commen.BPB_SecPerTrk = 0;
+    bpb_commen.BPB_NumHeads = 0;
 
     // 对于没有分区的设备，该字段为0
     bpb_commen.BPB_HiddSec = 0;
@@ -50,7 +45,7 @@ void initialize_BPB_common()
 void initialize_BPB_32bit()
 {
     // 初始化FAT表大小
-    bpb_32bit.BPB_FATSz32 = 8176; 
+    bpb_32bit.BPB_FATSz32 = 8176; // 假设为1024扇区，根据实际情况调整
 
     // 初始化扩展属性标志
     bpb_32bit.BPB_ExtFlags = 0;
@@ -80,7 +75,7 @@ void initialize_BPB_32bit()
     bpb_32bit.BS_BootSig = 0x29; // 表示下面的三个字段有效
 
     // 初始化卷ID号
-    bpb_32bit.BS_VolID = 0x03f4885b; // 示例值
+    bpb_32bit.BS_VolID = 0x12345678; // 示例值
 
     // 初始化卷标
     strncpy(bpb_32bit.BS_VolLab, "NO NAME    ", 11);
@@ -107,10 +102,10 @@ void initialize_FSInfo()
     fs_info.FSI_StrucBig = 0x61417272;
 
     // 设置FSI_Free_Count，不清楚则置为0xFFFFFFFF
-    fs_info.FSI_Free_Count = 0x000ff7fb;
+    fs_info.FSI_Free_Count = 0xFFFFFFFF;
 
     // 设置FSI_Nxt_Free，不清楚则置为0xFFFFFFFF
-    fs_info.FSI_Nxt_Free = 0x00000002;
+    fs_info.FSI_Nxt_Free = 0xFFFFFFFF;
 
     // 初始化FSI_rsvd2
     memset(fs_info.FSI_rsvd2, 0, sizeof(fs_info.FSI_rsvd2));
@@ -119,51 +114,56 @@ void initialize_FSInfo()
     fs_info.FSI_TrailSig = 0xAA550000;
 }
 
-void init_fat32()
+void formate_fat32(Device *device)
 {
-    //printf("init_fat32_start\n");
-    initialize_BPB_common();
+    // 初始化 BPB_common 结构体
+    initialize_BPB();
+    // 初始化 BPB_32bit 结构体
     initialize_BPB_32bit();
+    // 初始化 FSInfo 结构体
     initialize_FSInfo();
 
-    char *buf = (char *)malloc(512);
-    if (buf == NULL)
+    // 确保 bpb_commen 和 bpb_32bit 加起来的大小是 512 字节
+    if (sizeof(bpb_commen) + sizeof(bpb_32bit) != 512)
     {
-        perror("Failed to allocate memory");
+        printf("Error: BPB size is not 512 bytes\n");
         return;
     }
 
-    // 将 BPB_common 和 BPB_32bit 数据复制到缓冲区
-    memcpy(buf, &bpb_commen, sizeof(bpb_commen));
-    memcpy(buf + sizeof(bpb_commen), &bpb_32bit, sizeof(bpb_32bit));
+    // 创建一个缓冲区，用于存储 bpb_commen 和 bpb_32bit 结构体的数据
+    char bpb_buffer[512];
+    memcpy(bpb_buffer, &bpb_commen, sizeof(bpb_commen));
+    memcpy(bpb_buffer + sizeof(bpb_commen), &bpb_32bit, sizeof(bpb_32bit));
 
-    // 将缓冲区写入第一个块
-    if (write_block(&myDevice, 0, buf) != 0)
+    // 写入 bpb_commen 和 bpb_32bit 到第 0 扇区
+    int result = write_multiple_blocks(device, 0, bpb_buffer, sizeof(bpb_buffer));
+    if (result != sizeof(bpb_buffer))
     {
-        perror("failed to write block\n");
-        free(buf); // 确保在错误情况下释放内存
+        printf("Error writing BPB to sector 0\n");
         return;
     }
-    if (write_block(&myDevice, 5, buf) != 0)
-    {
-        perror("failed to write block\n");
-        free(buf); // 确保在错误情况下释放内存
-        return;
-    }
-    printf("\n\n%ld\n\n",sizeof(fs_info));
-    // 断言检查 FSInfo 大小，确保其大小为512字节
 
-    // 将 FSInfo 数据复制到缓冲区
-    memcpy(buf, &fs_info, sizeof(fs_info));
-    write_multiple_sectors(&myDevice, buf, 1, 524);
-    uint8_t data[] = {0xf8, 0xff, 0xff, 0x0f, 0xff, 0xff, 0xff, 0x0f, 0xf8, 0xff, 0xff, 0x0f};
-    memset(buf,0,512);
-    memcpy(buf, data, sizeof(data));
-    if (write_block(&myDevice, 32, buf) != 0)
+    // 写入 fs_info 到第一个扇区
+    result = write_multiple_blocks(device, 1, &fs_info, sizeof(fs_info));
+    if (result != sizeof(fs_info))
     {
-        perror("failed to write block\n");
-        free(buf); // 确保在错误情况下释放内存
+        printf("Error writing FSInfo to sector 1\n");
         return;
     }
-    free(buf); // 释放内存
+
+    result = write_multiple_blocks(device, 7, &fs_info, sizeof(fs_info));
+    if (result != sizeof(fs_info))
+    {
+        printf("Error writing FSInfo to sector 1\n");
+        return;
+    }
+
+    result = write_multiple_blocks(device, 6, bpb_buffer, sizeof(bpb_buffer));
+    if (result != sizeof(bpb_buffer))
+    {
+        printf("Error writing BPB to sector 0\n");
+        return;
+    }
+
+    printf("FAT32 formatted successfully\n");
 }

@@ -6,7 +6,8 @@ FS_DIR = .
 
 # Object directories
 OBJ_DIR = build
-INCLUDE_DIRS = -I$(FS_DIR)/driver -I$(FS_DIR)/fs_globle -I$(FS_DIR)
+INCLUDE_DIRS = -I$(FS_DIR)/driver -I$(FS_DIR)/block_cache \
+			   -I$(FS_DIR)/fs_globle
 
 C_SOURCES = $(shell find $(FS_DIR)/ -name "*.c")
 # Sources and objects
@@ -27,11 +28,5 @@ $(OBJ_DIR)/%.o: %.c
 clean:
 	rm -f $(OBJECTS) $(EXEC)
 
-# Run rule dependent on the executable
-run: $(EXEC)
-	./$(EXEC)
-
-# Debug rule, generating executable with debugging info
-debug: $(EXEC)
-
-.PHONY: all clean run debug
+run:
+	./myfs

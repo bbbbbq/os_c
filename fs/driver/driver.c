@@ -3,16 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fs_globle.h"
-
-void close_device(Device *device)
-{
-    if (device && device->disk)
-    {
-        fclose(device->disk);
-        free(device->name);
-    }
-}
-
+// 读取指定块到缓冲区
 int read_block(Device *device, uint64_t block_num, void *buffer)
 {
     if (!device || !buffer)
@@ -20,23 +11,29 @@ int read_block(Device *device, uint64_t block_num, void *buffer)
     if (block_num >= device->total_blocks)
         return -1;
 
+    FILE *disk = fopen(device->name, "rb");
+    if (!disk)
+        return -1;
+
     // 定位到块的开始位置
-    if (fseek(device->disk, block_num * device->block_size, SEEK_SET) != 0)
+    if (fseek(disk, block_num * device->block_size, SEEK_SET) != 0)
     {
-        perror("Failed to seek");
+        fclose(disk);
         return -1;
     }
 
     // 读取块内容
-    if (fread(buffer, 1, device->block_size, device->disk) != device->block_size)
+    if (fread(buffer, 1, device->block_size, disk) != device->block_size)
     {
-        perror("Failed to read block");
+        fclose(disk);
         return -1;
     }
 
+    fclose(disk);
     return 0;
 }
 
+// 将缓冲区的数据写入到指定的块
 int write_block(Device *device, uint64_t block_num, const void *buffer)
 {
     if (!device || !buffer)
@@ -44,23 +41,25 @@ int write_block(Device *device, uint64_t block_num, const void *buffer)
     if (block_num >= device->total_blocks)
         return -1;
 
+    FILE *disk = fopen(device->name, "r+b");
+    if (!disk)
+        return -1;
+
     // 定位到块的开始位置
-    if (fseek(device->disk, block_num * device->block_size, SEEK_SET) != 0)
+    if (fseek(disk, block_num * device->block_size, SEEK_SET) != 0)
     {
-        perror("Failed to seek");
+        fclose(disk);
         return -1;
     }
 
     // 写入块内容
-    if (fwrite(buffer, 1, device->block_size, device->disk) != device->block_size)
+    if (fwrite(buffer, 1, device->block_size, disk) != device->block_size)
     {
-        perror("Failed to write block");
+        fclose(disk);
         return -1;
     }
 
-    // 刷新缓冲区，确保数据写入磁盘
-    fflush(device->disk);
-
+    fclose(disk);
     return 0;
 }
 
@@ -69,50 +68,122 @@ int initialize_device(Device *device, const char *name, uint64_t total_blocks, u
 {
     if (!device || !name)
         return -1;
-    device->name = strdup(name);
+
+    device->name = strdup(name); // 复制设备名称
     device->total_blocks = total_blocks;
     device->block_size = block_size;
-    device->disk = fopen(name, "r+b");
-    if (!device->disk)
-    {
-        perror("Failed to open disk");
-        free(device->name);
-        return -1;
-    }
     return 0;
 }
 
-int write_multiple_sectors(Device *device, char *buf, uint64_t start_sector, size_t buf_size)
+int read_multiple_blocks(Device *device, uint64_t start_block_id, void *buffer, size_t buffer_size)
 {
-    if (!device || !buf)
-        return -1;
+    uint64_t num_blocks_to_read = buffer_size / SECTOR_SIZE;
+    uint64_t current_block_id = start_block_id;
+    size_t bytes_read = 0;
 
-    size_t bytes_remaining = buf_size;
-    const char *current_ptr = buf;
-    uint64_t current_sector = start_sector;
-
-    while (bytes_remaining > 0)
+    while (bytes_read < buffer_size && num_blocks_to_read > 0)
     {
-        // 计算当前要写入的字节数
-        size_t bytes_to_write = (bytes_remaining > device->block_size) ? device->block_size : bytes_remaining;
-
-        // 创建一个扇区大小的临时缓冲区并清零
-        char sector_buf[device->block_size];
-        memset(sector_buf, 0, device->block_size);
-        memcpy(sector_buf, current_ptr, bytes_to_write);
-
-        // 写入当前扇区
-        if (write_block(device, current_sector, sector_buf) != 0)
+        int result = read_block(device, current_block_id, buffer);
+        if (result != 0)
         {
-            perror("Failed to write block");
-            return -1;
+            printf("Error reading block %lu\n", current_block_id);
+            return -1; // 读取失败
         }
 
-        // 更新指针和剩余字节数
-        current_ptr += bytes_to_write;
-        bytes_remaining -= bytes_to_write;
-        current_sector++;
+        bytes_read += SECTOR_SIZE;
+        buffer += SECTOR_SIZE;
+        current_block_id++;
+        num_blocks_to_read--;
     }
 
-    return 0;
+    return bytes_read;
+}
+
+int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *buffer, size_t buffer_size)
+{
+    uint64_t num_blocks_to_write = buffer_size / SECTOR_SIZE;
+    uint64_t current_block_id = start_block_id;
+    size_t bytes_written = 0;
+
+    while (bytes_written < buffer_size && num_blocks_to_write > 0)
+    {
+        int result = write_block(device, current_block_id, buffer);
+        if (result != 0)
+        {
+            printf("Error writing block %lu\n", current_block_id);
+            return -1; // 写入失败
+        }
+
+        bytes_written += SECTOR_SIZE;
+        buffer += SECTOR_SIZE;
+        current_block_id++;
+        num_blocks_to_write--;
+    }
+    return bytes_written;
+}
+
+int read_by_cluster(Device *device, uint64_t cluser_num, void *buffer)
+{
+    uint64_t start_block_id = CLUSTER_TO_LBA(cluser_num);
+    size_t buffer_size = CLUSER_SIZE;
+    return read_multiple_blocks(device, start_block_id, buffer, buffer_size);
+}
+
+
+
+int write_by_cluster(Device *device, uint64_t cluser_num, const void *buffer)
+{
+    uint64_t start_block_id = CLUSTER_TO_LBA(cluser_num);
+    size_t buffer_size = CLUSER_SIZE;
+    return write_multiple_blocks(device, start_block_id, buffer, buffer_size);
+}
+
+int read_by_byte(Device *device, uint64_t block_num, uint64_t offset, uint64_t size_byte, void *buffer)
+{
+    if (offset + size_byte > BLOCK_SIZE)
+    {
+        return -1; // 表示错误，偏移量超出范围
+    }
+
+    uint8_t block_data[BLOCK_SIZE];
+    if (read_block(device, block_num, block_data) != 0)
+    {
+        return -1; // 读取块数据失败
+    }
+
+    for (int i = 0; i < size_byte; ++i)
+    {
+        ((uint8_t *)buffer)[i] = block_data[offset + i];
+    }
+
+    return 0; // 表示成功
+}
+
+int write_by_byte(Device *device, uint64_t block_num, uint64_t offset, uint64_t size_byte, const void *buffer)
+{
+    if (offset + size_byte > BLOCK_SIZE)
+    {
+        return -1; // 表示错误，偏移量超出范围
+    }
+
+    // 读取整个块的数据
+    uint8_t block_data[BLOCK_SIZE];
+    if (read_block(device, block_num, block_data) != 0)
+    {
+        return -1; // 读取块数据失败
+    }
+
+    // 将缓冲区的数据写入块的指定偏移位置
+    for (int i = 0; i < size_byte; ++i)
+    {
+        block_data[offset + i] = ((const uint8_t *)buffer)[i];
+    }
+
+    // 将更新后的数据写回设备
+    if (write_block(device, block_num, block_data) != 0)
+    {
+        return -1; // 写入块数据失败
+    }
+
+    return 0; // 表示成功
 }

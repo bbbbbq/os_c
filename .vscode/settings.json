@@ -42,7 +42,8 @@
         "user_lib.h": "c",
         "type.h": "c",
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "driver.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

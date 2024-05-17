@@ -29,10 +29,6 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/fs/block_cache  -I$(KERNEL_DIR)/virtio/plic \
 				-I$(KERNEL_DIR)/virtio/uart
 
-
-
-
-
 # Compilation and linking flags
 CFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -fno-builtin -Wall
 ASFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -g
