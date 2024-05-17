@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fs_globle.h"
+#include "assert.h"
 // 读取指定块到缓冲区
 int read_block(Device *device, uint64_t block_num, void *buffer)
 {
@@ -87,7 +88,7 @@ int read_multiple_blocks(Device *device, uint64_t start_block_id, void *buffer, 
         if (result != 0)
         {
             printf("Error reading block %lu\n", current_block_id);
-            return -1; // 读取失败
+            return 0; // 读取失败
         }
 
         bytes_read += SECTOR_SIZE;
@@ -96,7 +97,7 @@ int read_multiple_blocks(Device *device, uint64_t start_block_id, void *buffer, 
         num_blocks_to_read--;
     }
 
-    return bytes_read;
+    return 1;
 }
 
 int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *buffer, size_t buffer_size)
@@ -128,14 +129,15 @@ int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *b
     }
     if(bytes_written > buffer_size) bytes_written -= SECTOR_SIZE - buffer_size%SECTOR_SIZE;
     // 返回已写入的总字节数
-    return bytes_written;
+    return 1;
 }
 
 int read_by_cluster(Device *device, uint64_t cluser_num, void *buffer)
 {
     uint64_t start_block_id = CLUSTER_TO_LBA(cluser_num);
     size_t buffer_size = CLUSER_SIZE;
-    return read_multiple_blocks(device, start_block_id, buffer, buffer_size);
+    int tmp = read_multiple_blocks(device, start_block_id, buffer, buffer_size);
+    return tmp;
 }
 
 
@@ -219,5 +221,71 @@ int copy_block(Device *device, uint64_t src_block_num, uint64_t dest_block_num)
         return -1;
     }
     free(buffer);
+    return 0;
+}
+int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer)
+{
+    // 检查参数有效性
+    assert(buffer != NULL && device != NULL);
+
+    // 分配临时缓冲区
+    void *buffer_tmp = malloc(CLUSER_SIZE);
+    if (buffer_tmp == NULL)
+    {
+        printf("Error: Memory allocation failed.\n");
+        return 0;
+    }
+
+    // 读取整个簇的数据到临时缓冲区
+    if (read_by_cluster(device, cluser_num, buffer_tmp) != 0)
+    {
+        printf("Error: Failed to read data from cluster.\n");
+        free(buffer_tmp);
+        return -1;
+    }
+
+    // 拷贝指定偏移量和大小的数据到输出缓冲区
+    memcpy(buffer, buffer_tmp + offset, size_byte);
+
+    // 释放临时缓冲区
+    free(buffer_tmp);
+
+    return 1;
+}
+
+
+int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer)
+{
+    // 检查参数有效性
+    assert(buffer != NULL && device != NULL);
+
+    // 读取整个簇的数据到临时缓冲区
+    void *buffer_tmp = malloc(CLUSER_SIZE);
+    if (buffer_tmp == NULL)
+    {
+        printf("Error: Memory allocation failed.\n");
+        return -1;
+    }
+    if (read_by_cluster(device, cluser_num, buffer_tmp) == 0)
+    {
+        printf("Error: Failed to read data from cluster.\n");
+        free(buffer_tmp);
+        return -1;
+    }
+
+    // 将输入缓冲区中的数据写入临时缓冲区指定偏移量和大小的位置
+    memcpy(buffer_tmp + offset, buffer, size_byte);
+
+    // 将更新后的数据写回簇的数据区
+    if (write_by_cluster(device, cluser_num, buffer_tmp,sizeof(buffer_tmp)) == 0)
+    {
+        printf("Error: Failed to write data back to cluster.\n");
+        free(buffer_tmp);
+        return -1;
+    }
+
+    // 释放临时缓冲区
+    free(buffer_tmp);
+
     return 0;
 }

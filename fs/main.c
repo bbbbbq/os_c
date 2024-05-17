@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fs_globle.h"
+#include "dir.h"
 Device fat_device;
 void print_block_data(const unsigned char *block_data, int block_size)
 {
@@ -30,4 +31,7 @@ int main()
     char *buf = malloc(512);
     read_block(&fat_device,CLUSTER_TO_LBA(2),buf);
     init_root_entry();
+    Dirent tmp_dirent;
+    creat_dir_entry(&tmp_dirent, "FILENAME", 0x10, 1234, 5678, 9101, 1121, 2222, 3333, 1000);
+    create_dir(&root_dir_entry, tmp_dirent, &fat_device);
 }

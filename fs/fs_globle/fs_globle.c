@@ -137,7 +137,7 @@ void formate_fat32(Device *device)
 
     // 写入 bpb_commen 和 bpb_32bit 到第 0 扇区
     int result = write_multiple_blocks(device, 0, bpb_buffer, sizeof(bpb_buffer));
-    if (result != sizeof(bpb_buffer))
+    if (result != 1)
     {
         printf("Error writing BPB to sector 0\n");
         return;
@@ -145,21 +145,21 @@ void formate_fat32(Device *device)
 
     // 写入 fs_info 到第一个扇区
     result = write_multiple_blocks(device, 1, &fs_info, sizeof(fs_info));
-    if (result != sizeof(fs_info))
+    if (result != 1)
     {
         printf("Error writing FSInfo to sector 1\n");
         return;
     }
 
     result = write_multiple_blocks(device, 6, &fs_info, sizeof(fs_info));
-    if (result != sizeof(fs_info))
+    if (result != 1)
     {
         printf("Error writing FSInfo to sector 7\n");
         return;
     }
 
     result = write_multiple_blocks(device, 6, bpb_buffer, sizeof(bpb_buffer));
-    if (result != sizeof(bpb_buffer))
+    if (result != 1)
     {
         printf("Error writing BPB to sector 0\n");
         return;

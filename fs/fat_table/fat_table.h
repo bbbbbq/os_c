@@ -16,14 +16,14 @@ typedef struct
 
 extern Fat32Table fat_table;
 
+uint64_t is_end_of_cluster(uint64_t index);
 void format_fat_table();
 uint64_t find_first_valid_cluster();
-uint64_t find_next_valid_cluster(uint64_t index);
-uint64_t is_valid_cluster(uint64_t index);
-void convert_cluster_valid(uint64_t index);
-void convert_cluster_invalid(uint64_t index);
+uint64_t find_next_free_cluster(uint64_t index);
+uint64_t is_cluster_free(uint64_t index);
+void set_cluser_end(uint64_t index);
+void set_cluser_free(uint64_t index);
 uint64_t parse_cluster_number(uint64_t index);
-void set_cluster_number(uint64_t index, uint64_t cluster_number);
-
-
+void set_cluster_number(uint64_t index, uint32_t cluster_number);
+uint64_t find_last_cluster(uint64_t index);
 #endif
