@@ -1,6 +1,7 @@
 #ifndef DIR_H
 #define DIR_H
 #include <stdint.h>
+#include "driver.h"
 typedef struct
 {
     char DIR_Name[11];        /* 0  */
@@ -23,5 +24,7 @@ Dirent root_dir_entry;
 void creat_dir_entry(Dirent* dir, const char* name, uint8_t attr, uint16_t crt_time,
                      uint16_t crt_date, uint16_t wrt_time, uint16_t wrt_date,
                      uint16_t fst_clus_hi, uint16_t fst_clus_lo, uint32_t file_size);
+void init_root_entry();
+void read_and_parse_root_entry(Device *device);
 
 #endif
