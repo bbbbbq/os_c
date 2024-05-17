@@ -137,14 +137,27 @@ void init_fat32()
     memcpy(buf, &bpb_commen, sizeof(bpb_commen));
     memcpy(buf + sizeof(bpb_commen), &bpb_32bit, sizeof(bpb_32bit));
 
+<<<<<<< HEAD
     // 将缓冲区写入第一个块
     if (write_block(&myDevice, 0, buf) != 0)
+=======
+    // 写入 bpb_commen 和 bpb_32bit 到第 0 扇区
+    int result = write_multiple_blocks(device, 0, bpb_buffer, sizeof(bpb_buffer));
+    if (result != 1)
+>>>>>>> a45d3da (完成创建目录功能)
     {
         perror("failed to write block\n");
         free(buf); // 确保在错误情况下释放内存
         return;
     }
+<<<<<<< HEAD
     if (write_block(&myDevice, 5, buf) != 0)
+=======
+
+    // 写入 fs_info 到第一个扇区
+    result = write_multiple_blocks(device, 1, &fs_info, sizeof(fs_info));
+    if (result != 1)
+>>>>>>> a45d3da (完成创建目录功能)
     {
         perror("failed to write block\n");
         free(buf); // 确保在错误情况下释放内存
@@ -153,6 +166,7 @@ void init_fat32()
     printf("\n\n%ld\n\n",sizeof(fs_info));
     // 断言检查 FSInfo 大小，确保其大小为512字节
 
+<<<<<<< HEAD
     // 将 FSInfo 数据复制到缓冲区
     memcpy(buf, &fs_info, sizeof(fs_info));
     write_multiple_sectors(&myDevice, buf, 1, 524);
@@ -160,10 +174,28 @@ void init_fat32()
     memset(buf,0,512);
     memcpy(buf, data, sizeof(data));
     if (write_block(&myDevice, 32, buf) != 0)
+=======
+    result = write_multiple_blocks(device, 6, &fs_info, sizeof(fs_info));
+    if (result != 1)
+>>>>>>> a45d3da (完成创建目录功能)
     {
         perror("failed to write block\n");
         free(buf); // 确保在错误情况下释放内存
         return;
     }
+<<<<<<< HEAD
     free(buf); // 释放内存
 }
+=======
+
+    result = write_multiple_blocks(device, 6, bpb_buffer, sizeof(bpb_buffer));
+    if (result != 1)
+    {
+        printf("Error writing BPB to sector 0\n");
+        return;
+    }
+
+    printf("FAT32 formatted successfully\n");
+    
+}
+>>>>>>> a45d3da (完成创建目录功能)

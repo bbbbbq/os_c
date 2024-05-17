@@ -1,0 +1,75 @@
+#ifndef DIR_H
+#define DIR_H
+
+#include <stdint.h>
+#include "driver.h"
+
+// 目录项结构体定义
+typedef struct
+{
+    char DIR_Name[11];        /* 0  */
+    uint8_t DIR_Attr;         /* 11 */
+    uint8_t DIR_NTRes;        /* 12 */
+    uint8_t DIR_CrtTimeTenth; /* 13 */
+    uint16_t DIR_CrtTime;     /* 14 */
+    uint16_t DIR_CrtDate;     /* 16 */
+    uint16_t DIR_LstAccDate;  /* 18 */
+    uint16_t DIR_FstClusHI;   /* 20 */
+    uint16_t DIR_WrtTime;     /* 22 */
+    uint16_t DIR_WrtDate;     /* 24 */
+    uint16_t DIR_FstClusLO;   /* 26 */
+    uint32_t DIR_FileSize;    /* 28 */
+} Dirent __attribute__((__packed__));
+
+// 根目录项
+extern Dirent root_dir_entry;
+
+// 创建目录项函数声明
+void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr, uint16_t crt_time,
+                     uint16_t crt_date, uint16_t wrt_time, uint16_t wrt_date,
+                     uint16_t fst_clus_hi, uint16_t fst_clus_lo, uint32_t file_size);
+// 初始化根目录函数声明
+void init_root_entry();
+
+// 读取并解析根目录项函数声明
+void read_and_parse_root_entry(Device *device);
+
+// 获取文件或目录大小函数声明
+uint32_t get_file_or_dir_size(const Dirent *entry);
+
+// 获取创建时间函数声明
+uint64_t get_creation_time(const Dirent *entry);
+
+// 获取最后修改时间函数声明
+uint64_t get_last_modified_time(const Dirent *entry);
+
+// 获取最后访问时间函数声明
+uint64_t get_last_access_time(const Dirent *entry);
+
+// 设置文件或目录属性函数声明
+void set_file_or_dir_attribute(Dirent *entry, uint8_t attribute);
+
+// 提取目录项中的簇号函数声明
+uint32_t extract_cluster_number(const Dirent *dir_entry);
+
+// 比较目录项名称函数声明
+int compare_dir_entry_name(Dirent *dir_entry, char *name);
+
+// 解析目录项函数声明
+Dirent parse_directory_entry(uint32_t data);
+
+// 查找目录项函数声明
+Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name);
+
+// 查找文件或目录尾部簇号函数声明
+uint32_t find_file_or_dir_tail_cluser(Dirent *dir_entry);
+
+// 创建目录函数声明
+void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device);
+
+void append_data_to_directory(Device *device, Dirent *dir_entry, const void *data, size_t data_size);
+
+void set_file_or_dir_size(Dirent *entry, uint32_t new_size);
+
+
+#endif
