@@ -43,4 +43,7 @@ int main()
     {
         print_directory_entry(test);
     }
+    Dirent *dir_ty = find_directory_bfs("wode",root_dir_entry);
+    uint32_t num = dir_child_dir_num(dir_ty);
+    printf("%d\n",num);
 }

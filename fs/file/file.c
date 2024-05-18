@@ -1,6 +1,11 @@
 #include "file.h"
 #include "dir.h"
 #include "fat_table.h"
+#include "stdlib.h"
+#include <string.h>
+#include "stdio.h"
+#define min(a, b) ((a) < (b) ? (a) : (b))
+extern Device fat_device;
 void read_file(char *name, void *buffer, Device *fat_device)
 {
     // 查找指定文件的目录项
@@ -56,7 +61,7 @@ void read_file(char *name, void *buffer, Device *fat_device)
 void over_write_file(char *name, void *buffer, Device *fat_device, size_t buffer_size)
 {
     // 查找指定文件的目录项
-    Dirent *dir = find_directory_bfs(name, &root_dir_entry);
+    Dirent *dir = find_directory_bfs(name, root_dir_entry);
     if (dir == NULL)
     {
         printf("File not found\n");
@@ -102,14 +107,14 @@ void over_write_file(char *name, void *buffer, Device *fat_device, size_t buffer
 
     // 更新文件大小和结束标记
     set_file_or_dir_size(dir, buffer_size);
-    set_cluser_end(cluster_num);
+    set_cluser_end(cluster_num-2);
     printf("Data successfully overwritten to file: %s\n", name);
 }
 
 
 void append_to_file(char *name, void *buffer, size_t buffer_size, Device *fat_device)
 {
-    Dirent *dir = find_directory_bfs(name, &root_dir_entry);
+    Dirent *dir = find_directory_bfs(name, root_dir_entry);
     if (dir == NULL)
     {
         printf("File not found\n");
@@ -148,4 +153,64 @@ void append_to_file(char *name, void *buffer, size_t buffer_size, Device *fat_de
     // 释放内存
     free(file_data);
     free(merged_data);
+}
+
+
+//待修改
+void remove_file(char *name)
+{
+    Dirent* dir = find_directory_bfs(name,root_dir_entry);
+    Dirent* parent_dir = find_parent_directory_bfs(name,&root_dir_entry);
+    uint32_t cluser_num = extract_cluster_number(parent_dir);
+    uint32_t dir_chile_file_num = dir_child_dir_num(dir);
+    if(dir_chile_file_num!=0)
+    {
+        printf("目录下还有文件\n");
+        return;
+    }else
+    {
+        release_linked_clusters(cluser_num);
+        uint32_t dir_cluster = extract_cluster_number(parent_dir);
+        uint8_t buffer[CLUSER_SIZE];
+        read_by_cluster(&fat_device, dir_cluster, buffer);
+
+        for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
+        {
+            // 计算当前目录项在缓冲区中的偏移量
+            size_t offset = i * sizeof(Dirent);
+            Dirent tmp;
+            tmp = parse_directory_entry(buffer + offset);
+            if (compare_dir_entry_name(&tmp, name) == 1)
+            {
+                uint8_t data;
+                data = ATTR_DELETED;
+                write_by_byte_cluser(&fat_device, dir_cluster, offset+11,1,data);
+                return;
+            }
+        }
+    }
+}
+
+void rename_file_or_dir(char *name, char *new_name)
+{
+    Dirent *dir = find_directory_bfs(name, root_dir_entry);
+    Dirent *parent_dir = find_parent_directory_bfs(name, &root_dir_entry);
+    uint32_t dir_cluster = extract_cluster_number(parent_dir);
+    uint8_t buffer[CLUSER_SIZE];
+    read_by_cluster(&fat_device, dir_cluster, buffer);
+
+    for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
+    {
+        // 计算当前目录项在缓冲区中的偏移量
+        size_t offset = i * sizeof(Dirent);
+        Dirent tmp = parse_directory_entry(buffer + offset);
+        if (compare_dir_entry_name(&tmp, name) == 1)
+        {
+            // 更新目录项的名称
+            memset(tmp.DIR_Name, ' ', 11);                                                // 将名称字段置为空格
+            memcpy(tmp.DIR_Name, new_name, strlen(new_name));                             // 将新名称拷贝到名称字段中
+            write_by_byte_cluser(&fat_device, dir_cluster, offset, sizeof(Dirent), &tmp); // 将更新后的目录项写回簇中
+            return;
+        }
+    }
 }

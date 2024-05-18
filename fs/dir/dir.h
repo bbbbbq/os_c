@@ -11,6 +11,7 @@
 #define ATTR_DIRECTORY 0x10 // 子目录属性
 #define ATTR_ARCHIVE 0x20   // 归档属性
 #define ATTR_FILE 0x03  
+#define ATTR_DELETED 0x05 
 // 目录项结构体定义
 typedef struct
 {
@@ -87,4 +88,6 @@ void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *pare
 Dirent* find_directory_bfs(char* name,Dirent start_dir);
 
 Dirent *find_parent_directory_bfs(char *name, Dirent* start_dir);
+
+uint32_t dir_child_dir_num(Dirent *parent_dir);
 #endif

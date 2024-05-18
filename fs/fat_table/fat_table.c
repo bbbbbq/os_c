@@ -104,3 +104,16 @@ uint64_t find_last_cluster(uint64_t index)
     }
     return index;
 }
+
+void release_linked_clusters(uint32_t start_cluster)
+{
+    uint32_t current_cluster = start_cluster;
+    // 循环释放链条上的所有簇
+    while (!is_end_of_cluster(current_cluster-2))
+    {
+        uint32_t next_cluster = parse_cluster_number(current_cluster-2);
+        set_cluser_free(current_cluster-2);
+        current_cluster = next_cluster;
+    }
+    set_cluser_free(start_cluster-2);
+}

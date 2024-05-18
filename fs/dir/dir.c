@@ -473,3 +473,58 @@ Dirent *find_parent_directory_bfs(char *name, Dirent* start_dir)
     }
     return NULL;
 }
+
+uint32_t dir_child_dir_num(Dirent *parent_dir)
+{
+    uint32_t num_entries = 0; // 初始化目录项个数
+
+    if (!is_directory(parent_dir))
+    {
+        printf("Not a directory.\n");
+        return num_entries; // 返回0个目录项
+    }
+
+    uint32_t cluster_num = extract_cluster_number(parent_dir);
+    uint32_t total_size = get_file_or_dir_size(parent_dir);
+    uint32_t bytes_read = 0;
+
+    // 循环读取每个簇的数据
+    while (bytes_read < total_size)
+    {
+        uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
+        read_by_cluster(&fat_device, cluster_num, buffer);
+
+        // 解析目录项并统计个数
+        for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
+        {
+            Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
+
+            // 检查目录项的属性是否有效
+            // 检查是否是结束标志
+            if ((dir_entry.DIR_Attr & ATTR_VOLUME_ID) || dir_entry.DIR_Name[0] == '\0' || (dir_entry.DIR_Attr & ~(ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)) != 0 || ((dir_entry.DIR_FstClusHI << 16) || dir_entry.DIR_FstClusLO) > 8176)
+            {
+                printf("End of directory.\n");
+                return num_entries; // 返回当前统计结果
+            }
+
+            // 统计目录项个数
+            num_entries++;
+        }
+
+        // 更新已读取的字节数
+        bytes_read += CLUSER_SIZE;
+
+        // 检查是否需要读取下一个簇
+        if (bytes_read < total_size)
+        {
+            cluster_num = (uint32_t)parse_cluster_number(cluster_num);
+            if (cluster_num == 0xffffffff)
+            {
+                printf("End of directory.\n");
+                return num_entries; // 返回当前统计结果
+            }
+        }
+    }
+
+    return num_entries; // 返回最终统计结果
+}
