@@ -18,8 +18,8 @@ void print_block_data(const unsigned char *block_data, int block_size)
 }
 int main()
 {
-    const uint32_t block_size = 512;                                      // 设置每个块的大小
-    const uint64_t total_blocks = 4ULL * 1024 * 1024 * 1024 / block_size; // 计算总块数
+    const uint32_t block_size = 512;
+    const uint64_t total_blocks = 4ULL * 1024 * 1024 * 1024 / block_size;
     if (initialize_device(&fat_device, "myfilesystem.img", total_blocks, block_size) != 0)
     {
         fprintf(stderr, "Failed to initialize device\n");
@@ -39,9 +39,5 @@ int main()
     print_hex_data(buffer,32);
     Dirent tmp = parse_directory_entry(buffer);
     print_directory_entry(&tmp);
-    // uint32_t data;
-    // memcpy(&data,buffer,32);
-    // Dirent dir_tmp = parse_directory_entry(data);
-    // print_directory_entry(&dir_tmp);
-    // ls_dir(&root_dir_entry);
+    ls_dir(&root_dir_entry);
 }

@@ -40,7 +40,7 @@ void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr)
     dir->DIR_FileSize = 0;
 
     // 获取第一个有效簇号
-    uint32_t first_valid_cluster = find_first_valid_cluster();
+    uint32_t first_valid_cluster = find_first_valid_cluster()+2;
     dir->DIR_FstClusHI = (first_valid_cluster >> 16) & 0xFFFF; // 高16位
     dir->DIR_FstClusLO = first_valid_cluster & 0xFFFF;         // 低16位
 }
@@ -297,7 +297,6 @@ void print_directory_entry(const Dirent *dir_entry)
     printf("\n");
 }
 
-
 bool ls_dir(Dirent *parent_dir)
 {
     if (!is_directory(parent_dir))
@@ -314,13 +313,16 @@ bool ls_dir(Dirent *parent_dir)
     while (bytes_read < total_size)
     {
         uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
-        read_by_cluster(cluster_num, buffer, CLUSER_SIZE);
+        read_by_cluster(&fat_device, cluster_num, buffer);
 
         // 解析目录项并输出
         for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
         {
             Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
-            if (dir_entry.DIR_Name[0] == '\0') // 目录项为空，表示结束
+
+            // 检查目录项的属性是否有效
+            // 检查是否是结束标志
+            if ((dir_entry.DIR_Attr & ATTR_VOLUME_ID) || dir_entry.DIR_Name[0] == '\0' || (dir_entry.DIR_Attr & ~(ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)) != 0 || ((dir_entry.DIR_FstClusHI << 16) | dir_entry.DIR_FstClusLO) > 8176)
             {
                 printf("End of directory.\n");
                 return true;
