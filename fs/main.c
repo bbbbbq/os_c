@@ -16,7 +16,6 @@ void print_block_data(const unsigned char *block_data, int block_size)
         }
     }
 }
-
 int main()
 {
     const uint32_t block_size = 512;                                      // 设置每个块的大小
@@ -29,9 +28,20 @@ int main()
     BlockCache_manager_init();
     formate_fat32(&fat_device);
     char *buf = malloc(512);
-    read_block(&fat_device,CLUSTER_TO_LBA(2),buf);
+    read_block(&fat_device, CLUSTER_TO_LBA(2), buf);
+    print_by_cluster(&fat_device,2);
     init_root_entry();
     Dirent tmp_dirent;
-    creat_dir_entry(&tmp_dirent, "FILENAME", 0x10, 1234, 5678, 9101, 1121, 2222, 3333, 1000);
+    creat_dir_entry(&tmp_dirent, "FILENAME", ATTR_DIRECTORY);
     create_dir(&root_dir_entry, tmp_dirent, &fat_device);
+    void *buffer = malloc(32);
+    read_by_byte_cluser(&fat_device,2,0,32,buffer);
+    print_hex_data(buffer,32);
+    Dirent tmp = parse_directory_entry(buffer);
+    print_directory_entry(&tmp);
+    // uint32_t data;
+    // memcpy(&data,buffer,32);
+    // Dirent dir_tmp = parse_directory_entry(data);
+    // print_directory_entry(&dir_tmp);
+    // ls_dir(&root_dir_entry);
 }

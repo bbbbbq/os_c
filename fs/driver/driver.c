@@ -7,6 +7,7 @@
 // 读取指定块到缓冲区
 int read_block(Device *device, uint64_t block_num, void *buffer)
 {
+    printf("block_id:%d\n",block_num);
     if (!device || !buffer)
         return -1;
     if (block_num >= device->total_blocks)
@@ -237,7 +238,7 @@ int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, ui
     }
 
     // 读取整个簇的数据到临时缓冲区
-    if (read_by_cluster(device, cluser_num, buffer_tmp) != 0)
+    if (read_by_cluster(device, cluser_num, buffer_tmp) == 0)
     {
         printf("Error: Failed to read data from cluster.\n");
         free(buffer_tmp);
@@ -288,4 +289,43 @@ int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, u
     free(buffer_tmp);
 
     return 0;
+}
+
+void print_by_cluster(Device *device, uint64_t cluster_num)
+{
+    // 分配一个缓冲区来存储从设备读取的数据
+    uint8_t buffer[CLUSER_SIZE];
+
+    // 读取指定簇的数据到缓冲区中
+    if (read_by_cluster(device, cluster_num, buffer) == 0)
+    {
+        fprintf(stderr, "Error: Failed to read data from cluster %lu\n", cluster_num);
+        return;
+    }
+
+    // 打印读取到的数据
+    printf("Data in cluster %lu:\n", cluster_num);
+    for (int i = 0; i < CLUSER_SIZE; ++i)
+    {
+        printf("%02X ", buffer[i]); // 以十六进制形式打印每个字节的值
+        if ((i + 1) % 16 == 0)
+        {
+            printf("\n"); // 每行打印 16 个字节
+        }
+    }
+    printf("\n");
+}
+
+void print_hex_data(void *data, size_t size)
+{
+    uint8_t *bytes = (uint8_t *)data;
+    for (size_t i = 0; i < size; ++i)
+    {
+        printf("%02X ", bytes[i]); // 以十六进制形式打印每个字节的值
+        if ((i + 1) % 16 == 0)
+        {
+            printf("\n"); // 每行打印 16 个字节
+        }
+    }
+    printf("\n");
 }

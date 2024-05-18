@@ -13,6 +13,7 @@ typedef struct Device {
 } Device;
 
 // 函数声明：初始化设备
+void print_by_cluster(Device *device, uint64_t cluster_num);
 int initialize_device(Device* device, const char* name, uint64_t total_blocks, uint32_t block_size);
 int read_block(Device *device, uint64_t block_num, void *buffer);
 int write_block(Device *device, uint64_t block_num, const void *buffer);
@@ -25,4 +26,7 @@ int write_by_byte(Device *device, uint64_t block_num, uint64_t offset, uint64_t 
 int copy_block(Device *device, uint64_t src_block_num, uint64_t dest_block_num);
 int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer);
 int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer);
+void print_hex_data(void *data, size_t size);
+
+
 #endif

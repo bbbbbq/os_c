@@ -1,4 +1,5 @@
 #include "fat_table.h"
+#include <assert.h>
 Fat32Table fat_table;
 
 void format_fat_table()
@@ -65,7 +66,9 @@ void set_cluser_free(uint64_t index)
 
 uint64_t parse_cluster_number(uint64_t index)
 {
-    return fat_table.entries[index].entry_value & 0x0FFFFFFF;
+    uint32_t tmp = fat_table.entries[index].entry_value & 0x0FFFFFFF;
+    if (tmp > FAT_ENTRY_NUM) assert(0);
+    return tmp;
 }
 
 void set_cluster_number(uint64_t index, uint32_t cluster_number)
