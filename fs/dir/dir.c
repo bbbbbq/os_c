@@ -51,7 +51,7 @@ void init_root_entry()
 {
     printf("init_root_entry_start\n");
     memset(&root_dir_entry, 0, sizeof(Dirent));
-    strncpy(root_dir_entry.DIR_Name, "ROOT     ", 11);
+    strncpy(root_dir_entry.DIR_Name, "ROOT", 11);
     root_dir_entry.DIR_Attr = 0x10;
     root_dir_entry.DIR_FstClusHI=0x0000;
     root_dir_entry.DIR_FstClusLO=0x0002;
@@ -369,7 +369,7 @@ void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *pare
     create_dir(parent_dir, tmp_dirent, device);
 }
 
-Dirent *find_parent_directory_bfs(char *name, Dirent start_dir)
+Dirent *find_directory_bfs(char *name, Dirent start_dir)
 {
     struct queue_root *root;
     init_queue(&root);
@@ -404,6 +404,59 @@ Dirent *find_parent_directory_bfs(char *name, Dirent start_dir)
                     if(is_directory(&dir_entry))
                     {
                         queue_add(root,&dir_entry);
+                    }
+                }
+                bytes_read += CLUSER_SIZE;
+                if (bytes_read < total_size)
+                {
+                    cluster_num = (uint32_t)parse_cluster_number(cluster_num);
+                    if (cluster_num == 0xffffffff)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+Dirent *find_parent_directory_bfs(char *name, Dirent* start_dir)
+{
+    struct queue_root *root;
+    init_queue(&root);
+    queue_add(root, start_dir);
+    while (!queue_is_empty(root))
+    {
+        Dirent *tmp_dir = queue_get(root);
+        Dirent *res_dir = find_dir_entry(tmp_dir, name);
+        if (res_dir != NULL)
+            return tmp_dir;
+        else
+        {
+            if (!is_directory(tmp_dir))
+            {
+                //printf("Not a directory.\n");
+                continue;
+            }
+
+            uint32_t cluster_num = extract_cluster_number(tmp_dir);
+            uint32_t total_size = get_file_or_dir_size(tmp_dir);
+            uint32_t bytes_read = 0;
+
+            // 循环读取每个簇的数据
+            while (bytes_read < total_size)
+            {
+                uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
+                read_by_cluster(&fat_device, cluster_num, buffer);
+
+                // 解析目录项并输出
+                for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
+                {
+                    Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
+                    if (is_directory(&dir_entry))
+                    {
+                        queue_add(root, &dir_entry);
                     }
                 }
                 bytes_read += CLUSER_SIZE;

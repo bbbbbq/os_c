@@ -84,6 +84,7 @@ uint32_t is_directory(const Dirent *entry);
 
 void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir, Device *device);
 
-Dirent* find_parent_directory_bfs(char* name,Dirent start_dir);
+Dirent* find_directory_bfs(char* name,Dirent start_dir);
 
+Dirent *find_parent_directory_bfs(char *name, Dirent* start_dir);
 #endif

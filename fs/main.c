@@ -35,11 +35,11 @@ int main()
     add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
     //add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
     ls_dir(&root_dir_entry);
-    Dirent *test = find_parent_directory_bfs("123", root_dir_entry);
+    Dirent *test = find_parent_directory_bfs("123", &root_dir_entry);
     if (test == NULL)
     {
         printf("123\n");
-    }else 
+    }else
     {
         print_directory_entry(test);
     }
