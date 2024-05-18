@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "fat_table.h"
+#include "queue.h"
 // 外部变量声明
 extern Device fat_device;
 extern Fat32Table fat_table;
@@ -54,6 +55,7 @@ void init_root_entry()
     root_dir_entry.DIR_Attr = 0x10;
     root_dir_entry.DIR_FstClusHI=0x0000;
     root_dir_entry.DIR_FstClusLO=0x0002;
+    set_file_or_dir_size(&root_dir_entry, 32);
     write_by_cluster(&fat_device, 2, &root_dir_entry, sizeof(Dirent));
     uint64_t index = find_first_valid_cluster();
     set_cluser_end(index);
@@ -180,8 +182,6 @@ Dirent parse_directory_entry(void *buffer)
 
     return dir_entry;
 }
-
-// 查找目录项函数实现
 Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name)
 {
     uint32_t dir_cluster = extract_cluster_number(parent_dir_entry);
@@ -192,12 +192,21 @@ Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name)
     {
         // 计算当前目录项在缓冲区中的偏移量
         size_t offset = i * sizeof(Dirent);
-        Dirent tmp = parse_directory_entry(buffer + offset);
+        Dirent tmp;
+        tmp = parse_directory_entry(buffer + offset);
         if (compare_dir_entry_name(&tmp, dir_name) == 1)
         {
-            // 如果找到目录项，返回指向目录项的指针
-            return &tmp;
+            // 如果找到目录项，创建一个新的 Dirent 结构体，并将结果复制到其中
+            Dirent *result = malloc(sizeof(Dirent));
+            if (result == NULL)
+            {
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            memcpy(result, &tmp, sizeof(Dirent));
+            return result;
         }
+        // 不需要在这里释放 tmp 指针，因为它指向的内存是自动分配的
     }
     return NULL;
 }
@@ -256,9 +265,9 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
         printf("Error: Failed to create directory.\n");
         return;
     }
-    set_file_or_dir_size(parent_dir_entry, file_size + sizeof(Dirent));
+    set_file_or_dir_size(parent_dir_entry, parent_dir_entry->DIR_FileSize + sizeof(Dirent));
     uint32_t new_dir_cluser_num = extract_cluster_number(&new_dir_entry);
-    set_cluser_end(new_dir_cluser_num);
+    set_cluser_end(new_dir_cluser_num-2);
 }
 
 
@@ -322,7 +331,7 @@ bool ls_dir(Dirent *parent_dir)
 
             // 检查目录项的属性是否有效
             // 检查是否是结束标志
-            if ((dir_entry.DIR_Attr & ATTR_VOLUME_ID) || dir_entry.DIR_Name[0] == '\0' || (dir_entry.DIR_Attr & ~(ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)) != 0 || ((dir_entry.DIR_FstClusHI << 16) | dir_entry.DIR_FstClusLO) > 8176)
+            if ((dir_entry.DIR_Attr & ATTR_VOLUME_ID) || dir_entry.DIR_Name[0] == '\0' || (dir_entry.DIR_Attr & ~(ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)) != 0 || ((dir_entry.DIR_FstClusHI << 16) || dir_entry.DIR_FstClusLO) > 8176 )
             {
                 printf("End of directory.\n");
                 return true;
@@ -351,4 +360,63 @@ bool ls_dir(Dirent *parent_dir)
         }
     }
     return true;
+}
+
+void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir, Device *device)
+{
+    Dirent tmp_dirent;
+    creat_dir_entry(&tmp_dirent, name, attr);
+    create_dir(parent_dir, tmp_dirent, device);
+}
+
+Dirent *find_parent_directory_bfs(char *name, Dirent start_dir)
+{
+    struct queue_root *root;
+    init_queue(&root);
+    queue_add(root,&start_dir);
+    while(!queue_is_empty(root))
+    {
+        Dirent* tmp_dir = queue_get(root);
+        Dirent* res_dir = find_dir_entry(tmp_dir,name);
+        if(res_dir!=NULL) return res_dir;
+        else
+        {
+            if (!is_directory(tmp_dir))
+            {
+                printf("Not a directory.\n");
+                continue;
+            }
+
+            uint32_t cluster_num = extract_cluster_number(tmp_dir);
+            uint32_t total_size = get_file_or_dir_size(tmp_dir);
+            uint32_t bytes_read = 0;
+
+            // 循环读取每个簇的数据
+            while (bytes_read < total_size)
+            {
+                uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
+                read_by_cluster(&fat_device, cluster_num, buffer);
+
+                // 解析目录项并输出
+                for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
+                {
+                    Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
+                    if(is_directory(&dir_entry))
+                    {
+                        queue_add(root,&dir_entry);
+                    }
+                }
+                bytes_read += CLUSER_SIZE;
+                if (bytes_read < total_size)
+                {
+                    cluster_num = (uint32_t)parse_cluster_number(cluster_num);
+                    if (cluster_num == 0xffffffff)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return NULL;
 }

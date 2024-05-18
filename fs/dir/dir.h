@@ -10,7 +10,7 @@
 #define ATTR_VOLUME_ID 0x08 // 卷标属性
 #define ATTR_DIRECTORY 0x10 // 子目录属性
 #define ATTR_ARCHIVE 0x20   // 归档属性
-
+#define ATTR_FILE 0x03  
 // 目录项结构体定义
 typedef struct
 {
@@ -81,4 +81,9 @@ bool ls_dir(Dirent *parent_dir);
 void print_directory_entry(const Dirent *dir_entry);
 
 uint32_t is_directory(const Dirent *entry);
+
+void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir, Device *device);
+
+Dirent* find_parent_directory_bfs(char* name,Dirent start_dir);
+
 #endif

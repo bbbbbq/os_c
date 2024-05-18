@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "fs_globle.h"
 #include "dir.h"
+#include "queue.h"
 Device fat_device;
 void print_block_data(const unsigned char *block_data, int block_size)
 {
@@ -27,17 +28,19 @@ int main()
     }
     BlockCache_manager_init();
     formate_fat32(&fat_device);
-    char *buf = malloc(512);
-    read_block(&fat_device, CLUSTER_TO_LBA(2), buf);
-    print_by_cluster(&fat_device,2);
     init_root_entry();
-    Dirent tmp_dirent;
-    creat_dir_entry(&tmp_dirent, "123", ATTR_DIRECTORY);
-    create_dir(&root_dir_entry, tmp_dirent, &fat_device);
-    void *buffer = malloc(32);
-    read_by_byte_cluser(&fat_device,2,32,32,buffer);
-    print_hex_data(buffer,32);
-    Dirent tmp = parse_directory_entry(buffer);
-    print_directory_entry(&tmp);
+    add_file_or_dir_to_parent_directory("123",ATTR_DIRECTORY,&root_dir_entry,&fat_device);
+    add_file_or_dir_to_parent_directory("wode", ATTR_DIRECTORY, &root_dir_entry, &fat_device);
+    add_file_or_dir_to_parent_directory("wode123", ATTR_DIRECTORY, &root_dir_entry, &fat_device);
+    add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
+    //add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
     ls_dir(&root_dir_entry);
+    Dirent *test = find_parent_directory_bfs("123", root_dir_entry);
+    if (test == NULL)
+    {
+        printf("123\n");
+    }else 
+    {
+        print_directory_entry(test);
+    }
 }
