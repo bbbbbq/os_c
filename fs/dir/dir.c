@@ -228,9 +228,9 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
     // 获取父目录的最后一个簇号和文件大小
     uint32_t last_dir_cluster_index = find_file_or_dir_tail_cluser(parent_dir_entry);
     uint64_t file_size = get_file_or_dir_size(parent_dir_entry);
-
+    if(parent_dir_entry==&root_dir_entry) file_size+=32;
     // 计算最后一个簇中文件的结束偏移量
-    uint64_t last_cluster_end_offset = file_size % CLUSER_SIZE;
+    uint64_t last_cluster_end_offset = file_size % (CLUSER_SIZE);
 
     // 如果剩余空间不够放置新的目录项，需要找到下一个有效簇
     if (CLUSER_SIZE - last_cluster_end_offset < sizeof(Dirent))
@@ -241,7 +241,7 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
         // 更新父目录的页表项
         set_cluster_number(last_dir_cluster_index, next_cluster_index);
         set_cluster_number(next_cluster_index,0xffffffff);
-            // 更新最后一个簇号和文件大小
+        // 更新最后一个簇号和文件大小
         last_dir_cluster_index = next_cluster_index;
         last_cluster_end_offset = 0;
     }
@@ -250,6 +250,7 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
     uint64_t write_offset = last_cluster_end_offset;
 
     // 在最后一个簇中写入新的目录项
+    last_dir_cluster_index+=2;
     if (write_by_byte_cluser(device, last_dir_cluster_index, write_offset, sizeof(Dirent), &new_dir_entry) != 0)
     {
         printf("Error: Failed to create directory.\n");

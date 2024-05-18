@@ -32,10 +32,10 @@ int main()
     print_by_cluster(&fat_device,2);
     init_root_entry();
     Dirent tmp_dirent;
-    creat_dir_entry(&tmp_dirent, "FILENAME", ATTR_DIRECTORY);
+    creat_dir_entry(&tmp_dirent, "123", ATTR_DIRECTORY);
     create_dir(&root_dir_entry, tmp_dirent, &fat_device);
     void *buffer = malloc(32);
-    read_by_byte_cluser(&fat_device,2,0,32,buffer);
+    read_by_byte_cluser(&fat_device,2,32,32,buffer);
     print_hex_data(buffer,32);
     Dirent tmp = parse_directory_entry(buffer);
     print_directory_entry(&tmp);

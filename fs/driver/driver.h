@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #define SECTOR_SIZE 512
-#define CLUSER_SIZE SECTOR_SIZE*8
+#define CLUSER_SIZE (SECTOR_SIZE*8)
 // 设备结构体
 typedef struct Device {
     char* name;              // 设备名称

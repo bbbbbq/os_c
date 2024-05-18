@@ -262,6 +262,7 @@ int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, u
 
     // 读取整个簇的数据到临时缓冲区
     void *buffer_tmp = malloc(CLUSER_SIZE);
+    print_hex_data(buffer_tmp,CLUSER_SIZE);
     if (buffer_tmp == NULL)
     {
         printf("Error: Memory allocation failed.\n");
@@ -276,7 +277,7 @@ int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, u
 
     // 将输入缓冲区中的数据写入临时缓冲区指定偏移量和大小的位置
     memcpy(buffer_tmp + offset, buffer, size_byte);
-
+    print_hex_data(buffer_tmp,CLUSER_SIZE);
     // 将更新后的数据写回簇的数据区
     if (write_by_cluster(device, cluser_num, buffer_tmp,sizeof(buffer_tmp)) == 0)
     {
