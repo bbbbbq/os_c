@@ -578,7 +578,7 @@ uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluster_num, uint32_t
 
 uint32_t update_dir(char *name, Dirent *new_dir)
 {
-    Dirent* dir = find_dir_entry(root_dir_entry,name);
+    Dirent* dir = find_dir_entry(&root_dir_entry,name);
     uint32_t cluser_num=0;
     uint32_t offset=0;
     find_dir_cluster_and_offset(name,&cluser_num,&offset);
