@@ -1,9 +1,8 @@
 #include "file.h"
 #include "dir.h"
 #include "fat_table.h"
-#include "stdlib.h"
-#include <string.h>
-#include "stdio.h"
+#include "buddy.h"
+#include "string.h"
 #define min(a, b) ((a) < (b) ? (a) : (b))
 extern Device fat_device;
 void read_file(char *name, void *buffer, Device *fat_device)
@@ -12,12 +11,12 @@ void read_file(char *name, void *buffer, Device *fat_device)
     Dirent *dir = find_directory_bfs(name, root_dir_entry);
     if(is_directory(dir))
     {
-        printf("is_not_file\n");
+        printk("is_not_file\n");
         return;
     }
     if (dir == NULL)
     {
-        printf("File not found\n");
+        printk("File not found\n");
         return;
     }
 
@@ -26,7 +25,7 @@ void read_file(char *name, void *buffer, Device *fat_device)
     uint64_t file_size = get_file_or_dir_size(dir);
     if(file_size==0) 
     {
-        printf("file without data\n");
+        printk("file without data\n");
     }
     uint32_t bytes_read = 0;                     
     uint8_t *current_buffer = (uint8_t *)buffer;
@@ -47,7 +46,7 @@ void read_file(char *name, void *buffer, Device *fat_device)
             int result = read_by_cluster(fat_device, cluster_num, current_buffer);
             if (result != 0)
             {
-                printf("Error: Failed to read data\n");
+                printk("Error: Failed to read data\n");
                 return;
             }
         }
@@ -67,14 +66,14 @@ void over_write_file(char *name, void *buffer, Device *fat_device, size_t buffer
     Dirent *dir = find_directory_bfs(name, root_dir_entry);
     if (dir == NULL)
     {
-        printf("File not found\n");
+        printk("File not found\n");
         return;
     }
 
     // 确保目标是文件而不是目录
     if (is_directory(dir))
     {
-        printf("The target is a directory, not a file\n");
+        printk("The target is a directory, not a file\n");
         return;
     }
 
@@ -99,7 +98,7 @@ void over_write_file(char *name, void *buffer, Device *fat_device, size_t buffer
         int result = write_by_byte_cluser(fat_device, cluster_num, bytes_written, bytes_to_write, buffer + bytes_written);
         if (result != 0)
         {
-            printf("Error: Failed to write data\n");
+            printk("Error: Failed to write data\n");
             return;
         }
         bytes_written += bytes_to_write;
@@ -112,7 +111,7 @@ void over_write_file(char *name, void *buffer, Device *fat_device, size_t buffer
     set_file_or_dir_size(dir, buffer_size);
     set_cluser_end(cluster_num-2);
     update_dir(name, dir);
-    printf("Data successfully overwritten to file: %s\n", name);
+    printk("Data successfully overwritten to file: %s\n", name);
 }
 
 
@@ -121,12 +120,12 @@ void append_to_file(char *name, void *buffer, size_t buffer_size, Device *fat_de
     Dirent *dir = find_directory_bfs(name, root_dir_entry);
     if (dir == NULL)
     {
-        printf("File not found\n");
+        printk("File not found\n");
         return;
     }
     if (is_directory(dir))
     {
-        printf("The target is a directory, not a file\n");
+        printk("The target is a directory, not a file\n");
         return;
     }
 
@@ -135,7 +134,7 @@ void append_to_file(char *name, void *buffer, size_t buffer_size, Device *fat_de
     void *file_data = malloc(file_size);
     if (file_data == NULL)
     {
-        printf("Memory allocation failed\n");
+        printk("Memory allocation failed\n");
         return;
     }
     read_file(name, file_data, fat_device);
@@ -144,7 +143,7 @@ void append_to_file(char *name, void *buffer, size_t buffer_size, Device *fat_de
     void *merged_data = malloc(file_size + buffer_size);
     if (merged_data == NULL)
     {
-        printf("Memory allocation failed\n");
+        printk("Memory allocation failed\n");
         free(file_data);
         return;
     }
@@ -169,7 +168,7 @@ void remove_file(char *name)
     uint32_t dir_chile_file_num = dir_child_dir_num(dir);
     if(dir_chile_file_num!=0)
     {
-        printf("目录下还有文件\n");
+        printk("目录下还有文件\n");
         return;
     }else
     {

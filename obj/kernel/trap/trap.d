@@ -8,6 +8,4 @@ obj/kernel/trap/trap.o: kernel/trap/trap.c kernel/trap/trap.h \
  kernel/string/string.h kernel/batch/pid/pid.h kernel/batch/batch.h \
  kernel/trap/timer/timer.h kernel/globle/riscv.h \
  kernel/batch/processor/processor.h kernel/batch/task/taskmanager.h \
- kernel/data_structure/queue.h kernel/virtio/plic/plic.h \
- kernel/virtio/uart/uart.h kernel/virtio/uart/uart.h \
- kernel/data_structure/ring_buffer.h
+ kernel/data_structure/queue.h kernel/driver/driver.h

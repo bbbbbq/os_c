@@ -1,5 +1,5 @@
 #include "fat_table.h"
-#include <assert.h>
+#include "debug.h"
 Fat32Table fat_table;
 
 void format_fat_table()

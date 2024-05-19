@@ -44,7 +44,12 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "driver.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "virtio_m.h": "c",
+        "cstdlib": "c",
+        "fs_queue.h": "c",
+        "file.h": "c",
+        "fs.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

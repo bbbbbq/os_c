@@ -1,13 +1,12 @@
 #include "driver.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "string.h"
 #include "fs_globle.h"
-#include "assert.h"
+#include "debug.h"
+#include "buddy.h"
 // 读取指定块到缓冲区
 int read_block(Device *device, uint64_t block_num, void *buffer)
 {
-    //printf("block_id:%d\n",block_num);
+    // printk("block_id:%d\n",block_num);
     if (!device || !buffer)
         return -1;
     if (block_num >= device->total_blocks)
@@ -70,7 +69,6 @@ int initialize_device(Device *device, const char *name, uint64_t total_blocks, u
 {
     if (!device || !name)
         return -1;
-
     device->name = strdup(name); // 复制设备名称
     device->total_blocks = total_blocks;
     device->block_size = block_size;
@@ -88,7 +86,7 @@ int read_multiple_blocks(Device *device, uint64_t start_block_id, void *buffer, 
         int result = read_block(device, current_block_id, buffer);
         if (result != 0)
         {
-            printf("Error reading block %lu\n", current_block_id);
+            printk("Error reading block %lu\n", current_block_id);
             return 0; // 读取失败
         }
 
@@ -118,7 +116,7 @@ int write_multiple_blocks(Device *device, uint64_t start_block_id, const void *b
         int result = write_block(device, current_block_id, buffer);
         if (result != 0)
         {
-            printf("Error writing block %lu\n", current_block_id);
+            printk("Error writing block %lu\n", current_block_id);
             return -1; // 写入失败
         }
 
@@ -206,42 +204,42 @@ int copy_block(Device *device, uint64_t src_block_num, uint64_t dest_block_num)
     {
         return -1;
     }
-    void *buffer = malloc(SECTOR_SIZE);
+    void *buffer = bd_malloc(SECTOR_SIZE);
     if (buffer == NULL)
     {
         return -1;
     }
     if (read_block(device, src_block_num, buffer) != 0)
     {
-        free(buffer);
+        bd_free(buffer);
         return -1;
     }
     if (write_block(device, dest_block_num, buffer) != 0)
     {
-        free(buffer);
+        bd_free(buffer);
         return -1;
     }
-    free(buffer);
+    bd_free(buffer);
     return 0;
 }
 int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer)
 {
     // 检查参数有效性
-    assert(buffer != NULL && device != NULL);
+    ASSERT(buffer != NULL && device != NULL);
 
     // 分配临时缓冲区
-    void *buffer_tmp = malloc(CLUSER_SIZE);
+    void *buffer_tmp = bd_malloc(CLUSER_SIZE);
     if (buffer_tmp == NULL)
     {
-        printf("Error: Memory allocation failed.\n");
+        printk("Error: Memory allocation failed.\n");
         return 0;
     }
 
     // 读取整个簇的数据到临时缓冲区
     if (read_by_cluster(device, cluser_num, buffer_tmp) == 0)
     {
-        printf("Error: Failed to read data from cluster.\n");
-        free(buffer_tmp);
+        printk("Error: Failed to read data from cluster.\n");
+        bd_free(buffer_tmp);
         return -1;
     }
 
@@ -249,7 +247,7 @@ int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, ui
     memcpy(buffer, buffer_tmp + offset, size_byte);
 
     // 释放临时缓冲区
-    free(buffer_tmp);
+    bd_free(buffer_tmp);
 
     return 1;
 }
@@ -258,20 +256,20 @@ int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, ui
 int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer)
 {
     // 检查参数有效性
-    assert(buffer != NULL && device != NULL);
+    ASSERT(buffer != NULL && device != NULL);
 
     // 读取整个簇的数据到临时缓冲区
-    void *buffer_tmp = malloc(CLUSER_SIZE);
+    void *buffer_tmp = bd_malloc(CLUSER_SIZE);
     //print_hex_data(buffer_tmp,CLUSER_SIZE);
     if (buffer_tmp == NULL)
     {
-        printf("Error: Memory allocation failed.\n");
+        printk("Error: Memory allocation failed.\n");
         return -1;
     }
     if (read_by_cluster(device, cluser_num, buffer_tmp) == 0)
     {
-        printf("Error: Failed to read data from cluster.\n");
-        free(buffer_tmp);
+        printk("Error: Failed to read data from cluster.\n");
+        bd_free(buffer_tmp);
         return -1;
     }
 
@@ -281,13 +279,13 @@ int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, u
     // 将更新后的数据写回簇的数据区
     if (write_by_cluster(device, cluser_num, buffer_tmp,sizeof(buffer_tmp)) == 0)
     {
-        printf("Error: Failed to write data back to cluster.\n");
-        free(buffer_tmp);
+        printk("Error: Failed to write data back to cluster.\n");
+        bd_free(buffer_tmp);
         return -1;
     }
 
     // 释放临时缓冲区
-    free(buffer_tmp);
+    bd_free(buffer_tmp);
 
     return 0;
 }
@@ -300,21 +298,21 @@ void print_by_cluster(Device *device, uint64_t cluster_num)
     // 读取指定簇的数据到缓冲区中
     if (read_by_cluster(device, cluster_num, buffer) == 0)
     {
-        fprintf(stderr, "Error: Failed to read data from cluster %lu\n", cluster_num);
+        printk("Error: Failed to read data from cluster %lu\n", cluster_num);
         return;
     }
 
     // 打印读取到的数据
-    printf("Data in cluster %lu:\n", cluster_num);
+    printk("Data in cluster %lu:\n", cluster_num);
     for (int i = 0; i < CLUSER_SIZE; ++i)
     {
-        printf("%02X ", buffer[i]); // 以十六进制形式打印每个字节的值
+        printk("%02X ", buffer[i]); // 以十六进制形式打印每个字节的值
         if ((i + 1) % 16 == 0)
         {
-            printf("\n"); // 每行打印 16 个字节
+            printk("\n"); // 每行打印 16 个字节
         }
     }
-    printf("\n");
+    printk("\n");
 }
 
 void print_hex_data(void *data, size_t size)
@@ -322,11 +320,11 @@ void print_hex_data(void *data, size_t size)
     uint8_t *bytes = (uint8_t *)data;
     for (size_t i = 0; i < size; ++i)
     {
-        printf("%02X ", bytes[i]); // 以十六进制形式打印每个字节的值
+        printk("%02X ", bytes[i]); // 以十六进制形式打印每个字节的值
         if ((i + 1) % 16 == 0)
         {
-            printf("\n"); // 每行打印 16 个字节
+            printk("\n"); // 每行打印 16 个字节
         }
     }
-    printf("\n");
+    printk("\n");
 }

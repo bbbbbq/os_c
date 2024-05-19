@@ -1,9 +1,10 @@
-#include "block_cache.h"
+#include "fs.h"
+#include "debug.h"
 BlockCache_Manager BLOCKCACHE_MANAGER;
-extern Device fat_device;
+extern BlockDevice fat_device;
 void BlockCache_manager_init()
 {
-    vector_new(&BLOCKCACHE_MANAGER.blockcache_vector, sizeof(BlockCache));
+    vector_new(&BLOCKCACHE_MANAGER.blockcache_vector, sizeof(struct BlockCache));
 }
 
 void block_cache_sync_all()
@@ -12,12 +13,12 @@ void block_cache_sync_all()
     uint64_t blockcache_num = blockcache_vector.size;
     for(int i=0;i<blockcache_num;i++)
     {
-        BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
+        struct BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
         block_cache_sync(blockcache_ve);
     }
 }
 
-void block_cache_sync(BlockCache *block_cache)
+void block_cache_sync(struct BlockCache *block_cache)
 {
     if (block_cache->modified)
     {
@@ -26,10 +27,9 @@ void block_cache_sync(BlockCache *block_cache)
     }
 }
 
-
-void block_cache_new(BlockCache *block_cache, uint64_t block_id, Device *block_device)
+void block_cache_new(struct BlockCache *block_cache, uint64_t block_id, BlockDevice *block_device)
 {
-    memset(block_cache->cache, 0, BLOCK_SZ);
+    memset(block_cache->cache, 0, BLOCK_SIZE);
     block_cache->block_id = block_id;
     block_cache->block_device = block_device;
     block_cache->modified = false;
@@ -37,16 +37,15 @@ void block_cache_new(BlockCache *block_cache, uint64_t block_id, Device *block_d
     read_block(&fat_device,block_cache->block_id,block_cache->cache);
 }
 
-
-BlockCache *BlockCache_find_block_by_index(Device *blockdevice, uint64_t index)
+struct BlockCache *BlockCache_find_block_by_index(BlockDevice *blockdevice, uint64_t index)
 {
-    assert(blockdevice!=NULL);
+    ASSERT(blockdevice != NULL);
     struct vector blockcache_vector = BLOCKCACHE_MANAGER.blockcache_vector;
-    assert(blockcache_vector.size >= index);
+    ASSERT(blockcache_vector.size >= index);
     uint64_t blockcache_num = blockcache_vector.size;
     for(int i=0;i<blockcache_num;i++)
     {
-        BlockCache* blockcache_ve = vector_get(&blockcache_vector,i);
+        struct BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
         if(blockcache_ve->block_device==blockdevice&&blockcache_ve->block_id==index)
         {
             return blockcache_ve;
@@ -54,7 +53,7 @@ BlockCache *BlockCache_find_block_by_index(Device *blockdevice, uint64_t index)
     }
     for (int i = 0; i < blockcache_num; i++)
     {
-        BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
+        struct BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
         if(blockcache_ve->ref==0)
         {
             block_cache_sync(blockcache_ve);
@@ -63,14 +62,14 @@ BlockCache *BlockCache_find_block_by_index(Device *blockdevice, uint64_t index)
             return blockcache_ve;
         }
     }
-    assert(0);
+    ASSERT(0);
     return NULL;
 }
-void block_cache_release(BlockCache *b)
+void block_cache_release(struct BlockCache *b)
 {
     if (b == NULL)
     {
-        assert(0);
+        ASSERT(0);
         return;
     }
 
@@ -79,12 +78,13 @@ void block_cache_release(BlockCache *b)
     bool found = false;
     for (int i = 0; i < blockcache_num; i++)
     {
-        BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
+        struct BlockCache *blockcache_ve = vector_get(&blockcache_vector, i);
         if (blockcache_ve == b)
         {
             vector_remove(&blockcache_vector, i);
             found = true;
         }
     }
-    if (!found) assert(0);
+    if (!found)
+        ASSERT(0);
 }

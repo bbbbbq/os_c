@@ -28,5 +28,4 @@ int read_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, ui
 int write_by_byte_cluser(Device *device, uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer);
 void print_hex_data(void *data, size_t size);
 
-
 #endif

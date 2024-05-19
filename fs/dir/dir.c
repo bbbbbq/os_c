@@ -1,13 +1,9 @@
 #include "dir.h"
-#include <stdint.h>
-#include <stddef.h>
 #include "driver.h"
 #include "fs_globle.h"
 #include "fat_table.h"
-#include "stdio.h"
+#include "stdint.h"
 #include "string.h"
-#include <stdlib.h>
-#include <stdbool.h>
 #include "fat_table.h"
 #include "queue.h"
 // 外部变量声明
