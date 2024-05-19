@@ -35,15 +35,18 @@ int main()
     add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
     //add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
     ls_dir(&root_dir_entry);
-    Dirent *test = find_parent_directory_bfs("123", &root_dir_entry);
-    if (test == NULL)
-    {
-        printf("123\n");
-    }else
-    {
-        print_directory_entry(test);
-    }
-    Dirent *dir_ty = find_directory_bfs("wode",root_dir_entry);
-    uint32_t num = dir_child_dir_num(dir_ty);
-    printf("%d\n",num);
+    // Dirent *test = find_parent_directory_bfs("123", &root_dir_entry);
+    // if (test == NULL)
+    // {
+    //     printf("123\n");
+    // }else
+    // {
+    //     print_directory_entry(test);
+    // }
+    // Dirent *dir_ty = find_directory_bfs("wode",root_dir_entry);
+    // uint32_t num = dir_child_dir_num(dir_ty);
+    // printf("%d\n",num);
+    remove_file("123");
+    printf("\n\n\n\n\n\n\n");
+    ls_dir(&root_dir_entry);
 }

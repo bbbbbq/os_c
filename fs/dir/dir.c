@@ -237,7 +237,6 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
     // 获取父目录的最后一个簇号和文件大小
     uint32_t last_dir_cluster_index = find_file_or_dir_tail_cluser(parent_dir_entry);
     uint64_t file_size = get_file_or_dir_size(parent_dir_entry);
-    if(parent_dir_entry==&root_dir_entry) file_size+=32;
     // 计算最后一个簇中文件的结束偏移量
     uint64_t last_cluster_end_offset = file_size % (CLUSER_SIZE);
 
@@ -331,6 +330,7 @@ bool ls_dir(Dirent *parent_dir)
 
             // 检查目录项的属性是否有效
             // 检查是否是结束标志
+            if(dir_entry.DIR_Attr == ATTR_DELETED) continue;
             if ((dir_entry.DIR_Attr & ATTR_VOLUME_ID) || dir_entry.DIR_Name[0] == '\0' || (dir_entry.DIR_Attr & ~(ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)) != 0 || ((dir_entry.DIR_FstClusHI << 16) || dir_entry.DIR_FstClusLO) > 8176 )
             {
                 printf("End of directory.\n");

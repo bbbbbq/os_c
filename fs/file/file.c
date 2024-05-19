@@ -169,7 +169,7 @@ void remove_file(char *name)
         return;
     }else
     {
-        release_linked_clusters(cluser_num);
+        //release_linked_clusters(cluser_num);
         uint32_t dir_cluster = extract_cluster_number(parent_dir);
         uint8_t buffer[CLUSER_SIZE];
         read_by_cluster(&fat_device, dir_cluster, buffer);
@@ -184,7 +184,7 @@ void remove_file(char *name)
             {
                 uint8_t data;
                 data = ATTR_DELETED;
-                write_by_byte_cluser(&fat_device, dir_cluster, offset+11,1,data);
+                write_by_byte_cluser(&fat_device, dir_cluster, offset+11,1,&data);
                 return;
             }
         }
