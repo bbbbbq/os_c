@@ -222,7 +222,7 @@ void virtio_disk_intr()
         int id = disk.used->ring[disk.used_idx % NUM].id;
 
         if (disk.info[id].status != 0)
-            panic("virtio_disk_intr status\n");
+            panic("virtio_disk_intr status 123\n");
 
         BlockCache *b = disk.info[id].b;
         b->disk = false;
