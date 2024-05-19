@@ -1,5 +1,3 @@
-// ref: xv6-riscv by MIT (https://github.com/mit-pdos/xv6-riscv-fall19)
-
 #include "list.h"
 #include "stdint.h"
 #include <assert.h>

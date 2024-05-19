@@ -10,8 +10,8 @@
 #define BLOCKCACHE_NUMBER 40
 typedef struct
 {
-    struct vector blockcache_vector;
-}BlockCache_Manager;
+  struct vector blockcache_vector;
+} BlockCache_Manager;
 
 typedef struct
 {
@@ -21,7 +21,7 @@ typedef struct
   bool disk;
   bool modified;
   uint64_t ref;
-}BlockCache ;
+} BlockCache;
 
 void BlockCache_manager_init();
 BlockCache *BlockCache_find_block_by_index(Device *blockdevice, uint64_t index);
