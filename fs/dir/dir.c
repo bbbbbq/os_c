@@ -525,6 +525,62 @@ uint32_t dir_child_dir_num(Dirent *parent_dir)
             }
         }
     }
-
     return num_entries; // 返回最终统计结果
+}
+
+uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluster_num, uint32_t *offset)
+{
+    Dirent* dir = find_directory_bfs(name, root_dir_entry);
+    Dirent* parent_dir = find_parent_directory_bfs(name,&root_dir_entry);
+    if (dir == NULL)
+    {
+        printf("Directory not found.\n");
+        return 0;
+    }
+
+    uint32_t parent_cluster_num = extract_cluster_number(parent_dir);
+    uint32_t read_data_size = 0;
+    uint32_t parent_file_size = get_file_or_dir_size(parent_dir);
+
+    while (read_data_size < parent_file_size)
+    {
+        uint8_t buffer[CLUSER_SIZE];
+        read_by_cluster(&fat_device, parent_cluster_num, buffer);
+
+        for (int i = 0; i < CLUSER_SIZE; i += 32)
+        {
+            Dirent tmp = parse_directory_entry(buffer + i);
+            if (compare_dir_entry_name(&tmp, name) == 1)
+            {
+                // Found the directory entry
+                *cluster_num = parent_cluster_num;
+                *offset = i;
+                return 1;
+            }
+        }
+
+        read_data_size += CLUSER_SIZE;
+
+        if (read_data_size < parent_file_size)
+        {
+            parent_cluster_num = parse_cluster_number(parent_cluster_num);
+            if (parent_cluster_num == 0xffffffff)
+            {
+                printf("End of directory.\n");
+                return 0;
+            }
+        }
+    }
+
+    printf("Directory entry not found.\n");
+    return 0;
+}
+
+uint32_t update_dir(char *name, Dirent *new_dir)
+{
+    Dirent* dir = find_dir_entry(root_dir_entry,name);
+    uint32_t cluser_num=0;
+    uint32_t offset=0;
+    find_dir_cluster_and_offset(name,&cluser_num,&offset);
+    write_by_byte_cluser(&fat_device,cluser_num,offset,32,new_dir);
 }

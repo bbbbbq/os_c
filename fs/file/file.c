@@ -24,7 +24,10 @@ void read_file(char *name, void *buffer, Device *fat_device)
     // 获取文件的起始簇号和文件大小
     uint32_t cluster_num = extract_cluster_number(dir);
     uint64_t file_size = get_file_or_dir_size(dir);
-
+    if(file_size==0) 
+    {
+        printf("file without data\n");
+    }
     uint32_t bytes_read = 0;                     
     uint8_t *current_buffer = (uint8_t *)buffer;
 
@@ -108,6 +111,7 @@ void over_write_file(char *name, void *buffer, Device *fat_device, size_t buffer
     // 更新文件大小和结束标记
     set_file_or_dir_size(dir, buffer_size);
     set_cluser_end(cluster_num-2);
+    update_dir(name, dir);
     printf("Data successfully overwritten to file: %s\n", name);
 }
 
@@ -149,8 +153,8 @@ void append_to_file(char *name, void *buffer, size_t buffer_size, Device *fat_de
 
     // 调用 over_write_file 函数将合并后的数据覆盖写入文件
     over_write_file(name, merged_data, fat_device, file_size + buffer_size);
-
-    // 释放内存
+    set_file_or_dir_size(dir, file_size + buffer_size);
+    update_dir(name,dir);
     free(file_data);
     free(merged_data);
 }

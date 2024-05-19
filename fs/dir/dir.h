@@ -90,4 +90,9 @@ Dirent* find_directory_bfs(char* name,Dirent start_dir);
 Dirent *find_parent_directory_bfs(char *name, Dirent* start_dir);
 
 uint32_t dir_child_dir_num(Dirent *parent_dir);
+
+uint32_t find_dir_cluster_and_offset(char* name,uint32_t* cluser_num,uint32_t* offset);
+
+uint32_t update_dir(char *name, Dirent *new_dir);
+
 #endif

@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include "fs_globle.h"
 #include "dir.h"
-#include "queue.h"
-Device fat_device;
+#include "file.h"
+
+
 void print_block_data(const unsigned char *block_data, int block_size)
 {
     for (int i = 0; i <block_size ; ++i)
@@ -17,6 +18,9 @@ void print_block_data(const unsigned char *block_data, int block_size)
         }
     }
 }
+
+Device fat_device;
+
 int main()
 {
     const uint32_t block_size = 512;
@@ -33,20 +37,4 @@ int main()
     add_file_or_dir_to_parent_directory("wode", ATTR_DIRECTORY, &root_dir_entry, &fat_device);
     add_file_or_dir_to_parent_directory("wode123", ATTR_DIRECTORY, &root_dir_entry, &fat_device);
     add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
-    //add_file_or_dir_to_parent_directory("txt", ATTR_FILE, &root_dir_entry, &fat_device);
-    ls_dir(&root_dir_entry);
-    // Dirent *test = find_parent_directory_bfs("123", &root_dir_entry);
-    // if (test == NULL)
-    // {
-    //     printf("123\n");
-    // }else
-    // {
-    //     print_directory_entry(test);
-    // }
-    // Dirent *dir_ty = find_directory_bfs("wode",root_dir_entry);
-    // uint32_t num = dir_child_dir_num(dir_ty);
-    // printf("%d\n",num);
-    remove_file("123");
-    printf("\n\n\n\n\n\n\n");
-    ls_dir(&root_dir_entry);
 }

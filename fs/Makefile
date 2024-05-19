@@ -31,5 +31,5 @@ $(OBJ_DIR)/%.o: %.c
 clean:
 	rm -f $(OBJECTS) $(EXEC)
 
-run:
+run: $(EXEC)
 	./myfs
