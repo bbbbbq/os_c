@@ -544,6 +544,7 @@ uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluster_num, uint32_t
 
     while (read_data_size < parent_file_size)
     {
+        
         uint8_t buffer[CLUSER_SIZE];
         read_by_cluster(&fat_device, parent_cluster_num, buffer);
 
