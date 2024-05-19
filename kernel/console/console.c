@@ -1,5 +1,7 @@
 #include "console.h"
 #include "sbi.h"
+#include "string.h"
+#include "stdint.h"
 void print_str(const char* str) {
     while (*str) 
     {

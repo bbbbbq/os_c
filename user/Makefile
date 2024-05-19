@@ -1,41 +1,63 @@
-CROSS_PREFIX = riscv64-unknown-elf-
-CC = $(CROSS_PREFIX)gcc
-OBJCOPY = $(CROSS_PREFIX)objcopy
-OBJDUMP = $(CROSS_PREFIX)objdump
+ARCH ?= riscv64
+MODE ?= release
+CHAPTER ?= 7
+app_dir = src
+src_dir := build/$(ARCH)
+bin_dir := build/bin
+out_dir := target
+cmake_build_args := -DARCH=$(ARCH) -DCHAPTER=$(CHAPTER)
+ifeq ($(MODE), release)
+cmake_build_args += -DCMAKE_BUILD_TYPE=Release
+else ifeq ($(MODE), debug)
+cmake_build_args += -DCMAKE_BUILD_TYPE=Debug
+endif
 
-INC_DIR = ./include
-SRC_LINKER = ./linker/linker.ld
-TARGET_DIR = ./target
-APP_DIR = ./app
-LIB_DIR = -L/home/caigoubencai/Desktop/os_c-ch6/libc/build -lmylibc
+# riscv64-unknown-elf-
+OBJCOPY := $(ARCH)-unknown-elf-objcopy
+OBJDUMP := $(ARCH)-unknown-elf-objdump
+CP := cp
+CH_TESTS :=  
 
-# Include the library path and link against libc.a
-LIB_FLAGS = -l$(LIB_DIR) -lc
+CH2_TESTS := ch2_ ch2t_
+CH3_TESTS_BASE := $(CH2_TESTS) ch3_0_ ch3t_
+CH4_TESTS := ch2_ ch3_0_ ch4_
+CH5_TESTS := $(CH4_TESTS) ch5_
+CH6_TESTS := $(CH5_TESTS) ch6_
+CH7_TESTS := $(CH6_TESTS) ch7_
 
-# Auto-find C files in app directory
-APP_SRCS = $(wildcard $(APP_DIR)/*.c)
-# Map each C file to an ELF file in the target directory
-APP_TARGETS = $(patsubst $(APP_DIR)/%.c,$(TARGET_DIR)/%.elf,$(APP_SRCS))
+ifeq ($(CHAPTER), 2)
+	CH_TESTS += $(CH2_TESTS)
+else ifeq ($(CHAPTER), 3_0)
+	CH_TESTS += $(CH3_TESTS_BASE)
+else ifeq ($(CHAPTER), 3_1)
+	CH_TESTS += ch3_1_
+else ifeq ($(CHAPTER), 3_2)
+	CH_TESTS += ch3_2_
+else ifeq ($(CHAPTER), 4)
+	CH_TESTS += $(CH4_TESTS)
+else ifeq ($(CHAPTER), 5)
+	CH_TESTS += $(CH5_TESTS)
+else ifeq ($(CHAPTER), 6)
+	CH_TESTS += $(CH6_TESTS)
+else ifeq ($(CHAPTER), 7)
+	CH_TESTS += $(CH7_TESTS)
+endif
 
-# Other source files
-COMMON_SRCS = ./start.s ./main.c
+# CH_TESTS += oscomp/open oscomp/write
 
-# Ensure the target directory exists before building anything
-.PHONY: all build clean dump
-all: build
+binary:
+	@mkdir -p build
+	@cd build && cmake $(cmake_build_args) .. && make
+	@$(CP) src/oscomp/run-all.sh src/oscomp/text.txt build/riscv64/
+	@mkdir build/riscv64/mnt && touch build/riscv64/mnt/test_mount
+	@ln -s build/riscv64/ .
 
-build: $(TARGET_DIR) $(APP_TARGETS)
+pre:
+	@rm -rf $(out_dir)
+	@mkdir -p $(out_dir)/bin/
+	@mkdir -p $(out_dir)/elf/
 
-$(TARGET_DIR):
-	mkdir -p $(TARGET_DIR)
-
-# Rule to create each ELF file
-$(TARGET_DIR)/%.elf: $(APP_DIR)/%.c $(COMMON_SRCS)
-	$(CC) $^ -o $@ -T$(SRC_LINKER) -I$(INC_DIR) -nostdinc -nostdlib -mcmodel=medany -fno-builtin $(LIB_FLAGS)
-	$(OBJCOPY) --strip-all $@ -O binary $@.bin
-
-dump:
-	$(OBJDUMP) -h $(APP_TARGETS)
+all: binary
 
 clean:
-	rm -rf $(TARGET_DIR)/*
+	@rm -rf build target asm

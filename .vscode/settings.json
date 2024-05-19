@@ -43,7 +43,8 @@
         "type.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "driver.h": "c"
+        "driver.h": "c",
+        "stdbool.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

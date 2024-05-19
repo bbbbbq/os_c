@@ -27,7 +27,10 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/batch/processor  -I$(KERNEL_DIR)/fs   \
 				-I$(KERNEL_DIR)/virtio -I$(KERNEL_DIR)/fs \
 				-I$(KERNEL_DIR)/fs/block_cache  -I$(KERNEL_DIR)/virtio/plic \
-				-I$(KERNEL_DIR)/virtio/uart
+				-I$(KERNEL_DIR)/virtio/uart -I$(KERNEL_DIR)/fs \
+				-I$(KERNEL_DIR)/fs/driver -I$(KERNEL_DIR)/fs/fat_table \
+				-I$(KERNEL_DIR)/fs/file -I$(KERNEL_DIR)/fs/fs_globle \
+				-I$(KERNEL_DIR)/fs/fs_queue
 
 # Compilation and linking flags
 CFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -fno-builtin -Wall
@@ -77,14 +80,17 @@ run: $(BIN)
 	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M \
 		-drive file=fs.img,format=raw,id=disk0 \
 		-device virtio-blk-device,drive=disk0,bus=virtio-mmio-bus.0 \
+		-drive file=sdcard.img,if=none,format=raw,id=x0 \
+		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
 		-serial mon:stdio
 
 qemu_debug: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M -S -s \
-	-drive file=disk_image.img,format=raw,id=disk0 \
-	-device virtio-blk-device,drive=disk0,bus=virtio-mmio-bus.0 \
-	-serial mon:stdio
-
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M \
+		-drive file=fs.img,format=raw,id=disk0 \
+		-device virtio-blk-device,drive=disk0,bus=virtio-mmio-bus.0 \
+		-drive file=sdcard.img,if=none,format=raw,id=x0 \
+		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
+		-serial mon:stdio -S -s
 elf: $(ELF)
 
 $(ELF): $(OBJECTS)
