@@ -2,8 +2,11 @@
 #include "sbi.h"
 #include "string.h"
 #include "stdint.h"
-void print_str(const char* str) {
-    while (*str) 
+#include "virtio_disk.h"
+#include "fs_globle.h"
+void print_str(const char *str)
+{
+    while (*str)
     {
         console_putchar((uint64_t)(*str));
         str++;

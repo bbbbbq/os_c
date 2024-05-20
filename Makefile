@@ -24,11 +24,12 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/memory/kernel_address -I$(KERNEL_DIR)/elf \
 				-I$(KERNEL_DIR)/memory/mem  -I$(KERNEL_DIR)/memory/buddy \
 				-I$(KERNEL_DIR)/batch/loader -I$(KERNEL_DIR)/batch/pid  \
-				-I$(KERNEL_DIR)/batch/processor \
-				-I$(KERNEL_DIR)/batch/processor	 \
-				-I$(KERNEL_DIR)/fs/block_cache\
+				-I$(KERNEL_DIR)/batch/processor -I$(KERNEL_DIR)/fs/fat32/fs_driver\
+				-I$(KERNEL_DIR)/batch/processor	 -I$(KERNEL_DIR)/fs/fat32/fat_table\
+				-I$(KERNEL_DIR)/fs/block_cache -I$(KERNEL_DIR)/fs/fat32/fs_globle\
 				-I$(KERNEL_DIR)/driver/plic -I$(KERNEL_DIR)/driver/uart\
 				-I$(KERNEL_DIR)/driver/virtio -I$(KERNEL_DIR)/driver/virtio_disk\
+				-I$(KERNEL_DIR)/fs/fat32/dir -I$(KERNEL_DIR)/fs/fat32/fs_driver\
 				
 
 # Compilation and linking flags

@@ -5,4 +5,5 @@ obj/kernel/batch/context/context.o: kernel/batch/context/context.c \
  kernel/globle/stdint.h kernel/data_structure/vector.h \
  kernel/memory/buddy/buddy.h kernel/string/string.h \
  kernel/batch/pid/pid.h kernel/batch/batch.h kernel/console/console.h \
+ kernel/driver/virtio_disk/virtio_disk.h kernel/driver/virtio/virtio.h \
  kernel/batch/context/context.h kernel/globle/riscv.h kernel/trap/trap.h

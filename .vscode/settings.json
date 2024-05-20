@@ -51,7 +51,9 @@
         "file.h": "c",
         "fs.h": "c",
         "random": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "fs_globle.h": "c",
+        "console.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

@@ -13,6 +13,7 @@
 #include "string.h"
 #include "riscv.h"
 #include "virtio_disk.h"
+#include "fs_globle.h"
 extern uint8_t sbss, ebss;
 void clear_bss()
 {
@@ -29,11 +30,15 @@ int main_os()
   plic_init();
   uart_init();
   virtio_disk_init();
-  Block block = read_block(0);
-  print_hex(block.data, 512);
+  init_root_entry();
   loader_init_and_list_apps();
   taks_init();
+  Block block1;
+  uint32_t test = 0;
+  block1 = read_block(0);
+  print_hex(block1.data, 512);
   task_manager_add_2_initproc();
+  // init_fat_32();
   processor_run_tasks();
   ASSERT(0);
   return 0;
