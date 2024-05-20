@@ -187,6 +187,6 @@ struct LongDirent
 } __attribute__((__packed__));
 
 
-void formate_fat32(Device *device);
+void formate_fat32();
 
 #endif

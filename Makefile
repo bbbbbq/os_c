@@ -29,7 +29,9 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/fs/block_cache\
 				-I$(KERNEL_DIR)/driver/plic -I$(KERNEL_DIR)/driver/uart\
 				-I$(KERNEL_DIR)/driver/virtio -I$(KERNEL_DIR)/driver/virtio_disk\
-				
+				-I$(KERNEL_DIR)/fs -I$(KERNEL_DIR)/fs/dir \
+				-I$(KERNEL_DIR)/fs/driver -I$(KERNEL_DIR)/fs/fat_table \
+				-I$(KERNEL_DIR)/fs/file  -I$(KERNEL_DIR)/fs/fs_globle \
 
 # Compilation and linking flags
 CFLAGS = $(INCLUDE_DIRS) -march=rv64gc -mabi=lp64d -nostdlib -mcmodel=medany -g -fno-builtin -Wall

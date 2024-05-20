@@ -175,3 +175,33 @@ size_t strlen(const char *s)
     }
     return len;
 }
+
+char *strncpy(char *dest, const char *src, size_t n)
+{
+    size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++)
+    {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++)
+    {
+        dest[i] = '\0'; // Fill the rest of the array with null characters if src is shorter than n
+    }
+    return dest;
+}
+
+int strncmp(const char *s1, const char *s2, size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        if (s1[i] != s2[i])
+        {
+            return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+        }
+        if (s1[i] == '\0')
+        {
+            return 0; // Both strings are equal until the end of one of them
+        }
+    }
+    return 0; // Strings are equal up to the first n characters
+}

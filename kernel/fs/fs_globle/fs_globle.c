@@ -1,5 +1,5 @@
 #include "fs_globle.h"
-#include <string.h>
+#include "string.h"
 struct BPB_32bit bpb_32bit;
 struct FSInfo fs_info;
 struct BPB_common bpb_commen;
@@ -114,7 +114,7 @@ void initialize_FSInfo()
     fs_info.FSI_TrailSig = 0xAA550000;
 }
 
-void formate_fat32(Device *device)
+void formate_fat32()
 {
     // 初始化 BPB_common 结构体
     initialize_BPB();
@@ -126,7 +126,7 @@ void formate_fat32(Device *device)
     // 确保 bpb_commen 和 bpb_32bit 加起来的大小是 512 字节
     if (sizeof(bpb_commen) + sizeof(bpb_32bit) != 512)
     {
-        printf("Error: BPB size is not 512 bytes\n");
+        printk("Error: BPB size is not 512 bytes\n");
         return;
     }
 
@@ -136,35 +136,34 @@ void formate_fat32(Device *device)
     memcpy(bpb_buffer + sizeof(bpb_commen), &bpb_32bit, sizeof(bpb_32bit));
 
     // 写入 bpb_commen 和 bpb_32bit 到第 0 扇区
-    int result = write_multiple_blocks(device, 0, bpb_buffer, sizeof(bpb_buffer));
+    int result = write_multiple_blocks(0, bpb_buffer, sizeof(bpb_buffer));
     if (result != 1)
     {
-        printf("Error writing BPB to sector 0\n");
+        printk("Error writing BPB to sector 0\n");
         return;
     }
 
     // 写入 fs_info 到第一个扇区
-    result = write_multiple_blocks(device, 1, &fs_info, sizeof(fs_info));
+    result = write_multiple_blocks(1, &fs_info, sizeof(fs_info));
     if (result != 1)
     {
-        printf("Error writing FSInfo to sector 1\n");
+        printk("Error writing FSInfo to sector 1\n");
         return;
     }
 
-    result = write_multiple_blocks(device, 6, &fs_info, sizeof(fs_info));
+    result = write_multiple_blocks(6, &fs_info, sizeof(fs_info));
     if (result != 1)
     {
-        printf("Error writing FSInfo to sector 7\n");
+        printk("Error writing FSInfo to sector 7\n");
         return;
     }
 
-    result = write_multiple_blocks(device, 6, bpb_buffer, sizeof(bpb_buffer));
+    result = write_multiple_blocks(6, bpb_buffer, sizeof(bpb_buffer));
     if (result != 1)
     {
-        printf("Error writing BPB to sector 0\n");
+        printk("Error writing BPB to sector 0\n");
         return;
     }
 
-    printf("FAT32 formatted successfully\n");
-    
+    printk("FAT32 formatted successfully\n");
 }

@@ -23,4 +23,7 @@ int memcmp(const void *ptr1, const void *ptr2, size_t num);
 void *memmove(void *dest, const void *src, size_t n);
 char *strcpy(char *restrict d, const char *s);
 size_t strlen(const char *s);
+char *strncpy(char *dest, const char *src, size_t n);
+int strncmp(const char *s1, const char *s2, size_t n);
+
 #endif // MY_STRING_H
