@@ -67,3 +67,31 @@ void print_uint64_hex(uint64_t value)
         console_putchar((uint64_t)hex); // 输出字符
     }
 }
+void print_hex(const void *data, size_t size)
+{
+    const unsigned char *ptr = (const unsigned char *)data;
+    const char *hex_chars = "0123456789ABCDEF";
+
+    console_putchar('\n'); // 开始前换行
+    for (size_t i = 0; i < size; ++i)
+    {
+        unsigned char byte = ptr[i];
+        char hex[3];
+        hex[0] = hex_chars[(byte >> 4) & 0x0F];
+        hex[1] = hex_chars[byte & 0x0F];
+        hex[2] = ' '; // 添加空格以分隔每个字节
+
+        console_putchar(hex[0]); // 输出高位
+        console_putchar(hex[1]); // 输出低位
+        console_putchar(hex[2]); // 输出空格
+
+        if ((i + 1) % 16 == 0)
+        { // 每16个字节后换行
+            console_putchar('\n');
+        }
+    }
+    if (size % 16 != 0)
+    { // 如果最后不是刚好结束，则也添加换行
+        console_putchar('\n');
+    }
+}

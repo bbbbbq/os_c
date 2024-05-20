@@ -341,8 +341,3 @@ void bd_init(void *base, void *end)
     panic("bd_init: free mem\n");
   }
 }
-
-void *malloc(uint64_t nbytes)
-{
-  bd_malloc(nbytes);
-}

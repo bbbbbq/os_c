@@ -3,7 +3,7 @@
 #include "buddy.h"
 #include "ring_buffer.h"
 #include "debug.h"
-#include "driver.h"
+#include "uart.h"
 ring_buffer_t uart_ring_buffer;
 
 void uart_init()

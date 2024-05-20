@@ -157,3 +157,21 @@ void *memmove(void *dest, const void *src, size_t n)
 
     return dest;
 }
+char *strcpy(char *restrict d, const char *s)
+{
+    char *dest = d;
+    while ((*dest++ = *s++) != '\0')
+        ;
+    return d;
+}
+
+size_t strlen(const char *s)
+{
+    size_t len = 0;
+    while (*s != '\0')
+    {
+        len++;
+        s++;
+    }
+    return len;
+}

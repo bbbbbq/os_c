@@ -11,7 +11,6 @@
 #include "riscv.h"
 #include "mem.h"
 #include "processor.h"
-#include "driver.h"
 extern void __alltraps();
 extern void __restore();
 

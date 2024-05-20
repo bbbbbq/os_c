@@ -3,7 +3,7 @@
 #include "riscv.h"
 #include "string.h"
 #include "debug.h"
-#include "driver.h"
+#include "uart.h"
 static void map_area_from_another(MapArea *map_area, MapArea *another)
 {
   map_area->vpn_range.l = another->vpn_range.l;

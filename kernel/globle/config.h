@@ -2,6 +2,7 @@
 #define _CONFIG_H_
 
 #include "stdint.h"
+#define TIMER_IRQ 13
 #define UART0_IRQ 10
 #define USER_STACK_SIZE (4096 * 2)
 #define KERNEL_STACK_SIZE (4096 * 2)

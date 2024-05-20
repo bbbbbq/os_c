@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "uart.h"
 #include "config.h"
 
 static int cpuid()

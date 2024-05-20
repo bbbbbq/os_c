@@ -49,7 +49,9 @@
         "cstdlib": "c",
         "fs_queue.h": "c",
         "file.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "random": "c",
+        "*.tcc": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true
