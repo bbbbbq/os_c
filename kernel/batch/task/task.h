@@ -50,6 +50,7 @@ struct TaskControlBlock
     char pwd[MAX_PWD_LENTH];
     uint64_t user_times;
     uint64_t sys_times;
+    uint64_t user_pace_size;
 };
 
 struct TaskManager

@@ -8,13 +8,13 @@ static int cpuid()
 
 void plic_init()
 {
-    printk("plic_init_start\n");
+    // printk("plic_init_start\n");
     *(uint32_t *)(PLIC + UART0_IRQ * 4) = 1;
     *(uint32_t *)(PLIC + VIRTIO0_IRQ * 4) = 1;
     int hart = cpuid();
     *(uint32_t *)PLIC_SENABLE(hart) = (1 << UART0_IRQ) | (1 << VIRTIO0_IRQ);
     *(uint32_t *)PLIC_SPRIORITY(hart) = 0;
-    printk("plic_init_end\n");
+    // printk("plic_init_end\n");
 }
 
 int plic_claim()

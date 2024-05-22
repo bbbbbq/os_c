@@ -8,8 +8,8 @@ ring_buffer_t uart_ring_buffer;
 
 void uart_init()
 {
-    printk("uart_init_start\n");
-    // 禁用所有中断
+    // printk("uart_init_start\n");
+    //  禁用所有中断
     UART_REG(UART_IER) = 0x00;
 
     // 启用 DLAB (Divisor Latch Access Bit)
@@ -38,7 +38,7 @@ void uart_init()
     // uart缓冲区初始化
     char *buffer = bd_malloc(sizeof(char) * 64);
     ring_buffer_init(&uart_ring_buffer, buffer, 64);
-    printk("UART initialized at baud rate %d\n", DESIRED_BAUD);
+    // printk("UART initialized at baud rate %d\n", DESIRED_BAUD);
 }
 
 void uart_send_one_byte(char byte)

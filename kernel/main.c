@@ -36,8 +36,6 @@ int main_os()
   init_root_entry();
   sys_inode_table = Sys_Inode_Table_new();
   init_sys_info();
-  // Block block = read_block(CLUSTER_TO_LBA(2));
-  // print_hex(block.data, 512);
   loader_init_and_list_apps();
   taks_init();
   task_manager_add_2_initproc();

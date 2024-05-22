@@ -90,8 +90,8 @@ uint64_t memory_set_token(MemorySet *memory_set)
   return page_table_token(&memory_set->page_table);
 }
 
-static void memory_set_push(MemorySet *memory_set, MapArea *map_area,
-                            uint8_t *data, uint64_t len)
+void memory_set_push(MemorySet *memory_set, MapArea *map_area,
+                     uint8_t *data, uint64_t len)
 {
   map_area_map(map_area, &memory_set->page_table);
   if (data && len >= 0)
@@ -102,9 +102,9 @@ static void memory_set_push(MemorySet *memory_set, MapArea *map_area,
 }
 
 // Assume that no conflicts.
-static void memory_set_insert_framed_area(MemorySet *memory_set,
-                                          VirtAddr start_va, VirtAddr end_va,
-                                          MapPermission permission)
+void memory_set_insert_framed_area(MemorySet *memory_set,
+                                   VirtAddr start_va, VirtAddr end_va,
+                                   MapPermission permission)
 {
   MapArea map_area;
   map_area.vpn_range.l = page_floor(start_va);

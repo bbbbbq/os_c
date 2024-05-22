@@ -44,7 +44,7 @@ void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr)
 // 初始化根目录函数实现
 void init_root_entry()
 {
-    printk("init_root_entry_start\n");
+    // printk("init_root_entry_start\n");
     memset(&root_dir_entry, 0, sizeof(Dirent));
     strncpy(root_dir_entry.DIR_Name, "ROOT", 11);
     root_dir_entry.DIR_Attr = 0x10;
@@ -54,7 +54,7 @@ void init_root_entry()
     write_by_cluster(2, &root_dir_entry, sizeof(Dirent));
     uint64_t index = find_first_valid_cluster();
     set_cluser_end(index);
-    printk("init_root_entry_end\n");
+    // printk("init_root_entry_end\n");
 }
 
 // 读取并解析根目录项函数实现

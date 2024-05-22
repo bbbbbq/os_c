@@ -35,4 +35,12 @@ int64_t SYS_getdents64(int64_t fd, char *buffer);
 int64_t SYS_read(int64_t fd, char *buffer, uint32_t count);
 int64_t SYS_mkdirat(char *path, uint64_t mode);
 int64_t SYS_write(int64_t fd, char *buffer, uint64_t count);
+int64_t SYS_times(char *uts);
+int64_t SYS_uname(char *uts);
+int64_t SYS_dup3(int64_t old_fd, int64_t new_fd);
+int64_t SYS_dup(int64_t fd);
+int64_t SYS_chdir(char *path);
+int64_t SYS_getcwd(char *buffer, size_t size);
+int64_t SYS_fstat(int64_t fd, char *kst);
+int64_t SYS_brk(uint64_t address_change);
 #endif

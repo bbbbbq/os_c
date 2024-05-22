@@ -86,7 +86,6 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   s->trap_cx_ppn = (PhysPageNum)pte_ppn(*memory_set_translate(
       &s->memory_set, (VirtPageNum)addr2pn((VirtAddr)TRAP_CONTEXT)));
 
-  // alloc a pid and a kernel stack in kernel space
   s->pid = PidAllocator_alloc();
   kernel_stack_new(&s->kernel_stack, s->pid);
   uint64_t kernel_stack_top = kernel_stack_get_top(s->kernel_stack);
@@ -99,11 +98,10 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   vector_new(&s->children, sizeof(struct TaskControlBlock *));
   s->exit_code = 0;
 
-  // prepare TrapContext in user space
   struct TrapContext *trap_cx = task_control_block_get_trap_cx(s);
   app_init_context(entry_point, user_sp, kernel_space_token(), kernel_stack_top,
                    (uint64_t)trap_handler, trap_cx);
-
+  s->user_pace_size = s->base_size;
   s->priority = DEFAULT_PRIORITY;
   s->stride = 0;
   queue_init(&s->inode_table_index);

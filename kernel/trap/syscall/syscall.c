@@ -602,3 +602,27 @@ int64_t SYS_times(char *uts)
     memcmp(&times, uts, sizeof(struct tms));
     return 0;
 }
+
+// 只支持扩容不支持缩
+int64_t SYS_brk(uint64_t address_change)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    if (current_task == NULL)
+        return -1;
+    uint64_t base_size = current_task->user_pace_size;
+    if (address_change > 0)
+    {
+        current_task->user_pace_size += address_change;
+        VirtAddr start_va = base_size;
+        VirtAddr end_va = base_size + address_change;
+        memory_set_insert_framed_area(&current_task->memory_set,
+                                      start_va, end_va,
+                                      PTE_W | PTE_R);
+        return 0;
+    }
+    else
+    {
+        current_task->user_pace_size -= address_change;
+        return 0;
+    }
+}

@@ -151,5 +151,9 @@ int64_t memory_set_mmap(MemorySet *memory_set, uint64_t start, uint64_t len,
                         uint64_t prot);                                         // 内存映射
 int64_t memory_set_munmap(MemorySet *memory_set, uint64_t start, uint64_t len); // 取消内存映射
 void memory_set_remap_test();                                                   // 内存重映射测试
-
+void memory_set_insert_framed_area(MemorySet *memory_set,
+                                   VirtAddr start_va, VirtAddr end_va,
+                                   MapPermission permission);
+void memory_set_push(MemorySet *memory_set, MapArea *map_area,
+                     uint8_t *data, uint64_t len);
 #endif // _MM_H_
