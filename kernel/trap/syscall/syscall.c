@@ -326,19 +326,63 @@ int32_t sys_close(uint32_t fd)
     uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
     if (sys_inode_index == NULL)
     {
-        return 0;
+        return -1;
     }
     else if (*sys_inode_index == 0)
     {
-        return 0;
+        return -1;
     }
     else
     {
         uint32_t ref_cnt = Sys_Inode_Table_get_inode_ref(*sys_inode_index);
         if (ref_cnt == 0)
-            return 1;
+            return 0;
         Sys_Inode_Table_set_inode_ref(*sys_inode_index, ref_cnt--);
         *sys_inode_index = 0;
-        return 1;
+        return 0;
     }
+}
+
+// buf：一个缓存区，用于保存所读取目录的信息。缓存区的结构如下：
+//     struct dirent
+// {
+//     uint64 d_ino;            // 索引结点号
+//     int64 d_off;             // 到下一个dirent的偏移
+//     unsigned short d_reclen; // 当前dirent的长度
+//     unsigned char d_type;    // 文件类型
+//     char d_name[];           // 文件名
+// };
+int64_t SYS_getdents64(int64_t fd, char *buffer)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    if (sys_inode_index == NULL)
+    {
+        return -1;
+    }
+    else if (*sys_inode_index == 0)
+    {
+        return -1;
+    }
+
+    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+
+    // 定义dirent_64结构，增加一个足够大的字符数组来存储文件名
+    struct dirent_64
+    {
+        uint64_t d_ino;          // 索引结点号
+        int64_t d_off;           // 到下一个dirent的偏移
+        unsigned short d_reclen; // 当前dirent的长度
+        unsigned char d_type;    // 文件类型
+        char d_name[20];         // 文件名，假设文件名不会超过255字符
+    };
+
+    struct dirent_64 *buffer_tmp = (struct dirent_64 *)buffer; // 假设外部buffer足够大
+    buffer_tmp->d_ino = *sys_inode_index;
+    buffer_tmp->d_reclen = sizeof(struct dirent_64);
+    buffer_tmp->d_type = inode->dir.DIR_Attr;
+    strncpy(buffer_tmp->d_name, inode->dir.DIR_Name, sizeof(buffer_tmp->d_name) - 1); // 安全复制字符串
+    buffer_tmp->d_name[sizeof(buffer_tmp->d_name) - 1] = '\0';                        // 确保字符串结束
+
+    return 0; // 返回填充的字节数
 }
