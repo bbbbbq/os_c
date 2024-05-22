@@ -196,7 +196,7 @@ void analyze_open_flags(const OpenFlags *of, bool *readable, bool *writable, boo
     *directory = (of->flags & O_DIRECTORY) != 0;
 }
 
-Inode Inode_new_by_dirent(Dirent *dir, bool read, bool write)
+Inode Inode_new_by_dirent(Dirent *dir, bool read, bool write, bool append)
 {
     Inode inode;
     inode.dir = *dir;
@@ -205,5 +205,6 @@ Inode Inode_new_by_dirent(Dirent *dir, bool read, bool write)
     inode.readable = read;
     inode.writable = write;
     inode.ref_cnt = 0;
+    inode.append = append;
     return inode;
 }

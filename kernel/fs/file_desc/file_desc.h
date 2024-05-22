@@ -12,6 +12,7 @@ typedef struct
     uint64_t offset;
     bool readable;
     bool writable;
+    bool append;
 } Inode;
 
 inline bool Inode_is_readable(Inode inode) { return inode.readable; };
@@ -19,7 +20,7 @@ inline bool Inode_is_writable(Inode inode) { return inode.writable; };
 uint32_t Inode_read_file(Inode *inode, char *buffer);
 uint32_t Inode_write_file(Inode *inode, char *buffer, size_t size);
 Inode Inode_new_by_file_name(char *name, bool read, bool write);
-Inode Inode_new_by_dirent(Dirent *dir, bool read, bool write);
+Inode Inode_new_by_dirent(Dirent *dir, bool read, bool write, bool append);
 #define RDONLY 0x0      // 只读标志位，由于它是0，意味着默认不设置任何位
 #define WRONLY (1 << 0) // 只写标志位
 #define RDWR (1 << 1)   // 读写标志位

@@ -264,7 +264,7 @@ int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
             return -1;
         }
     }
-    Inode new_inode = Inode_new_by_dirent(target_file, readable, writable);
+    Inode new_inode = Inode_new_by_dirent(target_file, readable, writable, append);
     new_inode.ref_cnt++;
     uint32_t new_inode_index = add_inode_to_Inode_table(&new_inode);
     int32_t fd_new = queue_enqueue(&current_task->inode_table_index, new_inode_index);
@@ -288,7 +288,7 @@ int64_t sys_open(const char *pathname, OpenFlags flage)
         if (creat)
         {
             Dirent *new_dir = create_file_or_dir_by_path(pathname, ATTR_FILE);
-            Inode inode = Inode_new_by_dirent(new_dir, readable, writable);
+            Inode inode = Inode_new_by_dirent(new_dir, readable, writable, append);
             uint32_t sys_inode_index = add_inode_to_Inode_table(&inode);
             struct TaskControlBlock *current_task = processor_current_task();
             uint32_t fd = queue_get_at(&current_task->inode_table_index, sys_inode_index);
@@ -305,7 +305,7 @@ int64_t sys_open(const char *pathname, OpenFlags flage)
         int32_t index = Find_Inode_By_Dir_In_Inode_Table(*dir);
         if (index == -1)
         {
-            Inode new_inode = Inode_new_by_dirent(dir, readable, writable);
+            Inode new_inode = Inode_new_by_dirent(dir, readable, writable, append);
             uint32_t new_inode_index_sys = add_inode_to_Inode_table(&new_inode);
             int32_t fd = queue_enqueue(&current_task->inode_table_index, new_inode_index_sys);
             return fd;
@@ -392,8 +392,36 @@ int64_t SYS_read(int64_t fd, char *buffer, uint32_t count)
     struct TaskControlBlock *current_task = processor_current_task();
     uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
     Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+    if (inode == NULL)
+        return -1;
     uint32_t offset = inode->offset;
     buffer = malloc(count);
-    read_file_by_byte(inode->dir, offset, buffer, count);
+    read_file_by_byte(&inode->dir, offset, buffer, count);
+    return 0;
+}
+
+int64_t SYS_write(int64_t fd, char *buffer, uint64_t count)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+    if (inode == NULL)
+        return -1;
+    if (buffer == NULL)
+        return -1;
+    bool append = inode->append;
+    bool write = inode->writable;
+    if (inode->dir.DIR_Attr == ATTR_DIRECTORY)
+        return -1;
+    if (!write)
+        return -1;
+    if (append)
+    {
+        append_to_file_by_dir(inode->dir, buffer, count);
+    }
+    else
+    {
+        write_file_by_byte(inode->dir, inode->offset, buffer, count);
+    }
     return 0;
 }

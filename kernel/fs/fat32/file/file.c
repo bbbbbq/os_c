@@ -283,3 +283,33 @@ Dirent *create_file_or_dir_by_path(char *path, uint32_t attr)
     Dirent new_dir = add_file_or_dir_to_parent_directory(last_comp_name, (uint64_t)attr, parent_dir);
     return &new_dir;
 }
+
+bool append_to_file_by_dir(Dirent *dir, void *buffer, size_t buffer_size)
+{
+    // 读取当前文件的数据
+    size_t file_size = get_file_or_dir_size(dir);
+    void *file_data = bd_malloc(file_size);
+    if (file_data == NULL)
+    {
+        printk("Memory allocation failed\n");
+        return;
+    }
+    read_file(dir->DIR_Name, file_data);
+
+    void *merged_data = bd_malloc(file_size + buffer_size);
+    if (merged_data == NULL)
+    {
+        printk("Memory allocation failed\n");
+        bd_free(file_data);
+        return;
+    }
+    memcpy(merged_data, file_data, file_size);
+    memcpy(merged_data + file_size, buffer, buffer_size);
+
+    // 调用 over_write_file 函数将合并后的数据覆盖写入文件
+    over_write_file(dir->DIR_Name, merged_data, file_size + buffer_size);
+    set_file_or_dir_size(dir, file_size + buffer_size);
+    update_dir(dir->DIR_Name, dir);
+    bd_free(file_data);
+    bd_free(merged_data);
+}

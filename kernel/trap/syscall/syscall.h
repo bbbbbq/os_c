@@ -31,4 +31,6 @@ void sys_exit(int32_t status);
 int64_t sys_openat(int32_t fd, char *path, OpenFlags flage);
 int64_t sys_open(const char *pathname, OpenFlags flage);
 int32_t sys_close(uint32_t fd);
+int64_t SYS_getdents64(int64_t fd, char *buffer);
+int64_t SYS_read(int64_t fd, char *buffer, uint32_t count);
 #endif // SYSCALL_H

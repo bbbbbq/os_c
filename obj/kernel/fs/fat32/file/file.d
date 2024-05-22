@@ -9,5 +9,5 @@ obj/kernel/fs/fat32/file/file.o: kernel/fs/fat32/file/file.c \
  kernel/memory/mem/mem.h kernel/globle/config.h kernel/globle/stdint.h \
  kernel/data_structure/vector.h kernel/batch/pid/pid.h \
  kernel/batch/batch.h kernel/console/console.h \
- kernel/batch/context/context.h kernel/batch/task/taskmanager.h \
- kernel/data_structure/queue.h
+ kernel/batch/context/context.h kernel/data_structure/queue.h \
+ kernel/batch/task/taskmanager.h
