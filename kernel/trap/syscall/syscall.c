@@ -386,3 +386,14 @@ int64_t SYS_getdents64(int64_t fd, char *buffer)
 
     return 0; // 返回填充的字节数
 }
+
+int64_t SYS_read(int64_t fd, char *buffer, uint32_t count)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+    uint32_t offset = inode->offset;
+    buffer = malloc(count);
+    read_file_by_byte(inode->dir, offset, buffer, count);
+    return 0;
+}
