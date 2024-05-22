@@ -58,8 +58,8 @@ static void map_area_unmap(MapArea *map_area, PageTable *pt, bool dealloc)
   }
 }
 
-static void map_area_copy_data(MapArea *map_area, PageTable *pt, uint8_t *data,
-                               uint64_t len)
+void map_area_copy_data(MapArea *map_area, PageTable *pt, uint8_t *data,
+                        uint64_t len)
 {
   uint64_t start = 0;
   VirtPageNum current_vpn = map_area->vpn_range.l;

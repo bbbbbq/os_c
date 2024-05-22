@@ -156,4 +156,7 @@ void memory_set_insert_framed_area(MemorySet *memory_set,
                                    MapPermission permission);
 void memory_set_push(MemorySet *memory_set, MapArea *map_area,
                      uint8_t *data, uint64_t len);
+
+void map_area_copy_data(MapArea *map_area, PageTable *pt, uint8_t *data,
+                        uint64_t len);
 #endif // _MM_H_

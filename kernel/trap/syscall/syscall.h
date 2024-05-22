@@ -17,6 +17,13 @@
 #define SYSCALL_MMAP 222
 #define SYSCALL_WAITPID 260
 #define SYSCALL_SPAWN 400
+
+struct timespec
+{
+    uint64_t tv_sec; // 秒
+    long tv_nsec;    // 纳秒
+};
+
 // 系统调用函数原型
 int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2);
 int32_t exit(int32_t value);
@@ -43,4 +50,8 @@ int64_t SYS_chdir(char *path);
 int64_t SYS_getcwd(char *buffer, size_t size);
 int64_t SYS_fstat(int64_t fd, char *kst);
 int64_t SYS_brk(uint64_t address_change);
+int64_t sys_munmap(uint64_t start, uint64_t len);
+int64_t sys_getppid();
+uint64_t sys_mmap(uint64_t addr, uint64_t len, uint64_t prot,
+                  uint64_t flags, uint64_t fd, uint64_t pgoff);
 #endif

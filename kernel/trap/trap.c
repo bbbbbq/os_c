@@ -51,6 +51,7 @@ void trap_handler()
     {
     case SupervisorTimer:
       intr_timer_handle();
+      ticks++;
       task_exit_current_and_run_next();
       break;
     default:
@@ -128,14 +129,13 @@ void trap_from_kernel(uint64_t cause)
   int irq;
   if (cause > 0x8000000000000000)
     cause -= (uint64_t)0x8000000000000000;
-  // printk("cause: ");
-  // print_uint64(cause);
-  // printk("\n");
-  // print_sepc();
   switch (cause)
   {
   case SupervisorTimer:
     timer_set_next_trigger();
+    struct TaskControlBlock *current_task = processor_current_task();
+    current_task->user_times++;
+    ticks++;
     break;
   case SupervisorExternal:
     irq = plic_claim();

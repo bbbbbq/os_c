@@ -2,6 +2,7 @@
 #include "sbi.h"
 #include "task.h"
 #include "riscv.h"
+uint64_t ticks = 0;
 static inline uint64_t read_time(void)
 {
     uint64_t time;

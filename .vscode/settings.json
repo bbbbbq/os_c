@@ -56,7 +56,8 @@
         "atomic": "c",
         "typeinfo": "c",
         "unistd.h": "c",
-        "fs_driver.h": "c"
+        "fs_driver.h": "c",
+        "timer.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

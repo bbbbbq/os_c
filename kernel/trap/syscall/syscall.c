@@ -13,7 +13,7 @@
 #include "sys_inode_table.h"
 #include "virtio_disk.h"
 #include "sys_info.h"
-
+#include "timer.h"
 extern struct utsname globle_info;
 int32_t exit(int32_t value)
 {
@@ -606,7 +606,10 @@ int64_t SYS_times(char *uts)
 // 只支持扩容不支持缩
 int64_t SYS_brk(uint64_t address_change)
 {
+
     struct TaskControlBlock *current_task = processor_current_task();
+    if (address_change == 0)
+        return current_task->base_size;
     if (current_task == NULL)
         return -1;
     uint64_t base_size = current_task->user_pace_size;
@@ -625,4 +628,89 @@ int64_t SYS_brk(uint64_t address_change)
         current_task->user_pace_size -= address_change;
         return 0;
     }
+}
+
+int64_t sys_munmap(uint64_t start, uint64_t len)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    MemorySet *memory_set = &current_task->memory_set;
+    if (memory_set_munmap(memory_set, start, len) == len)
+        return 0;
+    return -1;
+}
+
+int64_t sys_getppid()
+{
+    struct TaskControlBlock *parent_task = processor_current_task()->parent;
+    return parent_task->pid.pid;
+}
+
+int64_t SYS_gettimeofday(char *buffer)
+{
+    struct timespec ts;
+    ts.tv_sec = ticks / 100000;
+    ts.tv_nsec = ticks * 2;
+    strncpy(buffer, &ts, sizeof(struct timespec));
+    return 0;
+}
+// 为实现进程共享
+uint64_t sys_mmap(uint64_t addr, uint64_t len, uint64_t prot,
+                  uint64_t flags, uint64_t fd, uint64_t pgoff)
+{
+    bool readable = false;
+    bool writable = false;
+    bool creat = false;
+    bool excl = false;
+    bool trunc = false;
+    bool append = false;
+    bool directory = false;
+    OpenFlags flage;
+    flage.flags = flags;
+    analyze_open_flags(&flage, &readable, &writable, &creat, &excl, &trunc, &append, &directory);
+
+    struct TaskControlBlock *current_task = processor_current_task();
+    if (fd >= queue_size(&current_task->inode_table_index))
+    {
+        return -1; // 错误：文件描述符超出范围
+    }
+
+    uint32_t inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    Inode *inode = find_index_inode(sys_inode_table, inode_index);
+    if (inode == NULL)
+    {
+        return -1; // 错误：无法找到索引节点
+    }
+
+    char *buffer;
+    uint32_t file_size = inode->dir.DIR_FileSize;
+
+    if (len > file_size)
+    {
+        return -1; // 错误：请求长度超过文件大小
+    }
+
+    buffer = bd_malloc(file_size);
+    if (buffer == NULL)
+    {
+        return -1; // 错误：内存分配失败
+    }
+
+    if (Inode_read_file(inode, buffer) != file_size)
+    {
+        bd_free(buffer);
+        return -1; // 错误：文件读取失败
+    }
+
+    if (pgoff > file_size)
+    {
+        bd_free(buffer);
+        return -1; // 错误：偏移量超出文件大小
+    }
+
+    char *buffer_offset = buffer + pgoff;
+
+    map_area_copy_data(&current_task->memory_set, &KERNEL_SPACE.page_table, buffer_offset, len);
+
+    bd_free(buffer); // 清理临时分配的内存
+    return 0;        // 成功
 }

@@ -179,6 +179,7 @@ void task_manager_run_next_task()
 void task_exit_current_and_run_next()
 {
   struct TaskControlBlock *task = processor_current_task();
+  task->user_times++;
   task->task_status = Zombie;
   task->exit_code = Exited;
   struct TaskControlBlock **x = (struct TaskControlBlock **)(task->children.buffer);

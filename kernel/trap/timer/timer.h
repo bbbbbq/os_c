@@ -2,7 +2,7 @@
 #define TIMER_H
 #include "stdint.h"
 #include "console.h"
-static uint64_t ticks = 0;
+extern uint64_t ticks;
 #define TIMEBASE 100
 
 #define TICKS_PER_SEC 100
