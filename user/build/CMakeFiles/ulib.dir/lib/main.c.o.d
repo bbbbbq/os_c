@@ -1,4 +1,4 @@
 CMakeFiles/ulib.dir/lib/main.c.o: \
- /home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/main.c \
- /home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/include/unistd.h \
- /home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/include/stddef.h
+ /home/caigoubencai/Desktop/os_c-ch6/user/lib/main.c \
+ /home/caigoubencai/Desktop/os_c-ch6/user/include/unistd.h \
+ /home/caigoubencai/Desktop/os_c-ch6/user/include/stddef.h

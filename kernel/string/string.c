@@ -205,3 +205,48 @@ int strncmp(const char *s1, const char *s2, size_t n)
     }
     return 0; // Strings are equal up to the first n characters
 }
+
+char *strchr(const char *str, int c)
+{
+    // 循环遍历字符串直到遇到字符串结束符 '\0'
+    while (*str != '\0')
+    {
+        if (*str == (char)c)
+        {                       // 检查当前字符是否是要查找的字符
+            return (char *)str; // 返回指向该字符的指针
+        }
+        str++; // 移动到下一个字符
+    }
+
+    // 如果搜索字符是 '\0'，则应返回指向它的指针
+    if (c == '\0')
+    {
+        return (char *)str;
+    }
+
+    return NULL; // 如果未找到字符，则返回 NULL
+}
+
+char *strncat(char *dest, const char *src, size_t n)
+{
+    char *ptr = dest + strlen(dest); // 找到 dest 的结尾
+    size_t i;
+
+    for (i = 0; i < n && src[i] != '\0'; i++)
+    {
+        ptr[i] = src[i]; // 复制字符
+    }
+    ptr[i] = '\0'; // 确保字符串正确结束
+
+    return dest; // 返回 dest 的指针
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+    while (*s1 && (*s1 == *s2))
+    {
+        s1++;
+        s2++;
+    }
+    return (unsigned char)*s1 - (unsigned char)*s2;
+}

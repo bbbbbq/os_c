@@ -17,21 +17,23 @@ _app_names:
 
   .section .data
   .global app_0_start
-  .global app_0_end
+  .global app_1_start
+  .global app_2_start
+  .global app_3_end
 app_0_start:
-  .incbin "../../user/riscv64/00t.elf"
+  .incbin "../../user/riscv64/exit"
 app_0_end:
 
   .section .data
   .global app_1_start
   .global app_1_end
 app_1_start:
-  .incbin "../../user/riscv64/01t.elf"
+  .incbin "../../user/riscv64/fork"
 app_1_end:
 
   .section .data
   .global app_2_start
   .global app_2_end
 app_2_start:
-  .incbin "../../user/riscv64/initproc.elf"
+  .incbin "../../user/riscv64/initproc"
 app_2_end:

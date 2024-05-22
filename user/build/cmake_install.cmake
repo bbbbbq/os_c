@@ -1,4 +1,4 @@
-# Install script for directory: /home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user
+# Install script for directory: /home/caigoubencai/Desktop/os_c-ch6/user
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/caigoubencai/Desktop/os_c-ch6/user/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

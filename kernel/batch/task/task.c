@@ -106,6 +106,11 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
 
   s->priority = DEFAULT_PRIORITY;
   s->stride = 0;
+  queue_init(&s->inode_table_index);
+  Inode inode;
+  queue_enqueue(&s->inode_table_index, &inode);
+  queue_enqueue(&s->inode_table_index, &inode);
+  queue_enqueue(&s->inode_table_index, &inode);
 }
 
 struct TrapContext *task_current_trap_cx()

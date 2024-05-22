@@ -73,3 +73,29 @@ int queue_is_empty(const Queue *q)
 {
     return q->size == 0;
 }
+
+void *queue_get_at(const Queue *q, int index)
+{
+    if (q == NULL || index < 0 || index >= q->size)
+    {
+        return NULL; // 检查索引有效性和队列非空
+    }
+
+    Node *current = q->head;
+    int count = 0;
+
+    // 遍历链表直到所需的索引
+    while (current != NULL && count < index)
+    {
+        current = current->next;
+        count++;
+    }
+
+    // 如果当前节点非空，返回节点数据
+    if (current != NULL)
+    {
+        return current->data;
+    }
+
+    return NULL; // 如果找不到索引对应的节点，返回 NULL
+}

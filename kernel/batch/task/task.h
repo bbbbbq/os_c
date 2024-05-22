@@ -7,12 +7,13 @@
 #include "batch.h"
 #include "config.h"
 #include "pid.h"
+#include "file_desc.h"
+#include "queue.h"
 #define MAX_APP_NUM 20
 #define BIG_STRIDE 100000
 #define MAX_APP_NAME_LENGTH 64
 #define DEFAULT_PRIORITY 16
-
-
+#define PER_PRO_OPEN_FILE_MAX_NUM 20
 
 enum TaskStatus 
 {
@@ -28,7 +29,7 @@ struct TaskContext
     uint64_t sp;
     uint64_t x[12];
 };
-
+#define MAX_PWD_LENTH 64
 struct TaskControlBlock
 {
     PidHandle pid;
@@ -41,10 +42,12 @@ struct TaskControlBlock
     struct TaskControlBlock *parent;
     struct vector children;
     int exit_code;
-
     // stride scheduling
     uint64_t priority;
     uint64_t stride;
+    Queue inode_table_index;
+    OpenFlags inode_flages[PER_PRO_OPEN_FILE_MAX_NUM];
+    char pwd[MAX_PWD_LENTH];
 };
 
 struct TaskManager

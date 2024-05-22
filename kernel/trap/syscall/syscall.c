@@ -10,6 +10,7 @@
 #include "trap.h"
 #include "processor.h"
 #include "timer.h"
+#include "sys_inode_table.h"
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -230,4 +231,42 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         break;
     }
     return -1;
+}
+
+int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
+{
+    bool *readable;
+    bool *writable;
+    bool *creat;
+    bool *excl;
+    bool *trunc;
+    bool *append;
+    bool *directory;
+    analyze_open_flags(&flage, readable, writable, creat, excl, trunc, append, directory);
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    Inode *inode = find_index_inode(sys_inode_table, inode_index);
+    if (inode == NULL)
+    {
+        return -1;
+    }
+    Dirent dir = inode->dir;
+    Dirent *target_file = find_dir_entry(&dir, file_name);
+    if (target_file == NULL)
+    {
+        if (creat)
+        {
+            creat_dir_entry(target_file, file_name, ATTR_FILE);
+            create_dir(&dir, *target_file);
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    Inode new_inode = Inode_new_by_dirent(target_file, readable, writable);
+    new_inode.ref_cnt++;
+    uint32_t new_inode_index = add_inode_to_Inode_table(&new_inode);
+    queue_enqueue(&current_task->inode_table_index, new_inode_index);
+    return new_inode_index;
 }

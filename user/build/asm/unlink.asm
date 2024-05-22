@@ -1,5 +1,5 @@
 
-/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/build/riscv64/unlink:     file format elf64-littleriscv
+/home/caigoubencai/Desktop/os_c-ch6/user/build/riscv64/unlink:     file format elf64-littleriscv
 
 
 Disassembly of section .text:

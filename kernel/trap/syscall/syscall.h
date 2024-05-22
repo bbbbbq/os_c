@@ -2,7 +2,7 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 #include "stdint.h"
-
+#include "file_desc.h"
 // 定义系统调用ID
 #define SYSCALL_READ 63
 #define SYSCALL_WRITE 64
@@ -28,4 +28,5 @@ int64_t sys_fork();
 int64_t sys_exec(char *path);
 int64_t sys_getpid();
 void sys_exit(int32_t status);
+int64_t sys_openat(int32_t fd, char *path, OpenFlags flage);
 #endif // SYSCALL_H

@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_ASM
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/arch/riscv/crt.S" "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/build/CMakeFiles/ulib.dir/lib/arch/riscv/crt.S.o"
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/src/oscomp/clone.s" "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/build/CMakeFiles/ulib.dir/src/oscomp/clone.s.o"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/lib/arch/riscv/crt.S" "/home/caigoubencai/Desktop/os_c-ch6/user/build/CMakeFiles/ulib.dir/lib/arch/riscv/crt.S.o"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/src/oscomp/clone.s" "/home/caigoubencai/Desktop/os_c-ch6/user/build/CMakeFiles/ulib.dir/src/oscomp/clone.s.o"
   )
 set(CMAKE_ASM_COMPILER_ID "GNU")
 
@@ -21,11 +21,11 @@ set(CMAKE_ASM_TARGET_INCLUDE_PATH
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/main.c" "CMakeFiles/ulib.dir/lib/main.c.o" "gcc" "CMakeFiles/ulib.dir/lib/main.c.o.d"
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/stdio.c" "CMakeFiles/ulib.dir/lib/stdio.c.o" "gcc" "CMakeFiles/ulib.dir/lib/stdio.c.o.d"
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/stdlib.c" "CMakeFiles/ulib.dir/lib/stdlib.c.o" "gcc" "CMakeFiles/ulib.dir/lib/stdlib.c.o.d"
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/string.c" "CMakeFiles/ulib.dir/lib/string.c.o" "gcc" "CMakeFiles/ulib.dir/lib/string.c.o.d"
-  "/home/caigoubencai/Desktop/testsuits-for-oskernel/riscv-syscalls-testing/user/lib/syscall.c" "CMakeFiles/ulib.dir/lib/syscall.c.o" "gcc" "CMakeFiles/ulib.dir/lib/syscall.c.o.d"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/lib/main.c" "CMakeFiles/ulib.dir/lib/main.c.o" "gcc" "CMakeFiles/ulib.dir/lib/main.c.o.d"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/lib/stdio.c" "CMakeFiles/ulib.dir/lib/stdio.c.o" "gcc" "CMakeFiles/ulib.dir/lib/stdio.c.o.d"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/lib/stdlib.c" "CMakeFiles/ulib.dir/lib/stdlib.c.o" "gcc" "CMakeFiles/ulib.dir/lib/stdlib.c.o.d"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/lib/string.c" "CMakeFiles/ulib.dir/lib/string.c.o" "gcc" "CMakeFiles/ulib.dir/lib/string.c.o.d"
+  "/home/caigoubencai/Desktop/os_c-ch6/user/lib/syscall.c" "CMakeFiles/ulib.dir/lib/syscall.c.o" "gcc" "CMakeFiles/ulib.dir/lib/syscall.c.o.d"
   )
 
 # Targets to which this target links.

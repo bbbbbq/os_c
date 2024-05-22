@@ -124,14 +124,14 @@ void init_trap()
 
 void trap_from_kernel(uint64_t cause)
 {
-  printk("trap_from_kernel\n");
+  // printk("trap_from_kernel\n");
   int irq;
   if (cause > 0x8000000000000000)
     cause -= (uint64_t)0x8000000000000000;
-  printk("cause: ");
-  print_uint64(cause);
-  printk("\n");
-  print_sepc();
+  // printk("cause: ");
+  // print_uint64(cause);
+  // printk("\n");
+  // print_sepc();
   switch (cause)
   {
   case SupervisorTimer:
@@ -139,7 +139,7 @@ void trap_from_kernel(uint64_t cause)
     break;
   case SupervisorExternal:
     irq = plic_claim();
-    printk("irq : %d\n", irq);
+    // printk("irq : %d\n", irq);
     if (irq == VIRTIO0_IRQ)
     {
       virtio_disk_intr();
