@@ -48,6 +48,8 @@ struct TaskControlBlock
     Queue inode_table_index;
     OpenFlags inode_flages[PER_PRO_OPEN_FILE_MAX_NUM];
     char pwd[MAX_PWD_LENTH];
+    uint64_t user_times;
+    uint64_t sys_times;
 };
 
 struct TaskManager

@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/caigoubencai/Desktop/os_c-ch6/user/lib/arch/riscv/crt.S
+
+/home/caigoubencai/Desktop/os_c-ch6/user/src/oscomp/clone.s
+

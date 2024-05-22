@@ -111,6 +111,9 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   queue_enqueue(&s->inode_table_index, &inode);
   queue_enqueue(&s->inode_table_index, &inode);
   queue_enqueue(&s->inode_table_index, &inode);
+  memset(s->pwd, 0, sizeof(s->pwd));
+  s->sys_times = 0;
+  s->user_times = 0;
 }
 
 struct TrapContext *task_current_trap_cx()

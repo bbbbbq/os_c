@@ -53,5 +53,5 @@ bool is_valid_path(const Path *path);
 void parse_path(const char *path, char components[MAX_PATH_COMPONENTS][MAX_COMPONENT_LENGTH]);
 void remove_last_path_component(char *path);
 const char *get_last_path_component(const char *path);
-void analyze_open_flags(const OpenFlags *of, bool *readable, bool *writable, bool *creat, bool *excl, bool *trunc, bool *append, bool *directory);
+void analyze_open_flags(OpenFlags *of, bool *readable, bool *writable, bool *creat, bool *excl, bool *trunc, bool *append, bool *directory);
 #endif

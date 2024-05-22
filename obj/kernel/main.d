@@ -12,4 +12,5 @@ obj/kernel/main.o: kernel/main.c kernel/console/console.h \
  kernel/batch/processor/processor.h kernel/batch/task/taskmanager.h \
  kernel/globle/riscv.h kernel/driver/virtio_disk/virtio_disk.h \
  kernel/driver/virtio/virtio.h kernel/fs/fat32/fs_globle/fs_globle.h \
- kernel/fs/sys_inode_table/sys_inode_table.h
+ kernel/fs/sys_inode_table/sys_inode_table.h \
+ kernel/globle/sys_info/sys_info.h

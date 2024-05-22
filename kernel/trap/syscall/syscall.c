@@ -12,6 +12,9 @@
 #include "timer.h"
 #include "sys_inode_table.h"
 #include "virtio_disk.h"
+#include "sys_info.h"
+
+extern struct utsname globle_info;
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -233,17 +236,16 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
     }
     return -1;
 }
-
 int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
 {
-    bool *readable;
-    bool *writable;
-    bool *creat;
-    bool *excl;
-    bool *trunc;
-    bool *append;
-    bool *directory;
-    analyze_open_flags(&flage, readable, writable, creat, excl, trunc, append, directory);
+    bool readable = false;
+    bool writable = false;
+    bool creat = false;
+    bool excl = false;
+    bool trunc = false;
+    bool append = false;
+    bool directory = false;
+    analyze_open_flags(&flage, &readable, &writable, &creat, &excl, &trunc, &append, &directory);
     struct TaskControlBlock *current_task = processor_current_task();
     uint32_t inode_index = queue_get_at(&current_task->inode_table_index, fd);
     Inode *inode = find_index_inode(sys_inode_table, inode_index);
@@ -275,23 +277,31 @@ int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
 int64_t sys_open(const char *pathname, OpenFlags flage)
 {
     struct TaskControlBlock *current_task = processor_current_task();
-    bool *readable = bd_malloc(1);
-    bool *writable = bd_malloc(1);
-    bool *creat = bd_malloc(1);
-    bool *excl = bd_malloc(1);
-    bool *trunc = bd_malloc(1);
-    bool *append = bd_malloc(1);
-    bool *directory = bd_malloc(1);
-    analyze_open_flags(&flage, readable, writable, creat, excl, trunc, append, directory);
+
+    // 使用栈上的布尔变量，避免动态分配内存
+    bool readable = false;
+    bool writable = false;
+    bool creat = false;
+    bool excl = false;
+    bool trunc = false;
+    bool append = false;
+    bool directory = false;
+
+    // 直接传递布尔变量的地址
+    analyze_open_flags(&flage, &readable, &writable, &creat, &excl, &trunc, &append, &directory);
+
     Dirent *dir = find_dir_by_path(pathname);
     if (dir == NULL)
     {
         if (creat)
         {
             Dirent *new_dir = create_file_or_dir_by_path(pathname, ATTR_FILE);
+            if (new_dir == NULL)
+            {
+                return -1; // 检查是否成功创建目录或文件
+            }
             Inode inode = Inode_new_by_dirent(new_dir, readable, writable, append);
             uint32_t sys_inode_index = add_inode_to_Inode_table(&inode);
-            struct TaskControlBlock *current_task = processor_current_task();
             uint32_t fd = queue_get_at(&current_task->inode_table_index, sys_inode_index);
             return fd;
         }
@@ -302,7 +312,6 @@ int64_t sys_open(const char *pathname, OpenFlags flage)
     }
     else
     {
-        Dirent *dir = find_dir_by_path(pathname);
         int32_t index = Find_Inode_By_Dir_In_Inode_Table(*dir);
         if (index == -1)
         {
@@ -318,7 +327,6 @@ int64_t sys_open(const char *pathname, OpenFlags flage)
             return fd;
         }
     }
-    return -1;
 }
 
 int32_t sys_close(uint32_t fd)
@@ -329,12 +337,13 @@ int32_t sys_close(uint32_t fd)
     {
         return -1;
     }
-    else if (*sys_inode_index == 0)
+    else if (sys_inode_index == NULL)
     {
         return -1;
     }
     else
     {
+        queue_set_at(&current_task->inode_table_index, fd, NULL);
         uint32_t ref_cnt = Sys_Inode_Table_get_inode_ref(*sys_inode_index);
         if (ref_cnt == 0)
             return 0;
@@ -431,10 +440,10 @@ int64_t SYS_mkdirat(char *path, uint64_t mode)
     Dirent *dir = find_dir_by_path(path);
     if (dir == NULL)
         return -1;
-    bool *owner_read = bd_malloc(1);
-    bool *owner_write = bd_malloc(1);
-    bool *owner_exec = bd_malloc(1);
-    parse_mode(mode, owner_read, owner_write, owner_exec);
+    bool owner_read;
+    bool owner_write;
+    bool owner_exec;
+    parse_mode(mode, &owner_read, &owner_write, &owner_exec);
     uint32_t attr;
     attr = ATTR_DIRECTORY;
     create_file_or_dir_by_path(path, attr);
@@ -501,5 +510,95 @@ int64_t SYS_fstat(int64_t fd, char *kst)
     }
     else
         return -1;
+    return 0;
+}
+
+int64_t SYS_getcwd(char *buffer, size_t size)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    if (buffer == NULL || size == 0)
+        return -1;
+
+    char *pwd = current_task->pwd;
+    if (pwd == NULL)
+        return -1;
+
+    strncpy(buffer, pwd, size);
+
+    buffer[size - 1] = '\0';
+
+    return strlen(buffer);
+}
+
+int64_t SYS_chdir(char *path)
+{
+    if (path == NULL)
+        return -1;
+
+    struct TaskControlBlock *current_task = processor_current_task();
+    strncpy(current_task->pwd, path, MAX_PWD_LENTH - 1);
+    current_task->pwd[MAX_PWD_LENTH - 1] = '\0';
+    return 0;
+}
+
+int64_t SYS_dup(int64_t fd)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    if (sys_inode_index == NULL)
+        return -1;
+    int64_t new_fd = queue_enqueue(&current_task->inode_table_index, sys_inode_index);
+    return new_fd;
+}
+
+int64_t SYS_dup3(int64_t old_fd, int64_t new_fd)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, old_fd);
+    if (sys_inode_index == NULL)
+        return -1;
+    uint32_t queue_size = current_task->inode_table_index.size;
+    for (int i = 0; i < new_fd - queue_size; i++)
+    {
+        queue_enqueue(&current_task->inode_table_index, NULL);
+    }
+    queue_enqueue(&current_task->inode_table_index, &new_fd);
+    return 0;
+}
+
+int64_t SYS_uname(char *uts)
+{
+    if (uts == NULL)
+        return -1;
+    strncpy(&globle_info, uts, sizeof(struct utsname));
+    return 0;
+}
+
+struct tms
+{
+    uint64_t tms_utime;  // 用户 CPU 时间
+    uint64_t tms_stime;  // 系统 CPU 时间
+    uint64_t tms_cutime; // 已终止子进程的用户 CPU 时间
+    uint64_t tms_cstime; // 已终止子进程的系统 CPU 时间
+};
+
+int64_t SYS_times(char *uts)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    struct tms times;
+    memset(&times, 0, sizeof(struct tms));
+    times.tms_utime = current_task->user_times;
+    times.tms_stime = current_task->sys_times;
+    uint32_t vector_cnt = vector_size(&current_task->children);
+    for (int i = 0; i < vector_cnt; i++)
+    {
+        struct TaskControlBlock *tmp = vector_get(&current_task->children, i);
+        if (tmp->task_status == Exited)
+        {
+            times.tms_cstime += tmp->sys_times;
+            times.tms_cutime += tmp->user_times;
+        }
+    }
+    memcmp(&times, uts, sizeof(struct tms));
     return 0;
 }

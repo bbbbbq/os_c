@@ -12,4 +12,5 @@ obj/kernel/trap/syscall/syscall.o: kernel/trap/syscall/syscall.c \
  kernel/sbi/sbi.h kernel/trap/trap.h kernel/batch/processor/processor.h \
  kernel/batch/task/taskmanager.h kernel/trap/timer/timer.h \
  kernel/fs/sys_inode_table/sys_inode_table.h \
- kernel/driver/virtio_disk/virtio_disk.h kernel/driver/virtio/virtio.h
+ kernel/driver/virtio_disk/virtio_disk.h kernel/driver/virtio/virtio.h \
+ kernel/globle/sys_info/sys_info.h

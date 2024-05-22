@@ -98,5 +98,30 @@ void *queue_get_at(const Queue *q, int index)
         return current->data;
     }
 
-    return NULL; // 如果找不到索引对应的节点，返回 NULL
+    return NULL;
+}
+
+bool queue_set_at(Queue *q, int index, void *new_data)
+{
+    if (q == NULL || index < 0 || index >= q->size)
+    {
+        return 0;
+    }
+
+    Node *current = q->head;
+    int count = 0;
+
+    while (current != NULL && count < index)
+    {
+        current = current->next;
+        count++;
+    }
+
+    if (current != NULL)
+    {
+        current->data = new_data;
+        return 1;
+    }
+
+    return 0;
 }

@@ -16,6 +16,7 @@
 #include "dir.h"
 #include "fs_globle.h"
 #include "sys_inode_table.h"
+#include "sys_info.h"
 extern uint8_t sbss, ebss;
 void clear_bss()
 {
@@ -34,6 +35,7 @@ int main_os()
   virtio_disk_init();
   init_root_entry();
   sys_inode_table = Sys_Inode_Table_new();
+  init_sys_info();
   // Block block = read_block(CLUSTER_TO_LBA(2));
   // print_hex(block.data, 512);
   loader_init_and_list_apps();

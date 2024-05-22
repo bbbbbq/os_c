@@ -26,4 +26,5 @@ void *queue_dequeue(Queue *q);
 void queue_clear(Queue *q);
 int queue_is_empty(const Queue *q);
 void *queue_get_at(const Queue *q, int index);
+bool queue_set_at(Queue *q, int index, void *new_data);
 #endif // QUEUE_H
