@@ -184,9 +184,15 @@ const char *get_last_path_component(const char *path)
 
     return NULL; // 没有找到有效的最后一个组件
 }
-
 void analyze_open_flags(const OpenFlags *of, bool *readable, bool *writable, bool *creat, bool *excl, bool *trunc, bool *append, bool *directory)
 {
+    // 验证传入的指针是否为非空
+    if (!of || !readable || !writable || !creat || !excl || !trunc || !append || !directory)
+    {
+        ASSERT(0);
+        return; // 返回，或者根据实际情况进行其他异常处理
+    }
+
     *readable = (of->flags & O_RDONLY) || (of->flags & O_RDWR);
     *writable = (of->flags & O_WRONLY) || (of->flags & O_RDWR);
     *creat = (of->flags & O_CREAT) != 0;

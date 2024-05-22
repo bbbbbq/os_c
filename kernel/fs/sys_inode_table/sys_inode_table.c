@@ -117,3 +117,19 @@ uint32_t Sys_Inode_Table_get_inode_ref(uint32_t index)
     Inode *inode = find_index_inode(sys_inode_table, index);
     return inode->ref_cnt;
 }
+
+void parse_mode(uint64_t mode, bool *owner_read, bool *owner_write, bool *owner_exec)
+{
+    if (owner_read != NULL)
+    {
+        *owner_read = (mode & OWNER_READ) ? true : false;
+    }
+    if (owner_write != NULL)
+    {
+        *owner_write = (mode & OWNER_WRITE) ? true : false;
+    }
+    if (owner_exec != NULL)
+    {
+        *owner_exec = (mode & OWNER_EXEC) ? true : false;
+    }
+}

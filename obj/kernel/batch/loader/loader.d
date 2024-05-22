@@ -7,4 +7,5 @@ obj/kernel/batch/loader/loader.o: kernel/batch/loader/loader.c \
  kernel/console/console.h kernel/batch/context/context.h \
  kernel/fs/file_desc/file_desc.h kernel/fs/file_desc/../fat32/dir/dir.h \
  kernel/fs/fat32/fs_driver/fs_driver.h kernel/fs/fat32/file/file.h \
- kernel/fs/fat32/dir/dir.h kernel/batch/loader/loader.h
+ kernel/fs/fat32/dir/dir.h kernel/data_structure/queue.h \
+ kernel/batch/loader/loader.h

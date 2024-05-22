@@ -274,13 +274,13 @@ int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
 int64_t sys_open(const char *pathname, OpenFlags flage)
 {
     struct TaskControlBlock *current_task = processor_current_task();
-    bool *readable;
-    bool *writable;
-    bool *creat;
-    bool *excl;
-    bool *trunc;
-    bool *append;
-    bool *directory;
+    bool *readable = bd_malloc(1);
+    bool *writable = bd_malloc(1);
+    bool *creat = bd_malloc(1);
+    bool *excl = bd_malloc(1);
+    bool *trunc = bd_malloc(1);
+    bool *append = bd_malloc(1);
+    bool *directory = bd_malloc(1);
     analyze_open_flags(&flage, readable, writable, creat, excl, trunc, append, directory);
     Dirent *dir = find_dir_by_path(pathname);
     if (dir == NULL)
@@ -395,7 +395,6 @@ int64_t SYS_read(int64_t fd, char *buffer, uint32_t count)
     if (inode == NULL)
         return -1;
     uint32_t offset = inode->offset;
-    buffer = malloc(count);
     read_file_by_byte(&inode->dir, offset, buffer, count);
     return 0;
 }
@@ -417,11 +416,26 @@ int64_t SYS_write(int64_t fd, char *buffer, uint64_t count)
         return -1;
     if (append)
     {
-        append_to_file_by_dir(inode->dir, buffer, count);
+        append_to_file_by_dir(&inode->dir, buffer, count);
     }
     else
     {
-        write_file_by_byte(inode->dir, inode->offset, buffer, count);
+        write_file_by_byte(&inode->dir, inode->offset, buffer, count);
     }
+    return 0;
+}
+
+int64_t SYS_mkdirat(char *path, uint64_t mode)
+{
+    Dirent *dir = find_dir_by_path(path);
+    if (dir == NULL)
+        return -1;
+    bool *owner_read = bd_malloc(1);
+    bool *owner_write = bd_malloc(1);
+    bool *owner_exec = bd_malloc(1);
+    parse_mode(mode, owner_read, owner_write, owner_exec);
+    uint32_t attr;
+    attr = ATTR_DIRECTORY;
+    create_file_or_dir_by_path(path, attr);
     return 0;
 }
