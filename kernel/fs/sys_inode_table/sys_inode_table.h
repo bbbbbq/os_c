@@ -13,4 +13,5 @@ char *get_current_proc_pwd();
 bool inode_table_add(Path *path);
 uint32_t count_valid_components(char components[MAX_PATH_COMPONENTS][MAX_COMPONENT_LENGTH]);
 uint32_t add_inode_to_Inode_table(Inode *inode);
+int32_t Find_Inode_By_Dir_In_Inode_Table(Dirent dir);
 #endif

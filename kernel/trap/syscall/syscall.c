@@ -267,6 +267,55 @@ int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
     Inode new_inode = Inode_new_by_dirent(target_file, readable, writable);
     new_inode.ref_cnt++;
     uint32_t new_inode_index = add_inode_to_Inode_table(&new_inode);
-    queue_enqueue(&current_task->inode_table_index, new_inode_index);
-    return new_inode_index;
+    int32_t fd_new = queue_enqueue(&current_task->inode_table_index, new_inode_index);
+    return fd_new;
+}
+
+int64_t sys_open(const char *pathname, OpenFlags flage)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    bool *readable;
+    bool *writable;
+    bool *creat;
+    bool *excl;
+    bool *trunc;
+    bool *append;
+    bool *directory;
+    analyze_open_flags(&flage, readable, writable, creat, excl, trunc, append, directory);
+    Dirent *dir = find_dir_by_path(pathname);
+    if (dir == NULL)
+    {
+        if (creat)
+        {
+            Dirent *new_dir = create_file_or_dir_by_path(pathname, ATTR_FILE);
+            Inode inode = Inode_new_by_dirent(new_dir, readable, writable);
+            uint32_t sys_inode_index = add_inode_to_Inode_table(&inode);
+            struct TaskControlBlock *current_task = processor_current_task();
+            uint32_t fd = queue_get_at(&current_task->inode_table_index, sys_inode_index);
+            return fd;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        Dirent *dir = find_dir_by_path(pathname);
+        int32_t index = Find_Inode_By_Dir_In_Inode_Table(*dir);
+        if (index == -1)
+        {
+            Inode new_inode = Inode_new_by_dirent(dir, readable, writable);
+            uint32_t new_inode_index_sys = add_inode_to_Inode_table(&new_inode);
+            int32_t fd = queue_enqueue(&current_task->inode_table_index, new_inode_index_sys);
+            return fd;
+        }
+        else
+        {
+            index += 3;
+            int32_t fd = queue_enqueue(&current_task->inode_table_index, index);
+            return fd;
+        }
+    }
+    return -1;
 }

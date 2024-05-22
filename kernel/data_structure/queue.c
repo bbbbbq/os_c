@@ -9,26 +9,27 @@ void queue_init(Queue *q)
     q->size = 0;
 }
 
-void queue_enqueue(Queue *q, void *data)
+int queue_enqueue(Queue *q, void *data)
 {
     Node *newNode = (Node *)bd_malloc(sizeof(Node));
     if (newNode == NULL)
     {
-        ASSERT(0);
+        ASSERT(0); // 断言失败表示内存分配出错
     }
     newNode->data = data;
     newNode->next = NULL;
 
     if (q->tail == NULL)
-    { // Empty queue
-        q->head = q->tail = newNode;
+    {                                // 队列为空的情况
+        q->head = q->tail = newNode; // 新节点既是头也是尾
     }
     else
     {
-        q->tail->next = newNode;
-        q->tail = newNode;
+        q->tail->next = newNode; // 在队尾添加新节点
+        q->tail = newNode;       // 更新队尾指针
     }
-    q->size++;
+    q->size++;          // 更新队列大小
+    return q->size - 1; // 返回新节点的索引，索引是从0开始的
 }
 
 void *queue_dequeue(Queue *q)

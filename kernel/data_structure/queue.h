@@ -21,7 +21,7 @@ typedef struct
 
 // Function declarations
 void queue_init(Queue *q);
-void queue_enqueue(Queue *q, void *data);
+int queue_enqueue(Queue *q, void *data);
 void *queue_dequeue(Queue *q);
 void queue_clear(Queue *q);
 int queue_is_empty(const Queue *q);

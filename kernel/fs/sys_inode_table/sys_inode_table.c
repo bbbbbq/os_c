@@ -86,3 +86,22 @@ uint32_t add_inode_to_Inode_table(Inode *inode)
     queue_enqueue(&sys_inode_table.inode_table, inode);
     return sys_inode_table.inode_table.size - 1; // Return new inode position in the queue
 }
+
+int32_t Find_Inode_By_Dir_In_Inode_Table(Dirent dir)
+{
+    Node *current = sys_inode_table.inode_table.head;
+    uint32_t index = 0;
+
+    while (current != NULL)
+    {
+        Inode *inode = (Inode *)current->data;
+        if (strcmp(inode->dir.DIR_Name, dir.DIR_Name) == 0)
+        {
+            return index;
+        }
+        current = current->next;
+        index++;
+    }
+
+    return -1;
+}
