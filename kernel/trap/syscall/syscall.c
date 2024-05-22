@@ -319,3 +319,26 @@ int64_t sys_open(const char *pathname, OpenFlags flage)
     }
     return -1;
 }
+
+int32_t sys_close(uint32_t fd)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    if (sys_inode_index == NULL)
+    {
+        return 0;
+    }
+    else if (*sys_inode_index == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        uint32_t ref_cnt = Sys_Inode_Table_get_inode_ref(*sys_inode_index);
+        if (ref_cnt == 0)
+            return 1;
+        Sys_Inode_Table_set_inode_ref(*sys_inode_index, ref_cnt--);
+        *sys_inode_index = 0;
+        return 1;
+    }
+}

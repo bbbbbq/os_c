@@ -30,4 +30,5 @@ int64_t sys_getpid();
 void sys_exit(int32_t status);
 int64_t sys_openat(int32_t fd, char *path, OpenFlags flage);
 int64_t sys_open(const char *pathname, OpenFlags flage);
+int32_t sys_close(uint32_t fd);
 #endif // SYSCALL_H

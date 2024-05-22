@@ -14,4 +14,6 @@ bool inode_table_add(Path *path);
 uint32_t count_valid_components(char components[MAX_PATH_COMPONENTS][MAX_COMPONENT_LENGTH]);
 uint32_t add_inode_to_Inode_table(Inode *inode);
 int32_t Find_Inode_By_Dir_In_Inode_Table(Dirent dir);
+void Sys_Inode_Table_set_inode_ref(uint32_t index, uint32_t ref_cnt);
+uint32_t Sys_Inode_Table_get_inode_ref(uint32_t index);
 #endif

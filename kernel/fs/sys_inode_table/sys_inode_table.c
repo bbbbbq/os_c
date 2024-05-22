@@ -105,3 +105,15 @@ int32_t Find_Inode_By_Dir_In_Inode_Table(Dirent dir)
 
     return -1;
 }
+
+void Sys_Inode_Table_set_inode_ref(uint32_t index, uint32_t ref_cnt)
+{
+    Inode *inode = find_index_inode(sys_inode_table, index);
+    inode->ref_cnt = ref_cnt;
+}
+
+uint32_t Sys_Inode_Table_get_inode_ref(uint32_t index)
+{
+    Inode *inode = find_index_inode(sys_inode_table, index);
+    return inode->ref_cnt;
+}
