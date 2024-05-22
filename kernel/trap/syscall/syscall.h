@@ -33,4 +33,6 @@ int64_t sys_open(const char *pathname, OpenFlags flage);
 int32_t sys_close(uint32_t fd);
 int64_t SYS_getdents64(int64_t fd, char *buffer);
 int64_t SYS_read(int64_t fd, char *buffer, uint32_t count);
-#endif // SYSCALL_H
+int64_t SYS_mkdirat(char *path, uint64_t mode);
+int64_t SYS_write(int64_t fd, char *buffer, uint64_t count);
+#endif

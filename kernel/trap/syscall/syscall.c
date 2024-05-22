@@ -11,6 +11,7 @@
 #include "processor.h"
 #include "timer.h"
 #include "sys_inode_table.h"
+#include "virtio_disk.h"
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -437,5 +438,68 @@ int64_t SYS_mkdirat(char *path, uint64_t mode)
     uint32_t attr;
     attr = ATTR_DIRECTORY;
     create_file_or_dir_by_path(path, attr);
+    return 0;
+}
+
+int64_t SYS_fstat(int64_t fd, char *kst)
+{
+
+    struct kstat
+    {
+        uint8_t st_dev;
+        uint32_t st_ino;
+        uint32_t st_mode;
+        uint32_t st_nlink;
+        uint8_t st_uid;
+        uint8_t st_gid;
+        uint8_t st_rdev;
+        unsigned long __pad;
+        uint32_t st_size;
+        uint32_t st_blksize;
+        int __pad2;
+        uint32_t st_blocks;
+        long st_atime_sec;
+        long st_atime_nsec;
+        long st_mtime_sec;
+        long st_mtime_nsec;
+        long st_ctime_sec;
+        long st_ctime_nsec;
+        unsigned __unused[2];
+    };
+
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    if (sys_inode_index == NULL)
+    {
+        return -1;
+    }
+
+    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+    if (inode == NULL)
+    {
+        return -1;
+    }
+
+    Dirent dir = inode->dir;
+    struct kstat kstat_tmp;
+
+    memset(&kstat_tmp, 0, sizeof(kstat_tmp));
+    kstat_tmp.st_ino = *sys_inode_index;
+    kstat_tmp.st_size = dir.DIR_FileSize;
+    kstat_tmp.st_blocks = (dir.DIR_FileSize + 511) / 512;
+    kstat_tmp.st_blksize = BLOCK_SIZE;
+    kstat_tmp.st_mode = dir.DIR_Attr;
+    kstat_tmp.st_uid = 0;
+    kstat_tmp.st_gid = 0;
+    kstat_tmp.st_atime_sec = dir.DIR_LstAccDate;
+    kstat_tmp.st_mtime_sec = dir.DIR_WrtTime;
+    kstat_tmp.st_ctime_sec = dir.DIR_CrtTime;
+    kstat_tmp.st_nlink = inode->ref_cnt;
+    if (kst != NULL)
+    {
+        memcpy(kst, &kstat_tmp, sizeof(kstat_tmp));
+    }
+    else
+        return -1;
     return 0;
 }
