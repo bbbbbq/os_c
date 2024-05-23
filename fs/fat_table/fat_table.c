@@ -67,7 +67,8 @@ void set_cluser_free(uint64_t index)
 uint64_t parse_cluster_number(uint64_t index)
 {
     uint32_t tmp = fat_table.entries[index].entry_value & 0x0FFFFFFF;
-    if (tmp > FAT_ENTRY_NUM) assert(0);
+    if (tmp > FAT_ENTRY_NUM)
+        assert(0);
     return tmp;
 }
 
@@ -97,8 +98,9 @@ uint64_t is_end_of_cluster(uint64_t index)
 
 uint64_t find_last_cluster(uint64_t index)
 {
-    if(is_end_of_cluster(index)==1) return index;
-    while(is_end_of_cluster(index)==0)
+    if (is_end_of_cluster(index) == 1)
+        return index;
+    while (is_end_of_cluster(index) == 0)
     {
         index = parse_cluster_number(index);
     }
@@ -109,11 +111,11 @@ void release_linked_clusters(uint32_t start_cluster)
 {
     uint32_t current_cluster = start_cluster;
     // 循环释放链条上的所有簇
-    while (!is_end_of_cluster(current_cluster-2))
+    while (!is_end_of_cluster(current_cluster - 2))
     {
-        uint32_t next_cluster = parse_cluster_number(current_cluster-2);
-        set_cluser_free(current_cluster-2);
+        uint32_t next_cluster = parse_cluster_number(current_cluster - 2);
+        set_cluser_free(current_cluster - 2);
         current_cluster = next_cluster;
     }
-    set_cluser_free(start_cluster-2);
+    set_cluser_free(start_cluster - 2);
 }

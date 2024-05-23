@@ -1,17 +1,12 @@
 #include "dir.h"
-#include <stdint.h>
-#include <stddef.h>
-#include "driver.h"
+#include "fs_driver.h"
 #include "fs_globle.h"
 #include "fat_table.h"
-#include "stdio.h"
+#include "stdint.h"
 #include "string.h"
-#include <stdlib.h>
-#include <stdbool.h>
 #include "fat_table.h"
-#include "queue.h"
+#include "fs_queue.h"
 // 外部变量声明
-extern Device fat_device;
 extern Fat32Table fat_table;
 Dirent root_dir_entry;
 // 创建目录项函数实现
@@ -49,26 +44,26 @@ void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr)
 // 初始化根目录函数实现
 void init_root_entry()
 {
-    printf("init_root_entry_start\n");
+    // printf("init_root_entry_start\n");
     memset(&root_dir_entry, 0, sizeof(Dirent));
-    strncpy(root_dir_entry.DIR_Name, ".", 11);
+    strncpy(root_dir_entry.DIR_Name, "ROOT", 11);
     root_dir_entry.DIR_Attr = 0x10;
     root_dir_entry.DIR_FstClusHI = 0x0000;
     root_dir_entry.DIR_FstClusLO = 0x0002;
     set_file_or_dir_size(&root_dir_entry, 32);
-    write_by_cluster(&fat_device, 2, &root_dir_entry, sizeof(Dirent));
+    write_by_cluster(2, &root_dir_entry, sizeof(Dirent));
     uint64_t index = find_first_valid_cluster();
     set_cluser_end(index);
-    printf("init_root_entry_end\n");
+    // printf("init_root_entry_end\n");
 }
 
 // 读取并解析根目录项函数实现
-void read_and_parse_root_entry(Device *device)
+void read_and_parse_root_entry()
 {
     // 为根目录项分配缓冲区
     uint64_t cluster_size = SECTOR_SIZE * 8; // 簇大小
     uint64_t root_cluster = 2;               // 根目录所在的簇号
-    void *buffer = malloc(cluster_size);     // 缓冲区大小为一个簇的大小
+    void *buffer = malloc(cluster_size);  // 缓冲区大小为一个簇的大小
     if (buffer == NULL)
     {
         printf("Error: Memory allocation failed.\n");
@@ -76,7 +71,7 @@ void read_and_parse_root_entry(Device *device)
     }
     uint64_t root_block = CLUSTER_TO_LBA(2);
     // 读取根目录所在的簇的数据
-    if (read_by_byte(device, root_cluster, 0, sizeof(Dirent), buffer) != 0)
+    if (read_by_byte(root_cluster, 0, sizeof(Dirent), buffer) != 0)
     {
         printf("Error: Failed to read root directory data.\n");
         free(buffer);
@@ -186,7 +181,7 @@ Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name)
 {
     uint32_t dir_cluster = extract_cluster_number(parent_dir_entry);
     uint8_t buffer[CLUSER_SIZE];
-    read_by_cluster(&fat_device, dir_cluster, buffer);
+    read_by_cluster(dir_cluster, buffer);
 
     for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
     {
@@ -206,7 +201,6 @@ Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name)
             memcpy(result, &tmp, sizeof(Dirent));
             return result;
         }
-        // 不需要在这里释放 tmp 指针，因为它指向的内存是自动分配的
     }
     return NULL;
 }
@@ -218,7 +212,7 @@ uint32_t find_file_or_dir_tail_cluser(Dirent *dir_entry)
     return (uint32_t)find_last_cluster((uint64_t)cluser_num - 2);
 }
 // ?????
-void append_data_to_directory(Device *device, Dirent *dir_entry, const void *data, size_t data_size)
+void append_data_to_directory(Dirent *dir_entry, const void *data, size_t data_size)
 {
     uint32_t file_size = get_file_or_dir_size(dir_entry);
     uint32_t cluser_num = file_size / CLUSER_SIZE;
@@ -233,7 +227,7 @@ void set_file_or_dir_size(Dirent *entry, uint32_t new_size)
 }
 
 // 创建目录函数实现
-void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
+void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry)
 {
     // 获取父目录的最后一个簇号和文件大小
     uint32_t last_dir_cluster_index = find_file_or_dir_tail_cluser(parent_dir_entry);
@@ -260,7 +254,7 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device)
 
     // 在最后一个簇中写入新的目录项
     last_dir_cluster_index += 2;
-    if (write_by_byte_cluser(device, last_dir_cluster_index, write_offset, sizeof(Dirent), &new_dir_entry) != 0)
+    if (write_by_byte_cluser(last_dir_cluster_index, write_offset, sizeof(Dirent), &new_dir_entry) != 0)
     {
         printf("Error: Failed to create directory.\n");
         return;
@@ -321,7 +315,7 @@ bool ls_dir(Dirent *parent_dir)
     while (bytes_read < total_size)
     {
         uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
-        read_by_cluster(&fat_device, cluster_num, buffer);
+        read_by_cluster(cluster_num, buffer);
 
         // 解析目录项并输出
         for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
@@ -363,21 +357,22 @@ bool ls_dir(Dirent *parent_dir)
     return true;
 }
 
-void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir, Device *device)
+Dirent add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir)
 {
     Dirent tmp_dirent;
     creat_dir_entry(&tmp_dirent, name, attr);
-    create_dir(parent_dir, tmp_dirent, device);
+    create_dir(parent_dir, tmp_dirent);
+    return tmp_dirent;
 }
 
 Dirent *find_directory_bfs(char *name, Dirent start_dir)
 {
     struct queue_root *root;
-    init_queue(&root);
-    queue_add(root, &start_dir);
-    while (!queue_is_empty(root))
+    fs_init_queue(&root);
+    fs_queue_add(root, &start_dir);
+    while (!fs_queue_is_empty(root))
     {
-        Dirent *tmp_dir = queue_get(root);
+        Dirent *tmp_dir = fs_queue_get(root);
         Dirent *res_dir = find_dir_entry(tmp_dir, name);
         if (res_dir != NULL)
             return res_dir;
@@ -397,7 +392,7 @@ Dirent *find_directory_bfs(char *name, Dirent start_dir)
             while (bytes_read < total_size)
             {
                 uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
-                read_by_cluster(&fat_device, cluster_num, buffer);
+                read_by_cluster(cluster_num, buffer);
 
                 // 解析目录项并输出
                 for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
@@ -405,7 +400,7 @@ Dirent *find_directory_bfs(char *name, Dirent start_dir)
                     Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
                     if (is_directory(&dir_entry))
                     {
-                        queue_add(root, &dir_entry);
+                        fs_queue_add(root, &dir_entry);
                     }
                 }
                 bytes_read += CLUSER_SIZE;
@@ -426,11 +421,11 @@ Dirent *find_directory_bfs(char *name, Dirent start_dir)
 Dirent *find_parent_directory_bfs(char *name, Dirent *start_dir)
 {
     struct queue_root *root;
-    init_queue(&root);
-    queue_add(root, start_dir);
-    while (!queue_is_empty(root))
+    fs_init_queue(&root);
+    fs_queue_add(root, start_dir);
+    while (!fs_queue_is_empty(root))
     {
-        Dirent *tmp_dir = queue_get(root);
+        Dirent *tmp_dir = fs_queue_get(root);
         Dirent *res_dir = find_dir_entry(tmp_dir, name);
         if (res_dir != NULL)
             return tmp_dir;
@@ -450,7 +445,7 @@ Dirent *find_parent_directory_bfs(char *name, Dirent *start_dir)
             while (bytes_read < total_size)
             {
                 uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
-                read_by_cluster(&fat_device, cluster_num, buffer);
+                read_by_cluster(cluster_num, buffer);
 
                 // 解析目录项并输出
                 for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
@@ -458,7 +453,7 @@ Dirent *find_parent_directory_bfs(char *name, Dirent *start_dir)
                     Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
                     if (is_directory(&dir_entry))
                     {
-                        queue_add(root, &dir_entry);
+                        fs_queue_add(root, &dir_entry);
                     }
                 }
                 bytes_read += CLUSER_SIZE;
@@ -494,7 +489,7 @@ uint32_t dir_child_dir_num(Dirent *parent_dir)
     while (bytes_read < total_size)
     {
         uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
-        read_by_cluster(&fat_device, cluster_num, buffer);
+        read_by_cluster(cluster_num, buffer);
 
         // 解析目录项并统计个数
         for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
@@ -547,7 +542,7 @@ uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluster_num, uint32_t
     while (read_data_size < parent_file_size)
     {
         uint8_t buffer[CLUSER_SIZE];
-        read_by_cluster(&fat_device, parent_cluster_num, buffer);
+        read_by_cluster(parent_cluster_num, buffer);
 
         for (int i = 0; i < CLUSER_SIZE; i += 32)
         {
@@ -584,5 +579,5 @@ uint32_t update_dir(char *name, Dirent *new_dir)
     uint32_t cluser_num = 0;
     uint32_t offset = 0;
     find_dir_cluster_and_offset(name, &cluser_num, &offset);
-    write_by_byte_cluser(&fat_device, cluser_num, offset, 32, new_dir);
+    write_by_byte_cluser(cluser_num, offset, 32, new_dir);
 }

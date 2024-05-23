@@ -2,7 +2,7 @@
 #define DIR_H
 
 #include <stdint.h>
-#include "driver.h"
+#include "fs_driver.h"
 #include "stdbool.h"
 #define ATTR_READ_ONLY 0x01 // 只读属性
 #define ATTR_HIDDEN 0x02    // 隐藏属性
@@ -10,8 +10,8 @@
 #define ATTR_VOLUME_ID 0x08 // 卷标属性
 #define ATTR_DIRECTORY 0x10 // 子目录属性
 #define ATTR_ARCHIVE 0x20   // 归档属性
-#define ATTR_FILE 0x03  
-#define ATTR_DELETED 0x05 
+#define ATTR_FILE 0x03
+#define ATTR_DELETED 0x05
 // 目录项结构体定义
 typedef struct
 {
@@ -38,7 +38,7 @@ void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr);
 void init_root_entry();
 
 // 读取并解析根目录项函数声明
-void read_and_parse_root_entry(Device *device);
+void read_and_parse_root_entry();
 
 // 获取文件或目录大小函数声明
 uint32_t get_file_or_dir_size(const Dirent *entry);
@@ -71,9 +71,9 @@ Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name);
 uint32_t find_file_or_dir_tail_cluser(Dirent *dir_entry);
 
 // 创建目录函数声明
-void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry, Device *device);
+void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry);
 
-void append_data_to_directory(Device *device, Dirent *dir_entry, const void *data, size_t data_size);
+void append_data_to_directory(Dirent *dir_entry, const void *data, size_t data_size);
 
 void set_file_or_dir_size(Dirent *entry, uint32_t new_size);
 
@@ -83,15 +83,15 @@ void print_directory_entry(const Dirent *dir_entry);
 
 uint32_t is_directory(const Dirent *entry);
 
-void add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir, Device *device);
+Dirent add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *parent_dir);
 
-Dirent* find_directory_bfs(char* name,Dirent start_dir);
+Dirent *find_directory_bfs(char *name, Dirent start_dir);
 
-Dirent *find_parent_directory_bfs(char *name, Dirent* start_dir);
+Dirent *find_parent_directory_bfs(char *name, Dirent *start_dir);
 
 uint32_t dir_child_dir_num(Dirent *parent_dir);
 
-uint32_t find_dir_cluster_and_offset(char* name,uint32_t* cluser_num,uint32_t* offset);
+uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluser_num, uint32_t *offset);
 
 uint32_t update_dir(char *name, Dirent *new_dir);
 

@@ -1,7 +1,7 @@
 #ifndef FS_GLOBLE_H
 #define FS_GLOBLE_H
 #include <stdint.h>
-#include "driver.h"
+#include "fs_driver.h"
 #define SECTOR_SIZE 512
 #define BPB_LOCATION_SECTOR 0
 #define BLOCK_SIZE 512
@@ -187,6 +187,6 @@ struct LongDirent
 } __attribute__((__packed__));
 
 
-void formate_fat32(Device *device);
+void formate_fat32();
 
 #endif

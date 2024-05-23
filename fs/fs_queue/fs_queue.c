@@ -1,16 +1,16 @@
-#include "queue.h"
+#include "fs_queue.h"
+#include "stddef.h"
+// #include <memory.h>
+// // #include <stdio.h>
+// #include <stdlib.h>
 
-#include <memory.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-void init_queue(struct queue_root **root)
+void fs_init_queue(struct queue_root **root)
 {
     *root = (struct queue_root *)malloc(sizeof(struct queue_root));
     if (root == NULL)
     {
         printf("malloc failed");
-        exit(1);
+        return;
     }
     (*root)->head = (struct queue_node *)malloc(sizeof(struct queue_node)); /* Sentinel node */
     (*root)->tail = (*root)->head;
@@ -18,7 +18,7 @@ void init_queue(struct queue_root **root)
     (*root)->head->next = NULL;
 }
 
-int queue_add(struct queue_root *root, void *val)
+int fs_queue_add(struct queue_root *root, void *val)
 {
     struct queue_node *n;
     struct queue_node *node = (struct queue_node *)malloc(sizeof(struct queue_node));
@@ -41,7 +41,7 @@ int queue_add(struct queue_root *root, void *val)
     return 1;
 }
 
-void *queue_get(struct queue_root *root)
+void *fs_queue_get(struct queue_root *root)
 {
     struct queue_node *n;
     void *val;
@@ -63,7 +63,7 @@ void *queue_get(struct queue_root *root)
     return val;
 }
 
-uint32_t queue_is_empty(struct queue_root *root)
+uint32_t fs_queue_is_empty(struct queue_root *root)
 {
     return (root->head->next == NULL);
 }

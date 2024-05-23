@@ -1,11 +1,10 @@
-#include "block_cache.h"
-#include "driver.h"
 #include "fs_globle.h"
 #include "dir.h"
 #include "file.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "fs_driver.h"
 void print_block_data(const unsigned char *block_data, int block_size)
 {
     for (int i = 0; i < block_size; ++i)
@@ -18,90 +17,79 @@ void print_block_data(const unsigned char *block_data, int block_size)
     }
 }
 
-typedef struct
-{
-    unsigned char e_ident[16]; // ELF Identification
-    uint16_t e_type;           // Object file type
-    uint16_t e_machine;        // Machine type
-    uint32_t e_version;        // Object file version
-    uint64_t e_entry;          // Entry point address
-    uint64_t e_phoff;          // Program header offset
-    uint64_t e_shoff;          // Section header offset
-    uint32_t e_flags;          // Processor-specific flags
-    uint16_t e_ehsize;         // ELF header size
-    uint16_t e_phentsize;      // Size of program header entry
-    uint16_t e_phnum;          // Number of program header entries
-    uint16_t e_shentsize;      // Size of section header entry
-    uint16_t e_shnum;          // Number of section header entries
-    uint16_t e_shstrndx;       // Section name string table index
-} Elf64_Ehdr;
+// int main()
+// {
+//     const uint32_t block_size = 512;
+//     const uint64_t total_blocks = 4ULL * 1024 * 1024 * 1024 / block_size;
+//     //BlockCache_manager_init();
+//     //formate_fat32(&fat_device);
+//     init_root_entry();
+//     add_elf_to_root("brk.elf");
+//     ls_dir(&root_dir_entry);
+// }
 
-Device fat_device;
-
-int read_elf_file(char *filename, uint8_t **buffer, uint64_t *file_size)
+void import_file_to_os(char *source_file_name, char *target_file_name, Dirent *parent_dir)
 {
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
+    // 打开源文件
+    FILE *file = fopen(source_file_name, "rb");
+    if (!file)
     {
-        perror("Failed to open file");
-        return -1;
+        perror("Failed to open source file");
+        exit(EXIT_FAILURE);
     }
 
-    // Determine the file size
+    // 获取文件大小
     fseek(file, 0, SEEK_END);
-    *file_size = ftell(file);
+    size_t file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    // Allocate memory for the buffer if it's not already allocated
-    if (*buffer == NULL)
+    // 读取文件内容
+    char *buffer = malloc(file_size);
+    if (!buffer)
     {
-        *buffer = malloc(*file_size);
-        if (*buffer == NULL)
-        {
-            perror("Failed to allocate memory for the ELF file");
-            fclose(file);
-            return -1;
-        }
-    }
-
-    // Read the entire file into the buffer
-    if (fread(*buffer, 1, *file_size, file) != *file_size)
-    {
-        perror("Failed to read the ELF file");
+        perror("Memory allocation failed");
         fclose(file);
-        return -1;
+        exit(EXIT_FAILURE);
     }
+
+    if (fread(buffer, 1, file_size, file) != file_size)
+    {
+        perror("Failed to read file");
+        free(buffer);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
     fclose(file);
-    return 0;
+
+    printf("add_file_or_dir_to_parent_directory\n");
+    Dirent target_file = add_file_or_dir_to_parent_directory(target_file_name, ATTR_FILE, parent_dir);
+
+    printf("append_to_file\n");
+    // 将数据追加到目标文件
+    over_write_file(target_file_name,buffer,file_size);
+
+    free(buffer);
 }
 
-bool add_elf_to_root(char *file_name)
+int main(int argc, char *argv[])
 {
-    uint8_t *buffer = NULL;
-    uint64_t file_size = 0;
-    if (read_elf_file(file_name, &buffer, &file_size) == -1)
+    // 检查是否有足够的参数传入
+    if (argc < 3)
     {
-        free(buffer); // 确保失败时释放buffer
-        return false;
-    }
-    add_file_or_dir_to_parent_directory(file_name, ATTR_FILE, &root_dir_entry, &fat_device);
-    over_write_file(file_name, buffer, &fat_device, file_size);
-    free(buffer); // 成功后也要确保释放buffer
-    return true;
-}
-
-int main()
-{
-    const uint32_t block_size = 512;
-    const uint64_t total_blocks = 4ULL * 1024 * 1024 * 1024 / block_size;
-    if (initialize_device(&fat_device, "myfilesystem.img", total_blocks, block_size) != 0)
-    {
-        fprintf(stderr, "Failed to initialize device\n");
+        fprintf(stderr, "Usage: %s <source file> <target file>\n", argv[0]);
         return 1;
     }
-    BlockCache_manager_init();
-    formate_fat32(&fat_device);
+
+    // 初始化根目录项
     init_root_entry();
-    add_elf_to_root("brk.elf");
+
+    // 导入文件到操作系统中
+    // argv[1] 为源文件名，argv[2] 为目标文件名
+    import_file_to_os(argv[1], argv[2], &root_dir_entry);
+
+    // 列出根目录下的文件
     ls_dir(&root_dir_entry);
+
+    return 0;
 }
