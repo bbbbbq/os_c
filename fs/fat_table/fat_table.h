@@ -1,6 +1,7 @@
 #ifndef FAT_TABLE_H
 #define FAT_TABLE_H
 #include "stdint.h"
+#include <stdbool.h>
 #define FAT_ENTRY_NUM 8176
 // FAT32表项的结构体定义
 typedef struct
@@ -26,4 +27,5 @@ uint64_t parse_cluster_number(uint64_t index);
 void set_cluster_number(uint64_t index, uint32_t cluster_number);
 uint64_t find_last_cluster(uint64_t index);
 void release_linked_clusters(uint32_t start_cluster);
+bool init_fat_table();
 #endif

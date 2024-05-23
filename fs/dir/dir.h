@@ -95,4 +95,5 @@ uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluser_num, uint32_t 
 
 uint32_t update_dir(char *name, Dirent *new_dir);
 
+void parse_root_dir();
 #endif

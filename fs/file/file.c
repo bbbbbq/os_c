@@ -15,14 +15,14 @@ void read_file(char *name, void *buffer)
 {
     // 查找指定文件的目录项
     Dirent *dir = find_directory_bfs(name, root_dir_entry);
-    if (is_directory(dir))
-    {
-        printf("is_not_file\n");
-        return;
-    }
     if (dir == NULL)
     {
         printf("File not found\n");
+        return;
+    }
+    if (is_directory(dir))
+    {
+        printf("is_not_file\n");
         return;
     }
 
@@ -32,6 +32,7 @@ void read_file(char *name, void *buffer)
     if (file_size == 0)
     {
         printf("file without data\n");
+        return;
     }
     uint32_t bytes_read = 0;
     uint8_t *current_buffer = (uint8_t *)buffer;
@@ -42,28 +43,20 @@ void read_file(char *name, void *buffer)
         uint32_t bytes_to_read = CLUSER_SIZE;
         if (file_size - bytes_read < CLUSER_SIZE)
         {
-            bytes_to_read = file_size - bytes_read;
+            bytes_to_read = file_size - bytes_read; // Ensure we don't read beyond the file
         }
-        if (bytes_to_read < CLUSER_SIZE)
+
+        int result = read_by_byte_cluser(cluster_num, 0, bytes_to_read, current_buffer);
+        if (result == -1)
         {
-            read_by_byte_cluser(cluster_num, 0, bytes_to_read, current_buffer);
+            //printf("Error: Failed to read data\n");
+            return;
         }
-        else
-        {
-            int result = read_by_cluster(cluster_num, current_buffer);
-            if (result != 0)
-            {
-                printf("Error: Failed to read data\n");
-                return;
-            }
-        }
+
         bytes_read += bytes_to_read;
         current_buffer += bytes_to_read;
-        cluster_num = parse_cluster_number(cluster_num);
-        if (is_end_of_cluster(cluster_num))
-        {
-            break;
-        }
+        cluster_num = parse_cluster_number(cluster_num-2);
+        if (cluster_num > FAT_ENTRY_NUM) break;
     }
 }
 
@@ -109,7 +102,7 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
         {
             bytes_to_write = buffer_size - bytes_written;
         }
-        int result = write_by_byte_cluser(cluster_num, bytes_written % CLUSER_SIZE, bytes_to_write, (char *)buffer + bytes_written);
+        int result = write_by_byte_cluser(cluster_num,0, bytes_to_write, (char *)buffer + bytes_written);
         if (result != 0)
         {
             printf("Error: Failed to write data\n");
@@ -119,7 +112,7 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
         if (bytes_written < buffer_size)
         {
             cluster_num = find_next_free_cluster(cluster_num);
-            set_cluster_number(current_cluster, cluster_num);
+            set_cluster_number(current_cluster-2, cluster_num);
             current_cluster = cluster_num;
         }
     }

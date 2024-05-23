@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "fs_driver.h"
+#include <string.h>
+#include "fat_table.h"
 void print_block_data(const unsigned char *block_data, int block_size)
 {
     for (int i = 0; i < block_size; ++i)
@@ -16,17 +18,6 @@ void print_block_data(const unsigned char *block_data, int block_size)
         }
     }
 }
-
-// int main()
-// {
-//     const uint32_t block_size = 512;
-//     const uint64_t total_blocks = 4ULL * 1024 * 1024 * 1024 / block_size;
-//     //BlockCache_manager_init();
-//     //formate_fat32(&fat_device);
-//     init_root_entry();
-//     add_elf_to_root("brk.elf");
-//     ls_dir(&root_dir_entry);
-// }
 
 void import_file_to_os(char *source_file_name, char *target_file_name, Dirent *parent_dir)
 {
@@ -51,7 +42,6 @@ void import_file_to_os(char *source_file_name, char *target_file_name, Dirent *p
         fclose(file);
         exit(EXIT_FAILURE);
     }
-
     if (fread(buffer, 1, file_size, file) != file_size)
     {
         perror("Failed to read file");
@@ -61,35 +51,43 @@ void import_file_to_os(char *source_file_name, char *target_file_name, Dirent *p
     }
 
     fclose(file);
-
-    printf("add_file_or_dir_to_parent_directory\n");
-    Dirent target_file = add_file_or_dir_to_parent_directory(target_file_name, ATTR_FILE, parent_dir);
-
-    printf("append_to_file\n");
-    // 将数据追加到目标文件
+    Dirent target_file = add_file_or_dir_to_parent_directory(target_file_name, ATTR_FILE, &root_dir_entry);
     over_write_file(target_file_name,buffer,file_size);
 
     free(buffer);
 }
 
-int main(int argc, char *argv[])
-{
-    // 检查是否有足够的参数传入
-    if (argc < 3)
-    {
-        fprintf(stderr, "Usage: %s <source file> <target file>\n", argv[0]);
-        return 1;
-    }
+// int main()
+// {
+//     FILE *file;
+//     char line[256]; // Assuming file names will not exceed 255 characters
+//     const char *directory_prefix = "../user/riscv64/";
 
-    // 初始化根目录项
-    init_root_entry();
+//     init_fat_table();
+//     parse_root_dir();
+//     init_root_entry();
 
-    // 导入文件到操作系统中
-    // argv[1] 为源文件名，argv[2] 为目标文件名
-    import_file_to_os(argv[1], argv[2], &root_dir_entry);
+//     file = fopen("output.txt", "r");
+//     if (file == NULL)
+//     {
+//         perror("Failed to open output.txt");
+//         return EXIT_FAILURE;
+//     }
 
-    // 列出根目录下的文件
-    ls_dir(&root_dir_entry);
+//     while (fgets(line, sizeof(line), file))
+//     {
+//         line[strcspn(line, "\n")] = 0;
 
-    return 0;
-}
+//         char src_path[512];
+//         snprintf(src_path, sizeof(src_path), "%s%s", directory_prefix, line);
+
+//         printf("Processing file: %s\n", line);
+//         import_file_to_os(src_path, line, &root_dir_entry);
+//     }
+
+//     printf("Final directory listing:\n");
+//     ls_dir(&root_dir_entry);
+
+//     fclose(file);
+//     return 0;
+// }

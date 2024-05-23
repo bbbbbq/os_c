@@ -229,7 +229,7 @@ int write_by_byte_cluser(uint64_t cluser_num, uint64_t offset, uint64_t size_byt
     memcpy(buffer_tmp + offset, buffer, size_byte);
     // print_hex_data(buffer_tmp,CLUSER_SIZE);
     //  将更新后的数据写回簇的数据区
-    if (write_by_cluster(cluser_num, buffer_tmp, sizeof(buffer_tmp)) == 0)
+    if (write_by_cluster(cluser_num, buffer_tmp, CLUSER_SIZE) == 0)
     {
         printf("Error: Failed to write data back to cluster.\n");
         free(buffer_tmp);
@@ -283,7 +283,7 @@ void print_hex_data(void *data, size_t size)
 #define O_RDONLY 00
 Block read_block(uint64_t block_num)
 {
-    const char *img_path = "/home/caigoubencai/Desktop/os_c-ch6/sdcard.img";
+    const char *img_path = "../sdcard.img";
     int fd = open(img_path, O_RDONLY);
     if (fd == -1)
     {

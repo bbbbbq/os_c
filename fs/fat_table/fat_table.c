@@ -1,7 +1,11 @@
 #include "fat_table.h"
 #include <assert.h>
+#include "fs_driver.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
 Fat32Table fat_table;
-
 void format_fat_table()
 {
     for (int i = 0; i < FAT_ENTRY_NUM; ++i)
@@ -67,16 +71,12 @@ void set_cluser_free(uint64_t index)
 uint64_t parse_cluster_number(uint64_t index)
 {
     uint32_t tmp = fat_table.entries[index].entry_value & 0x0FFFFFFF;
-    if (tmp > FAT_ENTRY_NUM)
-        assert(0);
     return tmp;
 }
 
 void set_cluster_number(uint64_t index, uint32_t cluster_number)
 {
-    cluster_number &= 0x0FFFFFFF;
-    fat_table.entries[index].entry_value &= 0xF0000000;     // 清除原有簇号
-    fat_table.entries[index].entry_value |= cluster_number; // 设置新的簇号
+    fat_table.entries[index].entry_value = cluster_number; // 设置新的簇号
 }
 
 // uint32_t fat_table_index_to_cluser_num(uint64_t index)
@@ -118,4 +118,40 @@ void release_linked_clusters(uint32_t start_cluster)
         current_cluster = next_cluster;
     }
     set_cluser_free(start_cluster - 2);
+}
+
+bool init_fat_table()
+{
+    uint32_t start_block_num = 33;
+    uint32_t end_block_num = 32 + (8176 * 4 + 511) / 512;
+    uint32_t cur_block_num = start_block_num;
+    uint32_t total_entries_needed = 8176;
+    uint32_t entries_processed = 0;
+
+    while (cur_block_num < end_block_num)
+    {
+        Block block = read_block(cur_block_num);
+        uint32_t entries_in_this_block = BLOCK_SIZE / 4;
+        if (entries_processed + entries_in_this_block > total_entries_needed)
+        {
+            entries_in_this_block = total_entries_needed - entries_processed;
+        }
+
+        for (int i = 0; i < entries_in_this_block; i++)
+        {
+            if (entries_processed >= total_entries_needed)
+            {
+                break; // 不再处理超出需要的表项
+            }
+            memcpy(&fat_table.entries[entries_processed].entry_value, &block.data[i * 4], sizeof(uint32_t));
+            entries_processed++;
+        }
+
+        cur_block_num++;
+        if (entries_processed >= total_entries_needed)
+        {
+            break; // 如果已处理足够的表项，提前退出循环
+        }
+    }
+    return true;
 }

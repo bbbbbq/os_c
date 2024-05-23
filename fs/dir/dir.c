@@ -46,7 +46,7 @@ void init_root_entry()
 {
     // printf("init_root_entry_start\n");
     memset(&root_dir_entry, 0, sizeof(Dirent));
-    strncpy(root_dir_entry.DIR_Name, "123", 11);
+    strncpy(root_dir_entry.DIR_Name, ".", 11);
     root_dir_entry.DIR_Attr = 0x10;
     root_dir_entry.DIR_FstClusHI = 0x0000;
     root_dir_entry.DIR_FstClusLO = 0x0002;
@@ -262,6 +262,7 @@ void create_dir(Dirent *parent_dir_entry, Dirent new_dir_entry)
     set_file_or_dir_size(parent_dir_entry, parent_dir_entry->DIR_FileSize + sizeof(Dirent));
     uint32_t new_dir_cluser_num = extract_cluster_number(&new_dir_entry);
     set_cluser_end(new_dir_cluser_num - 2);
+    update_dir(".",parent_dir_entry);
 }
 
 Dirent create_dirent_entry(const char *name, uint8_t attr, uint16_t crt_time,
@@ -580,4 +581,14 @@ uint32_t update_dir(char *name, Dirent *new_dir)
     uint32_t offset = 0;
     find_dir_cluster_and_offset(name, &cluser_num, &offset);
     write_by_byte_cluser(cluser_num, offset, 32, new_dir);
+}
+
+void parse_root_dir()
+{
+    uint32_t sector_num = CLUSTER_TO_LBA(2);
+    char *buffer;
+    buffer = malloc(SECTOR_SIZE);
+    read_block_fs(sector_num, buffer);
+    memcpy(&root_dir_entry, buffer, sizeof(Dirent));
+    free(buffer);
 }
