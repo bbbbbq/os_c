@@ -14,6 +14,8 @@
 #include "virtio_disk.h"
 #include "sys_info.h"
 #include "timer.h"
+#include "queue.h"
+extern MemorySet KERNEL_SPACE;
 extern struct utsname globle_info;
 int32_t exit(int32_t value)
 {

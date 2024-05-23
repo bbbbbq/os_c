@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "vector.h": "c",
+        "block_cache.h": "c",
+        "vector": "c",
+        "stdlib.h": "c",
+        "string.h": "c",
+        "driver.h": "c",
+        "fat_table.h": "c",
+        "stdint.h": "c",
+        "stdio.h": "c",
+        "dir.h": "c",
+        "stdbool.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

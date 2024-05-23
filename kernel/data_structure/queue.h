@@ -27,4 +27,5 @@ void queue_clear(Queue *q);
 int queue_is_empty(const Queue *q);
 void *queue_get_at(const Queue *q, int index);
 bool queue_set_at(Queue *q, int index, void *new_data);
+uint32_t queue_size(Queue *q);
 #endif // QUEUE_H

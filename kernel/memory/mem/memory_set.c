@@ -162,7 +162,7 @@ static inline void memory_set_map_trampoline(MemorySet *memory_set)
                  addr2pn((PhysAddr)&strampoline), PTE_R | PTE_X);
 }
 
-static MemorySet KERNEL_SPACE;
+MemorySet KERNEL_SPACE;
 
 static void memory_set_new_kernel()
 {

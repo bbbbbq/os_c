@@ -125,3 +125,8 @@ bool queue_set_at(Queue *q, int index, void *new_data)
 
     return 0;
 }
+
+uint32_t queue_size(Queue *q)
+{
+    return q->size;
+}
