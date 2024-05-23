@@ -67,8 +67,6 @@ void set_cluser_free(uint64_t index)
 uint64_t parse_cluster_number(uint64_t index)
 {
     uint32_t tmp = fat_table.entries[index].entry_value & 0x0FFFFFFF;
-    if (tmp > FAT_ENTRY_NUM)
-        ASSERT(0);
     return tmp;
 }
 

@@ -4,7 +4,7 @@
 #include "string.h"
 #include "loader.h"
 char APP_NAMES[MAX_APP_NUM][MAX_APP_NAME_LENGTH];
-uint64_t loader_get_num_app() 
+uint64_t loader_get_num_app()
 {
   extern uint64_t _num_app[];
   return _num_app[0];

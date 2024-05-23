@@ -10,14 +10,14 @@ void read_file(char *name, void *buffer)
 {
     // 查找指定文件的目录项
     Dirent *dir = find_directory_bfs(name, root_dir_entry);
-    if (is_directory(dir))
-    {
-        printk("is_not_file\n");
-        return;
-    }
     if (dir == NULL)
     {
         printk("File not found\n");
+        return;
+    }
+    if (is_directory(dir))
+    {
+        printk("is_not_file\n");
         return;
     }
 
@@ -27,6 +27,7 @@ void read_file(char *name, void *buffer)
     if (file_size == 0)
     {
         printk("file without data\n");
+        return;
     }
     uint32_t bytes_read = 0;
     uint8_t *current_buffer = (uint8_t *)buffer;
@@ -37,30 +38,24 @@ void read_file(char *name, void *buffer)
         uint32_t bytes_to_read = CLUSER_SIZE;
         if (file_size - bytes_read < CLUSER_SIZE)
         {
-            bytes_to_read = file_size - bytes_read;
+            bytes_to_read = file_size - bytes_read; // Ensure we don't read beyond the file
         }
-        if (bytes_to_read < CLUSER_SIZE)
+
+        int result = read_by_byte_cluser(cluster_num, 0, bytes_to_read, current_buffer);
+        if (result == -1)
         {
-            read_by_byte_cluser(cluster_num, 0, bytes_to_read, current_buffer);
+            // printk("Error: Failed to read data\n");
+            return;
         }
-        else
-        {
-            int result = read_by_cluster(cluster_num, current_buffer);
-            if (result != 0)
-            {
-                printk("Error: Failed to read data\n");
-                return;
-            }
-        }
+
         bytes_read += bytes_to_read;
         current_buffer += bytes_to_read;
-        cluster_num = parse_cluster_number(cluster_num);
-        if (is_end_of_cluster(cluster_num))
-        {
+        cluster_num = parse_cluster_number(cluster_num - 2);
+        if (cluster_num > FAT_ENTRY_NUM)
             break;
-        }
     }
 }
+
 void over_write_file(char *name, void *buffer, size_t buffer_size)
 {
     // 查找指定文件的目录项
@@ -78,37 +73,32 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
         return;
     }
 
-    uint32_t cluster_num = extract_cluster_number(dir);                   // 获取文件的起始簇号
-    uint64_t file_size = get_file_or_dir_size(dir);                       // 获取文件大小
-    uint32_t cluster_count = (file_size + CLUSER_SIZE - 1) / CLUSER_SIZE; // 计算文件所占的簇数
+    // 获取文件的起始簇号
+    uint32_t cluster_num = extract_cluster_number(dir);
+    // 获取文件大小
+    uint64_t file_size = get_file_or_dir_size(dir);
+    // 计算文件所占的簇数
+    uint32_t cluster_count = (file_size + CLUSER_SIZE - 1) / CLUSER_SIZE;
 
     // 释放除了第一个簇外的其他簇
     uint32_t current_cluster = cluster_num;
-    uint32_t next_cluster;
     for (int i = 1; i < cluster_count; ++i)
     {
-        next_cluster = parse_cluster_number(current_cluster);
+        uint32_t next_cluster = parse_cluster_number(current_cluster);
         set_cluser_free(current_cluster);
         current_cluster = next_cluster;
-    }
-
-    // 重置文件大小，如果buffer_size小于文件原大小
-    if (buffer_size < file_size)
-    {
-        set_file_or_dir_size(dir, buffer_size);
-        set_cluser_end(cluster_num);
     }
 
     // 写入数据到第一个簇
     uint32_t bytes_written = 0;
     while (bytes_written < buffer_size)
     {
-        uint32_t bytes_to_write = min(buffer_size - bytes_written, CLUSER_SIZE); // 计算当前要写入的字节数
-        if (bytes_written + bytes_to_write > buffer_size)
+        uint32_t bytes_to_write = min(buffer_size - bytes_written, CLUSER_SIZE);
+        if (bytes_to_write + bytes_written > buffer_size)
         {
-            bytes_to_write = buffer_size - bytes_written; // 确保不会越界
+            bytes_to_write = buffer_size - bytes_written;
         }
-        int result = write_by_byte_cluser(cluster_num, bytes_written % CLUSER_SIZE, bytes_to_write, (uint8_t *)buffer + bytes_written);
+        int result = write_by_byte_cluser(cluster_num, 0, bytes_to_write, (char *)buffer + bytes_written);
         if (result != 0)
         {
             printk("Error: Failed to write data\n");
@@ -117,13 +107,15 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
         bytes_written += bytes_to_write;
         if (bytes_written < buffer_size)
         {
-            uint32_t new_cluster = find_next_free_cluster(cluster_num);
-            set_cluster_number(cluster_num, new_cluster);
-            cluster_num = new_cluster;
+            cluster_num = find_next_free_cluster(cluster_num);
+            set_cluster_number(current_cluster - 2, cluster_num);
+            current_cluster = cluster_num;
         }
     }
-
-    // 更新文件目录信息
+    // 更新文件大小和结束标记
+    set_file_or_dir_size(dir, buffer_size);
+    update_dir(dir->DIR_Name, dir);
+    set_cluser_end(cluster_num);
     update_dir(name, dir);
     printk("Data successfully overwritten to file: %s\n", name);
 }
