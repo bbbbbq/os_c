@@ -581,3 +581,12 @@ uint32_t update_dir(char *name, Dirent *new_dir)
     find_dir_cluster_and_offset(name, &cluser_num, &offset);
     write_by_byte_cluser(cluser_num, offset, 32, new_dir);
 }
+
+void parse_root_dir()
+{
+    uint32_t sector_num = CLUSTER_TO_LBA(2);
+    char *buffer;
+    buffer = bd_malloc(SECTOR_SIZE);
+    read_block_fs(sector_num, buffer);
+    memcpy(&root_dir_entry, buffer, sizeof(Dirent));
+}

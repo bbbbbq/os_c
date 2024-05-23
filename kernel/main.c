@@ -33,8 +33,8 @@ int main_os()
   plic_init();
   uart_init();
   virtio_disk_init();
-  init_root_entry();
-  sys_inode_table = Sys_Inode_Table_new();
+  parse_root_dir();
+  ls_dir(&root_dir_entry);
   init_sys_info();
   loader_init_and_list_apps();
   taks_init();

@@ -46,7 +46,7 @@ void init_root_entry()
 {
     // printf("init_root_entry_start\n");
     memset(&root_dir_entry, 0, sizeof(Dirent));
-    strncpy(root_dir_entry.DIR_Name, "ROOT", 11);
+    strncpy(root_dir_entry.DIR_Name, "123", 11);
     root_dir_entry.DIR_Attr = 0x10;
     root_dir_entry.DIR_FstClusHI = 0x0000;
     root_dir_entry.DIR_FstClusLO = 0x0002;

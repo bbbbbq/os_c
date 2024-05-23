@@ -229,7 +229,7 @@ int write_by_byte_cluser(uint64_t cluser_num, uint64_t offset, uint64_t size_byt
     }
 
     // 释放临时缓冲区
-    bd_free(buffer_tmp);
+    // bd_free(buffer_tmp);
 
     return 0;
 }

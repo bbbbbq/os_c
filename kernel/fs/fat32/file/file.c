@@ -61,7 +61,6 @@ void read_file(char *name, void *buffer)
         }
     }
 }
-
 void over_write_file(char *name, void *buffer, size_t buffer_size)
 {
     // 查找指定文件的目录项
@@ -85,11 +84,19 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
 
     // 释放除了第一个簇外的其他簇
     uint32_t current_cluster = cluster_num;
+    uint32_t next_cluster;
     for (int i = 1; i < cluster_count; ++i)
     {
-        uint32_t next_cluster = parse_cluster_number(current_cluster);
+        next_cluster = parse_cluster_number(current_cluster);
         set_cluser_free(current_cluster);
         current_cluster = next_cluster;
+    }
+
+    // 重置文件大小，如果buffer_size小于文件原大小
+    if (buffer_size < file_size)
+    {
+        set_file_or_dir_size(dir, buffer_size);
+        set_cluser_end(cluster_num);
     }
 
     // 写入数据到第一个簇
@@ -97,21 +104,26 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
     while (bytes_written < buffer_size)
     {
         uint32_t bytes_to_write = min(buffer_size - bytes_written, CLUSER_SIZE); // 计算当前要写入的字节数
-        int result = write_by_byte_cluser(cluster_num, bytes_written, bytes_to_write, buffer + bytes_written);
+        if (bytes_written + bytes_to_write > buffer_size)
+        {
+            bytes_to_write = buffer_size - bytes_written; // 确保不会越界
+        }
+        int result = write_by_byte_cluser(cluster_num, bytes_written % CLUSER_SIZE, bytes_to_write, (uint8_t *)buffer + bytes_written);
         if (result != 0)
         {
             printk("Error: Failed to write data\n");
             return;
         }
         bytes_written += bytes_to_write;
-        uint32_t cluser_t = (uint32_t)find_next_free_cluster(cluster_num);
-        set_cluster_number(cluster_num, cluser_t);
-        cluster_num = cluser_t;
+        if (bytes_written < buffer_size)
+        {
+            uint32_t new_cluster = find_next_free_cluster(cluster_num);
+            set_cluster_number(cluster_num, new_cluster);
+            cluster_num = new_cluster;
+        }
     }
 
-    // 更新文件大小和结束标记
-    set_file_or_dir_size(dir, buffer_size);
-    set_cluser_end(cluster_num - 2);
+    // 更新文件目录信息
     update_dir(name, dir);
     printk("Data successfully overwritten to file: %s\n", name);
 }
