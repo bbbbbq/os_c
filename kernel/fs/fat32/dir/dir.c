@@ -614,6 +614,8 @@ int load_file_names(Dirent *parent_dir, char file_names[MAX_FILES_PER_DIR][FILE_
         for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
         {
             Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
+            if (dir_is_alike(*parent_dir, dir_entry))
+                continue;
             file_num++;
             if (dir_entry.DIR_Attr == ATTR_DELETED)
                 continue;
@@ -641,4 +643,17 @@ int load_file_names(Dirent *parent_dir, char file_names[MAX_FILES_PER_DIR][FILE_
         }
     }
     return file_num - 1;
+}
+
+bool dir_is_alike(Dirent a, Dirent b)
+{
+    // 使用 memcmp 比较两个结构体
+    if (memcmp(&a, &b, sizeof(Dirent)) == 0)
+    {
+        return true; // 如果完全相同，则返回 true
+    }
+    else
+    {
+        return false; // 如果不同，则返回 false
+    }
 }

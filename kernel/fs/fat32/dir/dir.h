@@ -34,6 +34,7 @@ typedef struct
 // 根目录项
 extern Dirent root_dir_entry;
 
+bool dir_is_alike(Dirent a, Dirent b);
 // 创建目录项函数声明
 void creat_dir_entry(Dirent *dir, const char *name, uint8_t attr);
 // 初始化根目录函数声明

@@ -3,7 +3,7 @@
 #include "task.h"
 #include "string.h"
 #include "loader.h"
-char APP_NAMES[MAX_APP_NUM][MAX_APP_NAME_LENGTH];
+char APP_NAMES[MAX_APP_NUM][256];
 uint64_t loader_get_num_app()
 {
   extern uint64_t _num_app[];
@@ -47,17 +47,21 @@ size_t loader_get_app_size(uint64_t app_id)
     return app_size;
 }
 
-
-void loader_init_and_list_apps() 
+void loader_init_and_list_apps()
 {
-  extern uint64_t _app_names;
-  uint64_t num_app = loader_get_num_app();
-  uint8_t *ptr = (uint8_t *)&_app_names;
-  for (uint64_t i = 0; i < num_app; i++) 
-  {
-    strcpy_t(APP_NAMES[i], (char *)ptr);
-    ptr += (strlen_t((char *)ptr) + 1);
-  }
+  int64_t app_num = load_file_names(&root_dir_entry, APP_NAMES);
+  // if (app_num == -1)
+  // {
+  //   printk("Failed to load file names.\n");
+  // }
+  // else
+  // {
+  //   printk("Total files loaded: %d\n", app_num);
+  //   for (int i = 0; i < app_num; i++)
+  //   {
+  //     printk("File %d: %s\n", i + 1, APP_NAMES[i]);
+  //   }
+  // }
 }
 
 void list_apps() 

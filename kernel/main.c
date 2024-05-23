@@ -38,24 +38,6 @@ int main_os()
   init_fat_table();
   ls_dir(&root_dir_entry);
   init_sys_info();
-  char file_names[MAX_FILES_PER_DIR][FILE_NAME_LENGTH];
-  printk("\n\n\n\n\n");
-  // 调用函数
-  int file_count = load_file_names(&root_dir_entry, file_names);
-
-  if (file_count == -1)
-  {
-    printk("Failed to load file names.\n");
-  }
-  else
-  {
-    printk("Total files loaded: %d\n", file_count);
-    for (int i = 0; i < file_count; i++)
-    {
-      printk("File %d: %s\n", i + 1, file_names[i]);
-    }
-  }
-
   loader_init_and_list_apps();
   taks_init();
   task_manager_add_2_initproc();

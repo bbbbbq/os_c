@@ -9,7 +9,7 @@
 #include "pid.h"
 #include "file_desc.h"
 #include "queue.h"
-#define MAX_APP_NUM 20
+#define MAX_APP_NUM 100
 #define BIG_STRIDE 100000
 #define MAX_APP_NAME_LENGTH 64
 #define DEFAULT_PRIORITY 16
