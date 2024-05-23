@@ -6,17 +6,17 @@ gettimeofday
 yield
 fork
 openat
+mkdir
 chdir
-umount
 munmap
 times
 pipe
-uname
 exit
 execve
 fstat
+uname
+umount
 write
-mkdir
 getppid
 dup2
 clone
@@ -31,4 +31,3 @@ test_echo
 read
 waitpid
 sleep
-test_mount

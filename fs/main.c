@@ -57,37 +57,90 @@ void import_file_to_os(char *source_file_name, char *target_file_name, Dirent *p
     free(buffer);
 }
 
+int main()
+{
+    FILE *file;
+    char line[256]; // Assuming file names will not exceed 255 characters
+    const char *directory_prefix = "../user/riscv64/";
+
+    init_fat_table();
+    parse_root_dir();
+    init_root_entry();
+
+    file = fopen("output.txt", "r");
+    if (file == NULL)
+    {
+        perror("Failed to open output.txt");
+        return EXIT_FAILURE;
+    }
+
+    while (fgets(line, sizeof(line), file))
+    {
+        line[strcspn(line, "\n")] = 0;
+
+        char src_path[512];
+        snprintf(src_path, sizeof(src_path), "%s%s", directory_prefix, line);
+
+        printf("Processing file: %s\n", line);
+        import_file_to_os(src_path, line, &root_dir_entry);
+    }
+
+    printf("Final directory listing:\n");
+    ls_dir(&root_dir_entry);
+
+    fclose(file);
+    return 0;
+}
+
 // int main()
 // {
-//     FILE *file;
-//     char line[256]; // Assuming file names will not exceed 255 characters
-//     const char *directory_prefix = "../user/riscv64/";
-
 //     init_fat_table();
 //     parse_root_dir();
 //     init_root_entry();
-
-//     file = fopen("output.txt", "r");
-//     if (file == NULL)
+//     add_file_or_dir_to_parent_directory("1",ATTR_FILE,&root_dir_entry);
+//     add_file_or_dir_to_parent_directory("2", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("3", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("4", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("5", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("6", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("7", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("8", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("9", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("10", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("11", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("12", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("13", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("14", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("15", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("16", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("17", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("18", ATTR_FILE, &root_dir_entry);
+//     add_file_or_dir_to_parent_directory("19", ATTR_FILE, &root_dir_entry);
+//     ls_dir(&root_dir_entry);
+//     size_t data_size = 6000;
+//     char *buffer = malloc(data_size);
+//     char *tmp_buffer = malloc(data_size);
+//     if (buffer == NULL)
 //     {
-//         perror("Failed to open output.txt");
+//         fprintf(stderr, "Failed to allocate memory\n");
 //         return EXIT_FAILURE;
 //     }
-
-//     while (fgets(line, sizeof(line), file))
+//     for (size_t i = 0; i < data_size; ++i)
 //     {
-//         line[strcspn(line, "\n")] = 0;
-
-//         char src_path[512];
-//         snprintf(src_path, sizeof(src_path), "%s%s", directory_prefix, line);
-
-//         printf("Processing file: %s\n", line);
-//         import_file_to_os(src_path, line, &root_dir_entry);
+//         buffer[i] = (char)(32 + i % 95); // Cycle through printable ASCII characters
 //     }
+//     over_write_file("1",buffer,data_size);
 
-//     printf("Final directory listing:\n");
-//     ls_dir(&root_dir_entry);
-
-//     fclose(file);
-//     return 0;
+//     read_file("1",tmp_buffer);
+//     //printf("read_back\n");
+//     for (int i = 0; i < data_size; i++)
+//     {
+//         if(buffer[i]!=tmp_buffer[i])
+//         {
+//             printf("error : %d\n",i);
+//         }else
+//         {
+//             printf("success : %d\n", i);
+//         }
+//     }
 // }
