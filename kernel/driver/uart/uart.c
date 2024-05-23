@@ -88,7 +88,7 @@ void uart_irq_handler()
     {
         char received_byte = UART_REG(UART_RBR);
         // 将接收到的数据存入缓冲区或处理
-        process_received_byte(received_byte);
+        // process_received_byte(received_byte);
         print_str(&received_byte);
         print_str("\n");
     }

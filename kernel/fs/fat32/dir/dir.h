@@ -12,6 +12,8 @@
 #define ATTR_ARCHIVE 0x20   // 归档属性
 #define ATTR_FILE 0x03
 #define ATTR_DELETED 0x05
+#define MAX_FILES_PER_DIR 100
+#define FILE_NAME_LENGTH 256
 // 目录项结构体定义
 typedef struct
 {
@@ -96,4 +98,6 @@ uint32_t find_dir_cluster_and_offset(char *name, uint32_t *cluser_num, uint32_t 
 uint32_t update_dir(char *name, Dirent *new_dir);
 
 void parse_root_dir();
+
+int load_file_names(Dirent *parent_dir, char file_names[MAX_FILES_PER_DIR][FILE_NAME_LENGTH]);
 #endif

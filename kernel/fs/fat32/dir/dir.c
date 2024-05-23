@@ -590,3 +590,55 @@ void parse_root_dir()
     read_block_fs(sector_num, buffer);
     memcpy(&root_dir_entry, buffer, sizeof(Dirent));
 }
+
+int load_file_names(Dirent *parent_dir, char file_names[MAX_FILES_PER_DIR][FILE_NAME_LENGTH])
+{
+    uint32_t file_num = 0;
+    if (!is_directory(parent_dir))
+    {
+        printk("Not a directory.\n");
+        return -1;
+    }
+
+    uint32_t cluster_num = extract_cluster_number(parent_dir);
+    uint32_t total_size = get_file_or_dir_size(parent_dir);
+    uint32_t bytes_read = 0;
+
+    // 循环读取每个簇的数据
+    while (bytes_read < total_size)
+    {
+        uint8_t buffer[CLUSER_SIZE]; // 定义一个缓冲区用于读取簇的数据
+        read_by_cluster(cluster_num, buffer);
+
+        // 解析目录项并输出
+        for (int i = 0; i < CLUSER_SIZE / sizeof(Dirent); i++)
+        {
+            Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
+            file_num++;
+            if (dir_entry.DIR_Attr == ATTR_DELETED)
+                continue;
+            if ((dir_entry.DIR_Attr & ATTR_VOLUME_ID) || dir_entry.DIR_Name[0] == '\0' || (dir_entry.DIR_Attr & ~(ATTR_READ_ONLY | ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_DIRECTORY | ATTR_ARCHIVE)) != 0 || ((dir_entry.DIR_FstClusHI << 16) || dir_entry.DIR_FstClusLO) > 8176)
+            {
+                printk("End of directory.\n");
+                return file_num - 1;
+            }
+
+            memcpy(file_names[file_num - 1], dir_entry.DIR_Name, 11);
+        }
+
+        // 更新已读取的字节数
+        bytes_read += CLUSER_SIZE;
+
+        // 检查是否需要读取下一个簇
+        if (bytes_read < total_size)
+        {
+            cluster_num = (uint32_t)parse_cluster_number(cluster_num);
+            if (cluster_num == 0xffffffff)
+            {
+                printk("End of directory.\n");
+                return file_num - 1;
+            }
+        }
+    }
+    return file_num - 1;
+}
