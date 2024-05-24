@@ -9,8 +9,9 @@
 #include "trap.h"
 #include "loader.h"
 #include "taskmanager.h"
+extern uint64_t CURRENT_TASK_ID;
 struct TaskManager TASK_MANAGER;
-struct TaskControlBlock INITPROC;
+struct TaskControlBlock FIRST_TASK;
 extern void __switch(struct TaskContext **, struct TaskContext **);
 extern uint64_t _num_app[];
 
@@ -109,7 +110,7 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   queue_enqueue(&s->inode_table_index, &inode);
   queue_enqueue(&s->inode_table_index, &inode);
   queue_enqueue(&s->inode_table_index, &inode);
-  memset(s->pwd, 0, sizeof(s->pwd));
+  memset(s->pwd, ".", sizeof(s->pwd));
   s->sys_times = 0;
   s->user_times = 0;
 }
@@ -156,13 +157,19 @@ uint64_t task_control_block_get_user_token(struct TaskControlBlock *s)
 
 void taks_init()
 {
+  // printk("task_init\n");
   PidAllocator_init(&PID_ALLOCATOR);
+  // printk("PidAllocator_init\n");
   task_manager_init_2();
-  task_control_block_new(&INITPROC, loader_get_app_data_by_name("initproc"),
-                         loader_get_app_size_by_name("initproc"));
+  // printk("task_manager_init_2()\n");
+  char *cur_app_name = loader_get_app_name_by_index(CURRENT_TASK_ID);
+  // printk("loader_get_app_name_by_index\n");
+  task_control_block_new(&FIRST_TASK, loader_get_app_data_by_name(cur_app_name),
+                         loader_get_app_size_by_name(cur_app_name));
+  printk("task_control_block_new\n");
 }
 
 void task_manager_add_2_initproc()
 {
-  task_manager_add_2(&TASK_MANAGER_2, &INITPROC);
+  task_manager_add_2(&TASK_MANAGER_2, &FIRST_TASK);
 }

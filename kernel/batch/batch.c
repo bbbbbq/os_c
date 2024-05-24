@@ -182,12 +182,13 @@ void task_exit_current_and_run_next()
   task->user_times++;
   task->task_status = Zombie;
   task->exit_code = Exited;
-  struct TaskControlBlock **x = (struct TaskControlBlock **)(task->children.buffer);
-  for (uint64_t i = 0; i < task->children.size; i++)
-  {
-    x[i]->parent = &INITPROC;
-    vector_push(&INITPROC.children, x[i]);
-  }
+  // 收养操作
+  //  struct TaskControlBlock **x = (struct TaskControlBlock **)(task->children.buffer);
+  //  for (uint64_t i = 0; i < task->children.size; i++)
+  //  {
+  //    x[i]->parent = &INITPROC;
+  //    vector_push(&INITPROC.children, x[i]);
+  //  }
   vector_free(&task->children);
   memory_set_recycle_data_pages(&task->memory_set);
   kernel_stack_free(&task->kernel_stack);

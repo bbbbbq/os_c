@@ -12,7 +12,7 @@ void read_file(char *name, void *buffer)
     Dirent *dir = find_directory_bfs(name, root_dir_entry);
     if (dir == NULL)
     {
-        printk("File not found\n");
+        ASSERT(0);
         return;
     }
     if (is_directory(dir))
@@ -50,6 +50,10 @@ void read_file(char *name, void *buffer)
 
         bytes_read += bytes_to_read;
         current_buffer += bytes_to_read;
+        if (cluster_num < 2)
+        {
+            panic("cluster_num < 2");
+        }
         cluster_num = parse_cluster_number(cluster_num - 2);
         if (cluster_num > FAT_ENTRY_NUM)
             break;

@@ -4,13 +4,14 @@
 #include "string.h"
 #include "loader.h"
 char APP_NAMES[MAX_APP_NUM][256];
+uint64_t APP_NUM_GLOBLE = 0;
+uint64_t CURRENT_TASK_ID = 1;
 uint64_t loader_get_num_app()
 {
-  extern uint64_t _num_app[];
-  return _num_app[0];
+  return APP_NUM_GLOBLE;
 }
 
-uint8_t *loader_get_app_data(uint64_t app_id) 
+uint8_t *loader_get_app_data(uint64_t app_id)
 {
     ASSERT(app_id < loader_get_num_app());
     extern uint8_t app_0_start, app_1_start, app_2_start;
@@ -49,19 +50,7 @@ size_t loader_get_app_size(uint64_t app_id)
 
 void loader_init_and_list_apps()
 {
-  int64_t app_num = load_file_names(&root_dir_entry, APP_NAMES);
-  // if (app_num == -1)
-  // {
-  //   printk("Failed to load file names.\n");
-  // }
-  // else
-  // {
-  //   printk("Total files loaded: %d\n", app_num);
-  //   for (int i = 0; i < app_num; i++)
-  //   {
-  //     printk("File %d: %s\n", i + 1, APP_NAMES[i]);
-  //   }
-  // }
+  APP_NUM_GLOBLE = load_file_names(&root_dir_entry, APP_NAMES);
 }
 
 void list_apps() 
@@ -76,28 +65,46 @@ void list_apps()
 
 uint8_t* loader_get_app_data_by_name(char* name) 
 {
-  print_str("current task: ");
-  print_str(name);
-  print_str("\n");
-  int num_app = loader_get_num_app();
-  for (int i = 0; i < num_app; i++)
+  printk("loader_get_app_data_by_name_start\n");
+  Dirent *dir = find_directory_bfs(name, root_dir_entry);
+  if (dir == NULL)
+    return NULL;
+  printk("get_file_or_dir_size\n");
+  uint32_t file_size = get_file_or_dir_size(dir);
+  printk("get_file_or_dir_size_end\n");
+  if (file_size == 0)
   {
-    if (strcmp_t(APP_NAMES[i], name) == 0)
-    {
-      return loader_get_app_data(i);
-    }
+    printk("file_size = 0\n");
+    return NULL;
   }
-    return NULL; // Return NULL if no match is found
+  char *buffer = bd_malloc(file_size + 1);
+  if (buffer == NULL)
+  {
+    panic("buffer alloc error \n");
+  }
+  printk("read_file\n");
+  read_file(name, buffer);
+  printk("loader_get_app_data_by_name_end\n");
+  return buffer;
 }
 
-
-
-size_t loader_get_app_size_by_name(char *name) {
-  uint64_t num_app = loader_get_num_app();
-  for (uint64_t i = 0; i < num_app; i++) {
-    if (strcmp_t(APP_NAMES[i], name) == 0) {
-      return loader_get_app_size(i);
-    }
+size_t loader_get_app_size_by_name(char *name)
+{
+  Dirent *dir = find_directory_bfs(name, root_dir_entry);
+  if (dir == NULL)
+  {
+    panic("dir not found\n");
   }
-  return 0;
+  uint32_t file_size = get_file_or_dir_size(dir);
+  if (file_size == 0)
+  {
+    panic("file_size == 0\n");
+  }
+  return file_size;
+}
+
+char *loader_get_app_name_by_index(uint32_t id)
+{
+  char *app_name = APP_NAMES[id];
+  return app_name;
 }

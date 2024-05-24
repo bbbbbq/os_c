@@ -37,9 +37,17 @@ int main_os()
   parse_root_dir();
   init_fat_table();
   ls_dir(&root_dir_entry);
+  // Dirent *dir = find_directory_bfs("clone", root_dir_entry);
+  // char *buffer = bd_malloc(get_file_or_dir_size(dir));
+  // read_file("clone", buffer);
+  // print_hex(buffer, get_file_or_dir_size(dir));
+  // printk("init_sys_info\n");
   init_sys_info();
+  // printk("loader_init_and_list_apps();\n");
   loader_init_and_list_apps();
+  // printk("taks_init();\n");
   taks_init();
+  // printk("task_manager_add_2_initproc();\n");
   task_manager_add_2_initproc();
   processor_run_tasks();
   ASSERT(0);

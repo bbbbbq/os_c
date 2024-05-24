@@ -189,8 +189,8 @@ void virtio_disk_intr()
         __sync_synchronize();
         int id = disk.used->ring[disk.used_idx % NUM].id;
 
-        if (disk.info[id] != 0)
-            panic("virtio_disk_intr status\n");
+        // if (disk.info[id] != 0)
+        //     panic("virtio_disk_intr status\n");
         disk.used_idx += 1;
     }
 }
