@@ -133,3 +133,14 @@ void parse_mode(uint64_t mode, bool *owner_read, bool *owner_write, bool *owner_
         *owner_exec = (mode & OWNER_EXEC) ? true : false;
     }
 }
+
+void Sys_Inode_Table_init()
+{
+    Inode inode1, inode2, inode3;
+    inode1.type = INODE_TYPE_STDIN;
+    inode2.type = INODE_TYPE_STDOUT;
+    inode3.type = INODE_TYPE_STDERROR;
+    queue_enqueue(&sys_inode_table.inode_table, &inode1);
+    queue_enqueue(&sys_inode_table.inode_table, &inode2);
+    queue_enqueue(&sys_inode_table.inode_table, &inode3);
+}

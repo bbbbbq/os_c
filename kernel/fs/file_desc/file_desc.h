@@ -5,9 +5,16 @@
 #include "buddy.h"
 #include "file.h"
 #include "debug.h"
+#define INODE_TYPE_STDIN 0
+#define INODE_TYPE_STDOUT 1
+#define INODE_TYPE_STDERROR 2
+#define INODE_TYPE_PIPE 3
+#define INODE_TYPE_FILE 4
 typedef struct
 {
+    uint64_t type;
     Dirent dir;
+    char *pipe_buffer;
     int64_t ref_cnt;
     uint64_t offset;
     bool readable;

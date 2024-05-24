@@ -4,19 +4,37 @@
 #include "stdint.h"
 #include "file_desc.h"
 // 定义系统调用ID
-#define SYSCALL_READ 63
-#define SYSCALL_WRITE 64
-#define SYSCALL_EXIT 93
-#define SYSCALL_YIELD 124
-#define SYSCALL_SET_PRIORITY 140
-#define SYSCALL_GET_TIME 169
-#define SYSCALL_GETPID 172
-#define SYSCALL_MUNMAP 215
-#define SYSCALL_FORK 220
-#define SYSCALL_EXEC 221
-#define SYSCALL_MMAP 222
-#define SYSCALL_WAITPID 260
-#define SYSCALL_SPAWN 400
+#define SYS_GETCWD 17
+#define SYS_PIPE2 59
+#define SYS_DUP 23
+#define SYS_DUP3 24
+#define SYS_CHDIR 49
+#define SYS_OPENAT 56
+#define SYS_CLOSE 57
+#define SYS_READ 63
+#define SYS_WRITE 64
+#define SYS_LINKAT 37
+#define SYS_UNLINKAT 35
+#define SYS_MKDIRAT 34
+#define SYS_UMOUNT2 39
+#define SYS_MOUNT 40
+#define SYS_FSTAT 80
+#define SYS_CLONE 220
+#define SYS_EXECVE 221
+#define SYS_WAIT4 260
+#define SYS_EXIT 93
+#define SYS_GETPPID 173
+#define SYS_GETPID 172
+#define SYS_BRK 214
+#define SYS_MUNMAP 215
+#define SYS_MMAP 222
+#define SYS_TIMES 153
+#define SYS_UNAME 160
+#define SYS_SCHED_YIELD 124
+#define SYS_GETTIME 169
+#define SYS_NANOSLEEP 101
+#define SYS_GETDENTS64 61
+#define SYS_SPAWN 400
 
 struct timespec
 {
@@ -54,4 +72,5 @@ int64_t sys_munmap(uint64_t start, uint64_t len);
 int64_t sys_getppid();
 uint64_t sys_mmap(uint64_t addr, uint64_t len, uint64_t prot,
                   uint64_t flags, uint64_t fd, uint64_t pgoff);
+int64_t SYS_gettimeofday(char *buffer, int64_t t1);
 #endif

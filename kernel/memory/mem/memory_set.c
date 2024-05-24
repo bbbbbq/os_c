@@ -159,7 +159,7 @@ extern uint8_t strampoline;
 static inline void memory_set_map_trampoline(MemorySet *memory_set)
 {
   page_table_map(&memory_set->page_table, addr2pn(TRAMPOLINE),
-                 addr2pn((PhysAddr)&strampoline), PTE_R | PTE_X);
+                 addr2pn((PhysAddr)&strampoline), PTE_W | PTE_R | PTE_X);
 }
 
 MemorySet KERNEL_SPACE;
@@ -271,18 +271,9 @@ void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,
       end_va = (VirtAddr)(start_va + elf_program_get_memsz(&elf, ph));
       map_perm = MAP_PERM_U;
       ph_flags = elf_program_get_flags(&elf, ph);
-      if (ph_flags | PF_R)
-      {
-        map_perm |= MAP_PERM_R;
-      }
-      if (ph_flags | PF_W)
-      {
-        map_perm |= MAP_PERM_W;
-      }
-      if (ph_flags | PF_X)
-      {
-        map_perm |= MAP_PERM_X;
-      }
+      map_perm |= MAP_PERM_R;
+      map_perm |= MAP_PERM_W;
+      map_perm |= MAP_PERM_X;
       map_area.vpn_range.l = page_floor(start_va);
       map_area.vpn_range.r = page_ceil(end_va);
       map_area.map_type = MAP_FRAMED;
@@ -310,7 +301,7 @@ void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,
   map_area.vpn_range.l = page_floor(TRAP_CONTEXT);
   map_area.vpn_range.r = page_ceil(TRAMPOLINE);
   map_area.map_type = MAP_FRAMED;
-  map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
+  map_area.map_perm = MAP_PERM_X | MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
   // return

@@ -22,5 +22,5 @@ int32_t Find_Inode_By_Dir_In_Inode_Table(Dirent dir);
 void Sys_Inode_Table_set_inode_ref(uint32_t index, uint32_t ref_cnt);
 uint32_t Sys_Inode_Table_get_inode_ref(uint32_t index);
 void parse_mode(uint64_t mode, bool *owner_read, bool *owner_write, bool *owner_exec);
-
+void Sys_Inode_Table_init();
 #endif

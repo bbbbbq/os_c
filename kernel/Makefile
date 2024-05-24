@@ -71,7 +71,7 @@ $(OBJDIR)/%.o: %.asm
 
 # Clean build
 
-# Include dependencies
+# Include dependenciesP
 -include $(DEP_FILES)
 
 # Generate dependencies for C source files

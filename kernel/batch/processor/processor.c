@@ -41,7 +41,7 @@ uint64_t processor_current_user_token()
 
 void processor_run_tasks()
 {
-  printk("processor_run_tasks\n");
+  // printk("processor_run_tasks\n");
   processor_init(&PROCESSOR);
   struct TaskControlBlock *task;
   struct TaskContext *idle_task_cx_ptr;

@@ -81,6 +81,7 @@ uint64_t getpid(struct TaskControlBlock* self);
 
 void task_context_zero_init(struct TaskContext *cx);
 uint64_t task_control_block_get_user_token(struct TaskControlBlock *s);
-
 struct TrapContext *task_control_block_get_trap_cx(struct TaskControlBlock *s);
+
+void task_manager_add_new_task();
 #endif

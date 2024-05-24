@@ -27,27 +27,40 @@ void clear_bss()
   }
 }
 
+void print_byte_as_binary(uint8_t byte)
+{
+  for (int i = 7; i >= 0; i--)
+  {
+    printk("%c", (byte & (1 << i)) ? '1' : '0');
+  }
+}
+
+void print_file_data_as_binary(char *file_data, uint32_t file_size)
+{
+  printk("Binary representation of file data:\n");
+  for (uint32_t i = 0; i < file_size; i++)
+  {
+    print_byte_as_binary(file_data[i]);
+    printk(" "); // Add space between bytes for readability
+    if ((i + 1) % 8 == 0)
+    { // Break line every 8 bytes
+    }
+  }
+}
+
 int main_os()
 {
   mm_init();
-  init_trap();
   plic_init();
   uart_init();
   virtio_disk_init();
   parse_root_dir();
   init_fat_table();
-  ls_dir(&root_dir_entry);
-  // Dirent *dir = find_directory_bfs("clone", root_dir_entry);
-  // char *buffer = bd_malloc(get_file_or_dir_size(dir));
-  // read_file("clone", buffer);
-  // print_hex(buffer, get_file_or_dir_size(dir));
-  // printk("init_sys_info\n");
   init_sys_info();
-  // printk("loader_init_and_list_apps();\n");
+  ls_dir(&root_dir_entry);
   loader_init_and_list_apps();
-  // printk("taks_init();\n");
   taks_init();
-  // printk("task_manager_add_2_initproc();\n");
+  init_trap();
   task_manager_add_2_initproc();
   processor_run_tasks();
   ASSERT(0);

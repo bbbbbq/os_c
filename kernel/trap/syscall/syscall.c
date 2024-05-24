@@ -15,6 +15,7 @@
 #include "sys_info.h"
 #include "timer.h"
 #include "queue.h"
+#include "string.h"
 extern MemorySet KERNEL_SPACE;
 extern struct utsname globle_info;
 int32_t exit(int32_t value)
@@ -22,6 +23,8 @@ int32_t exit(int32_t value)
     print_str("exit : ");
     print_uint32((uint32_t)value);
     print_str("\n");
+    task_manager_add_new_task();
+    task_exit_current_and_run_next();
     return value;
 }
 
@@ -199,45 +202,61 @@ int64_t sys_get_time(TimeVal *ts, int64_t tz)
 
 int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
 {
+    // printk("syscall\n");
     switch (syscall_id)
     {
-    case SYSCALL_WAITPID:
-        return sys_waitpid((int64_t)a0, (int *)a1);
-    case SYSCALL_READ:
-        return read(a0, (char *)a1, a2);
-    case SYSCALL_WRITE:
-        return sys_write(a0, (char *)a1, a2);
-    case SYSCALL_EXIT:
+    case SYS_GETCWD:
+        return SYS_getcwd((char *)a0, (size_t)a1);
+    // case SYS_pipe2:
+    //     return SYS_pipe2((int *)a0, (int)a1);
+    case SYS_DUP:
+        return SYS_dup((int)a0);
+    case SYS_DUP3:
+        return SYS_dup3((int)a0, (int)a1);
+    case SYS_CHDIR:
+        return SYS_chdir((char *)a0);
+    case SYS_OPENAT:
+        return sys_openat((int)a0, (char *)a1, *(OpenFlags *)a2);
+    case SYS_CLOSE:
+        return sys_close((uint32_t)a0);
+    case SYS_READ:
+        return SYS_read((int)a0, (char *)a1, (uint32_t)a2);
+    case SYS_WRITE:
+        return SYS_write((int)a0, (char *)a1, (uint64_t)a2);
+    // case SYS_linkat:
+    //     return sys_linkat((int)a0, (char *)a1, (int)a2, (char *)a3, (unsigned int)a4); // Assuming a3 and a4 are additional parameters
+    // case SYS_unlinkat:
+    //     return sys_unlinkat((int)a0, (char *)a1, (unsigned int)a2);
+    case SYS_MKDIRAT:
+        return SYS_mkdirat((char *)a0, (uint64_t)a1);
+    // case SYS_mount:
+    //     return sys_mount((const char *)a0, (const char *)a1, (const char *)a2, (unsigned long)a3, (const void *)a4); // Assuming a2, a3, and a4 are additional parameters
+    // case SYS_umount2:
+    //     return sys_umount2((const char *)a0, (int)a1);
+    case SYS_FSTAT:
+        return SYS_fstat((int)a0, (char *)a1);
+    case SYS_GETDENTS64:
+        return SYS_getdents64((int)a0, (char *)a1);
+    // case SYS_CLONE:
+    //     return sys_clone((unsigned long)a0, (void *)a1, (int *)a2, (void *)a3, (int *)a4); // Assuming a1, a2, a3, and a4 are additional parameters
+    case SYS_EXECVE:
+        return sys_exec((char *)a0); // Assuming execve is handled by sys_exec for simplification
+    case SYS_EXIT:
         sys_exit((int)a0);
-        return -1;
-    case SYSCALL_YIELD:
-        return yield();
-    // case SYSCALL_SET_PRIORITY:
-    //     return set_priority((int64_t)a0);
-    case SYSCALL_GET_TIME:
-        return sys_get_time((TimeVal *)a0, (int64_t)a1);
-    case SYSCALL_GETPID:
-        return sys_getpid();
-    // case SYSCALL_MUNMAP:
-    //     return sys_munmap(a0, a1);
-    case SYSCALL_FORK:
-        printk("[kernel] sys_fork \n\n");
-        return sys_fork();
-    case SYSCALL_EXEC:
-        return sys_exec((char *)a0);
-    // case SYSCALL_MMAP:
-    //     return sys_mmap(a0, a1, a2);
-    // case SYSCALL_WAITPID:
-    //     return sys_waitpid((int64_t)a0, (int *)a1);
-    // case SYSCALL_SPAWN:
-    //     return sys_spawn((char *)a0);
+        return -1; // sys_exit does not return
+    case SYS_SCHED_YIELD:
+        return yield(); // Assuming yield is correctly named and takes no parameters
+    // case :
+    //     return SYS_gettimeofday((struct timespec *)a0, (int64_t)a1);
+    // case SYS_nanosleep:
+    //     return sys_nanosleep((const struct timespec *)a0, (struct timespec *)a1); // Assuming a1 is an additional parameter
     default:
-        printk("unsopport_sys_id %d", syscall_id);
+        printk("Unsupported syscall ID %d", syscall_id);
         ASSERT(0);
-        break;
+        return -1;
     }
-    return -1;
 }
+
 int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
 {
     bool readable = false;
@@ -413,26 +432,42 @@ int64_t SYS_read(int64_t fd, char *buffer, uint32_t count)
 
 int64_t SYS_write(int64_t fd, char *buffer, uint64_t count)
 {
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
-    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
-    if (inode == NULL)
-        return -1;
-    if (buffer == NULL)
-        return -1;
-    bool append = inode->append;
-    bool write = inode->writable;
-    if (inode->dir.DIR_Attr == ATTR_DIRECTORY)
-        return -1;
-    if (!write)
-        return -1;
-    if (append)
+    if (fd == 1 || fd == 2)
     {
-        append_to_file_by_dir(&inode->dir, buffer, count);
+        uint8_t stdout_write_buf[512];
+        copy_byte_buffer(processor_current_user_token(), stdout_write_buf,
+                         (uint8_t *)buffer, count, FROM_USER);
+        for (int i = 0; i < count; i++)
+        {
+            console_putchar(stdout_write_buf[i]);
+        }
     }
     else
     {
-        write_file_by_byte(&inode->dir, inode->offset, buffer, count);
+        uint8_t file_buffer[512];
+        copy_byte_buffer(processor_current_user_token(), file_buffer,
+                         (uint8_t *)buffer, count, FROM_USER);
+        struct TaskControlBlock *current_task = processor_current_task();
+        uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+        Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+        if (inode == NULL)
+            return -1;
+        if (buffer == NULL)
+            return -1;
+        bool append = inode->append;
+        bool write = inode->writable;
+        if (inode->dir.DIR_Attr == ATTR_DIRECTORY)
+            return -1;
+        if (!write)
+            return -1;
+        if (append)
+        {
+            append_to_file_by_dir(&inode->dir, file_buffer, count);
+        }
+        else
+        {
+            write_file_by_byte(&inode->dir, inode->offset, file_buffer, count);
+        }
     }
     return 0;
 }
@@ -555,16 +590,17 @@ int64_t SYS_dup(int64_t fd)
 
 int64_t SYS_dup3(int64_t old_fd, int64_t new_fd)
 {
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, old_fd);
-    if (sys_inode_index == NULL)
-        return -1;
-    uint32_t queue_size = current_task->inode_table_index.size;
-    for (int i = 0; i < new_fd - queue_size; i++)
-    {
-        queue_enqueue(&current_task->inode_table_index, NULL);
-    }
-    queue_enqueue(&current_task->inode_table_index, &new_fd);
+    printk("\ndup2\n");
+    // struct TaskControlBlock *current_task = processor_current_task();
+    // uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, old_fd);
+    // if (sys_inode_index == NULL)
+    //     return -1;
+    // uint32_t queue_size = current_task->inode_table_index.size;
+    // // for (int i = 0; i < old_fd - queue_size; i++)
+    // // {
+    // //     queue_enqueue(&current_task->inode_table_index, NULL);
+    // // }
+    // queue_enqueue(&current_task->inode_table_index, &new_fd);
     return 0;
 }
 
@@ -647,7 +683,7 @@ int64_t sys_getppid()
     return parent_task->pid.pid;
 }
 
-int64_t SYS_gettimeofday(char *buffer)
+int64_t SYS_gettimeofday(char *buffer, int64_t t1)
 {
     struct timespec ts;
     ts.tv_sec = ticks / 100000;

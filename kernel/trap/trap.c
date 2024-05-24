@@ -38,24 +38,26 @@ void print_sepc()
 
 void trap_handler()
 {
-  // printk("trap_handler \n");
+  // printk("trap_handler\n");
+  intr_off();
   set_kernel_trap_entry();
 
   struct TrapContext *cx = processor_current_trap_cx();
   uint64_t scause = r_scause();
+  uint64_t stval = r_stval();
 
   if (scause & (1ULL << 63))
   {
     scause &= ~(1ULL << 63);
+    // printk("scause : %d\n", scause);
     switch (scause)
     {
     case SupervisorTimer:
-      intr_timer_handle();
-      ticks++;
-      task_exit_current_and_run_next();
+      timer_set_next_trigger();
+      task_suspend_current_and_run_next();
       break;
     default:
-      ASSERT("Unsupported interrupt 0x%llx, stval = 0x%llx\n");
+      // panic("Unsupported interrupt");
       break;
     }
   }
@@ -73,20 +75,21 @@ void trap_handler()
     case InstructionPageFault:
     case LoadFault:
     case LoadPageFault:
-      ASSERT("Exception %lld in application, bad addr = %llx, bad instruction = ");
-      ASSERT("LoadPageFault\n");
-      task_exit_current_and_run_next();
+      // print_sepc();
+      printk("loadPageFault_error\n");
+      task_exit_current_and_run_next(-2);
       break;
     case IllegalInstruction:
-      ASSERT("IllegalInstruction in application, core dumped.\n");
-      task_exit_current_and_run_next();
+      printk("IllegalInstruction in application, core dumped.\n");
+      task_exit_current_and_run_next(-3);
       break;
     default:
-      ASSERT(0);
+      panic("Unsupported exception");
       break;
     }
   }
 
+  intr_on();
   trap_return();
 }
 
@@ -108,12 +111,10 @@ void trap_return()
   uint64_t user_satp = processor_current_user_token();
   uint64_t restore_va = (uint64_t)__restore - (uint64_t)__alltraps + TRAMPOLINE;
   asm volatile("fence.i");
-  asm volatile("mv x10, %1\n"
-               "mv x11, %2\n"
-               "jr %0\n"
-               :
-               : "r"(restore_va), "r"(trap_cx_ptr), "r"(user_satp)
-               : "memory", "x10", "x11");
+  asm volatile("mv x10, %0" : : "r"(trap_cx_ptr) : "x10");
+  asm volatile("mv x11, %0" : : "r"(user_satp) : "x11");
+  asm volatile("jr %0" : : "r"(restore_va));
+
   panic("Unreachable in back_to_user!\n");
 }
 

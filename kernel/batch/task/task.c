@@ -12,6 +12,8 @@
 extern uint64_t CURRENT_TASK_ID;
 struct TaskManager TASK_MANAGER;
 struct TaskControlBlock FIRST_TASK;
+#define MAX_APP_DATA_BYTES 1024 * 1024
+uint8_t CUR_APP_DATA[MAX_APP_DATA_BYTES];
 extern void __switch(struct TaskContext **, struct TaskContext **);
 extern uint64_t _num_app[];
 
@@ -106,10 +108,9 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   s->priority = DEFAULT_PRIORITY;
   s->stride = 0;
   queue_init(&s->inode_table_index);
-  Inode inode;
-  queue_enqueue(&s->inode_table_index, &inode);
-  queue_enqueue(&s->inode_table_index, &inode);
-  queue_enqueue(&s->inode_table_index, &inode);
+  queue_enqueue(&s->inode_table_index, 0);
+  queue_enqueue(&s->inode_table_index, 1);
+  queue_enqueue(&s->inode_table_index, 2);
   memset(s->pwd, ".", sizeof(s->pwd));
   s->sys_times = 0;
   s->user_times = 0;
@@ -157,19 +158,32 @@ uint64_t task_control_block_get_user_token(struct TaskControlBlock *s)
 
 void taks_init()
 {
-  // printk("task_init\n");
   PidAllocator_init(&PID_ALLOCATOR);
-  // printk("PidAllocator_init\n");
   task_manager_init_2();
-  // printk("task_manager_init_2()\n");
   char *cur_app_name = loader_get_app_name_by_index(CURRENT_TASK_ID);
-  // printk("loader_get_app_name_by_index\n");
-  task_control_block_new(&FIRST_TASK, loader_get_app_data_by_name(cur_app_name),
-                         loader_get_app_size_by_name(cur_app_name));
-  printk("task_control_block_new\n");
+  printk("cur_app_num : %s\n", cur_app_name);
+  char *app_data = loader_get_app_data_by_name(cur_app_name);
+  // print_hex_data(app_data, 32);
+  uint32_t app_size = loader_get_app_size_by_name(cur_app_name);
+  memcpy(CUR_APP_DATA, app_data, app_size);
+  task_control_block_new(&FIRST_TASK, CUR_APP_DATA, app_size);
 }
 
 void task_manager_add_2_initproc()
 {
   task_manager_add_2(&TASK_MANAGER_2, &FIRST_TASK);
+}
+
+void task_manager_add_new_task()
+{
+  CURRENT_TASK_ID++;
+  struct TaskControlBlock *s;
+  char *cur_app_name = loader_get_app_name_by_index(CURRENT_TASK_ID);
+  printk("cur_app_num : %s\n", cur_app_name);
+  char *app_data = loader_get_app_data_by_name(cur_app_name);
+  // print_hex_data(app_data, 32);
+  uint32_t app_size = loader_get_app_size_by_name(cur_app_name);
+  memcpy(CUR_APP_DATA, app_data, app_size);
+  task_control_block_new(s, CUR_APP_DATA, app_size);
+  task_manager_add_2(&TASK_MANAGER_2, s);
 }

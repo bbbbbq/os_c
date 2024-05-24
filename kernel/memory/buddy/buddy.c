@@ -123,6 +123,7 @@ void *bd_malloc(uint64_t nbytes)
   if (k >= nsizes)
   { // 没有空闲块？
     // release(&lock);
+    panic("heap_memory_end\n");
     return 0;
   }
 
