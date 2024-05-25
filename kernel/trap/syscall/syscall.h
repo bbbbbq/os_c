@@ -35,7 +35,7 @@
 #define SYS_NANOSLEEP 101
 #define SYS_GETDENTS64 61
 #define SYS_SPAWN 400
-
+#define SYS_OPEN 180
 struct timespec
 {
     uint64_t tv_sec; // 秒
@@ -54,7 +54,7 @@ int64_t sys_exec(char *path);
 int64_t sys_getpid();
 void sys_exit(int32_t status);
 int64_t sys_openat(int32_t fd, char *path, OpenFlags flage);
-int64_t sys_open(const char *pathname, OpenFlags flage);
+int64_t sys_open(const char *pathname, uint32_t flage_t);
 int32_t sys_close(uint32_t fd);
 int64_t SYS_getdents64(int64_t fd, char *buffer);
 int64_t SYS_read(int64_t fd, char *buffer, uint32_t count);

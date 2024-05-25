@@ -2,6 +2,7 @@
 #include "sbi.h"
 #include "string.h"
 #include "stdint.h"
+#include "mem.h"
 void print_str(const char* str) {
     while (*str) 
     {
@@ -94,4 +95,40 @@ void print_hex(const void *data, size_t size)
     { // 如果最后不是刚好结束，则也添加换行
         console_putchar('\n');
     }
+}
+
+uint64_t console_stdout(char *buffer, uint32_t count)
+{
+    char stdout_write_buf[512];
+    copy_byte_buffer(processor_current_user_token(), stdout_write_buf,
+                     (uint8_t *)buffer, count, FROM_USER);
+    for (int i = 0; i < count; i++)
+    {
+        console_putchar(stdout_write_buf[i]);
+    }
+    return count;
+}
+
+uint64_t console_stdin(char *buffer, uint32_t count)
+{
+    uint8_t stdout_write_buf[512];
+    copy_byte_buffer(processor_current_user_token(), stdout_write_buf,
+                     (uint8_t *)buffer, count, FROM_USER);
+    for (uint64_t i = 0; i < count; i++)
+    {
+        console_putchar((char)stdout_write_buf[i]);
+    }
+    return (int64_t)count;
+}
+
+uint64_t console_stderror(char *buffer, uint32_t count)
+{
+    char stdout_write_buf[512];
+    copy_byte_buffer(processor_current_user_token(), stdout_write_buf,
+                     (uint8_t *)buffer, count, FROM_USER);
+    for (int i = 0; i < count; i++)
+    {
+        console_putchar(stdout_write_buf[i]);
+    }
+    return count;
 }

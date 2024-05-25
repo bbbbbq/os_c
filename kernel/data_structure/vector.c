@@ -12,7 +12,7 @@ void vector_new(struct vector *v, uint64_t dsize)
   v->buffer = bd_malloc(v->capacity * v->dsize);
 }
 
-void vector_push(struct vector *v, void *d)
+uint64_t vector_push(struct vector *v, void *d)
 {
   if (v->size == v->capacity)
   {
@@ -23,6 +23,7 @@ void vector_push(struct vector *v, void *d)
     v->buffer = t;
   }
   memcpy((uint8_t *)(v->buffer + (v->size++) * v->dsize), d, v->dsize);
+  return v->size;
 }
 
 void vector_pop(struct vector *v)
@@ -66,4 +67,49 @@ void *vector_get(struct vector *v, uint64_t index)
 uint64_t vector_size(struct vector *v)
 {
   return v->size;
+}
+
+void vector_zero_at_index(struct vector *v, uint64_t index)
+{
+  if (index >= v->size)
+  {
+    panic("index out of range in vector_zero_at_index\n");
+  }
+  memset(v->buffer + index * v->dsize, 0, v->dsize);
+}
+
+void vector_ensure_capacity(struct vector *v, uint64_t index)
+{
+  // If index is within current size, return
+  if (index < v->size)
+    return;
+
+  // Ensure there is enough capacity
+  while (index >= v->capacity)
+  {
+    v->capacity <<= 1; // Double the capacity
+    char *new_buffer = bd_malloc(v->capacity * v->dsize);
+    if (!new_buffer)
+    {
+      panic("Out of memory when expanding vector.");
+    }
+    memcpy(new_buffer, v->buffer, v->size * v->dsize);
+    memset(new_buffer + v->size * v->dsize, 0, (v->capacity - v->size) * v->dsize);
+    bd_free(v->buffer);
+    v->buffer = new_buffer;
+  }
+
+  // Initialize new elements to zero up to the required index
+  if (index >= v->size)
+  {
+    memset(v->buffer + v->size * v->dsize, 0, (index - v->size + 1) * v->dsize);
+    v->size = index + 1; // Adjust size to include the new index
+  }
+}
+
+// Set the value at a specific index in the vector
+void vector_set_at_index(struct vector *v, uint64_t index, void *data)
+{
+  vector_ensure_capacity(v, index);                     // Ensure the vector is big enough
+  memcpy(v->buffer + index * v->dsize, data, v->dsize); // Copy data into the specified index
 }

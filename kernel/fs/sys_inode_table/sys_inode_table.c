@@ -8,7 +8,7 @@ Sys_Inode_Table sys_inode_table;
 Sys_Inode_Table Sys_Inode_Table_new()
 {
     Sys_Inode_Table new_table;
-    queue_init(&new_table.inode_table);
+    vector_new(&new_table.inode_table, 3);
     return new_table;
 }
 
@@ -81,41 +81,41 @@ bool inode_table_add(Path *path)
     return true;
 }
 
-uint32_t add_inode_to_Inode_table(Inode *inode)
+uint32_t add_inode_to_Inode_table(Sys_Inode_Table *table, Inode *inode)
 {
-    queue_enqueue(&sys_inode_table.inode_table, inode);
-    return sys_inode_table.inode_table.size - 1; // Return new inode position in the queue
+    vector_push(&table->inode_table, inode);
+    return vector_size(&table->inode_table) - 1; // Return new inode position in the vector
 }
 
-int32_t Find_Inode_By_Dir_In_Inode_Table(Dirent dir)
+int32_t find_inode_by_dir_in_inode_table(Sys_Inode_Table *table, Dirent dir)
 {
-    Node *current = sys_inode_table.inode_table.head;
-    uint32_t index = 0;
-
-    while (current != NULL)
+    for (uint64_t i = 0; i < vector_size(&table->inode_table); i++)
     {
-        Inode *inode = (Inode *)current->data;
-        if (strcmp(inode->dir.DIR_Name, dir.DIR_Name) == 0)
+        Inode *inode = (Inode *)vector_get(&table->inode_table, i);
+        if (inode && strcmp(inode->dir.DIR_Name, dir.DIR_Name) == 0)
         {
-            return index;
+            return i;
         }
-        current = current->next;
-        index++;
     }
-
     return -1;
 }
-
-void Sys_Inode_Table_set_inode_ref(uint32_t index, uint32_t ref_cnt)
+void set_inode_ref(Sys_Inode_Table *table, uint32_t index, uint32_t ref_cnt)
 {
-    Inode *inode = find_index_inode(sys_inode_table, index);
-    inode->ref_cnt = ref_cnt;
+    Inode *inode = (Inode *)vector_get(&table->inode_table, index);
+    if (inode)
+    {
+        inode->ref_cnt = ref_cnt;
+    }
 }
 
-uint32_t Sys_Inode_Table_get_inode_ref(uint32_t index)
+uint32_t get_inode_ref(Sys_Inode_Table *table, uint32_t index)
 {
-    Inode *inode = find_index_inode(sys_inode_table, index);
-    return inode->ref_cnt;
+    Inode *inode = (Inode *)vector_get(&table->inode_table, index);
+    if (inode)
+    {
+        return inode->ref_cnt;
+    }
+    return 0;
 }
 
 void parse_mode(uint64_t mode, bool *owner_read, bool *owner_write, bool *owner_exec)
@@ -140,7 +140,15 @@ void Sys_Inode_Table_init()
     inode1.type = INODE_TYPE_STDIN;
     inode2.type = INODE_TYPE_STDOUT;
     inode3.type = INODE_TYPE_STDERROR;
-    queue_enqueue(&sys_inode_table.inode_table, &inode1);
-    queue_enqueue(&sys_inode_table.inode_table, &inode2);
-    queue_enqueue(&sys_inode_table.inode_table, &inode3);
+    vector_push(&sys_inode_table.inode_table, &inode1);
+    vector_push(&sys_inode_table.inode_table, &inode2);
+    vector_push(&sys_inode_table.inode_table, &inode3);
+}
+
+Inode *sys_inode_table_find_fs(uint32_t fd)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint32_t sys_inode_index = vector_get(&current_task->inode_table_index, fd);
+    Inode *inode = vector_get(&sys_inode_table.inode_table, sys_inode_index);
+    return NULL;
 }

@@ -111,7 +111,7 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   queue_enqueue(&s->inode_table_index, 0);
   queue_enqueue(&s->inode_table_index, 1);
   queue_enqueue(&s->inode_table_index, 2);
-  memset(s->pwd, ".", sizeof(s->pwd));
+  memset(s->pwd, ".", 65);
   s->sys_times = 0;
   s->user_times = 0;
 }

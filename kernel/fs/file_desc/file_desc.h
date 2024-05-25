@@ -10,6 +10,7 @@
 #define INODE_TYPE_STDERROR 2
 #define INODE_TYPE_PIPE 3
 #define INODE_TYPE_FILE 4
+#define INODE_TYPE_NULL 5
 typedef struct
 {
     uint64_t type;

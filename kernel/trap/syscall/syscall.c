@@ -16,8 +16,10 @@
 #include "timer.h"
 #include "queue.h"
 #include "string.h"
+#include "console.h"
 extern MemorySet KERNEL_SPACE;
 extern struct utsname globle_info;
+
 int32_t exit(int32_t value)
 {
     print_str("exit : ");
@@ -26,6 +28,11 @@ int32_t exit(int32_t value)
     task_manager_add_new_task();
     task_exit_current_and_run_next();
     return value;
+}
+
+void sys_exit(int32_t status)
+{
+    exit(status);
 }
 
 int64_t write(uint64_t fd, char *buf, size_t count)
@@ -53,21 +60,6 @@ int64_t yield()
     print_str("\n-------yield------\n");
     task_suspend_current_and_run_next();
     return 1;
-}
-
-int64_t sys_write(uint64_t fd, char *buf, size_t count)
-{
-    return write(fd, buf, count);
-}
-
-void sys_exit(int32_t status)
-{
-    exit(status);
-}
-
-int64_t sys_yield()
-{
-    return yield();
 }
 
 size_t read(int32_t fd, uint8_t *buf, size_t len)
@@ -98,6 +90,7 @@ size_t read(int32_t fd, uint8_t *buf, size_t len)
     {
         ASSERT(0);
     }
+    return -1;
 }
 
 int64_t sys_waitpid(int64_t pid, int *exit_code_ptr)
@@ -205,6 +198,10 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
     // printk("syscall\n");
     switch (syscall_id)
     {
+    case SYS_OPEN:
+        return sys_open((char *)a0, (uint32_t)a1);
+    case SYS_BRK:
+        return SYS_brk((uint64_t)a0);
     case SYS_GETCWD:
         return SYS_getcwd((char *)a0, (size_t)a1);
     // case SYS_pipe2:
@@ -228,7 +225,7 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
     // case SYS_unlinkat:
     //     return sys_unlinkat((int)a0, (char *)a1, (unsigned int)a2);
     case SYS_MKDIRAT:
-        return SYS_mkdirat((char *)a0, (uint64_t)a1);
+        return SYS_mkdirat((char *)a1, (uint64_t)a2);
     // case SYS_mount:
     //     return sys_mount((const char *)a0, (const char *)a1, (const char *)a2, (unsigned long)a3, (const void *)a4); // Assuming a2, a3, and a4 are additional parameters
     // case SYS_umount2:
@@ -268,38 +265,34 @@ int64_t sys_openat(int32_t fd, char *file_name, OpenFlags flage)
     bool directory = false;
     analyze_open_flags(&flage, &readable, &writable, &creat, &excl, &trunc, &append, &directory);
     struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t inode_index = queue_get_at(&current_task->inode_table_index, fd);
-    Inode *inode = find_index_inode(sys_inode_table, inode_index);
-    if (inode == NULL)
-    {
+    Inode *inode = sys_inode_table_find_fs(fd);
+    if (inode == NULL && !creat)
         return -1;
-    }
     Dirent dir = inode->dir;
-    Dirent *target_file = find_dir_entry(&dir, file_name);
-    if (target_file == NULL)
+    Dirent *tar_dir = find_directory_bfs(file_name, dir);
+    if (tar_dir == NULL && creat)
     {
-        if (creat)
-        {
-            creat_dir_entry(target_file, file_name, ATTR_FILE);
-            create_dir(&dir, *target_file);
-        }
-        else
-        {
-            return -1;
-        }
+        create_dir(&dir, *tar_dir);
+        Inode inode = Inode_new_by_dirent(tar_dir, read, write, append);
+        uint32_t inode_index = add_inode_to_Inode_table(&sys_inode_table, &inode);
+        uint64_t new_fd = vector_push(&current_task->inode_table_index, inode_index);
+        return new_fd;
     }
-    Inode new_inode = Inode_new_by_dirent(target_file, readable, writable, append);
-    new_inode.ref_cnt++;
-    uint32_t new_inode_index = add_inode_to_Inode_table(&new_inode);
-    int32_t fd_new = queue_enqueue(&current_task->inode_table_index, new_inode_index);
-    return fd_new;
+    else
+    {
+        Inode inode = Inode_new_by_dirent(tar_dir, read, write, append);
+        uint32_t inode_index = add_inode_to_Inode_table(&sys_inode_table, &inode);
+        uint64_t new_fd = vector_push(&current_task->inode_table_index, inode_index);
+        return new_fd;
+    }
+    return -1;
 }
 
-int64_t sys_open(const char *pathname, OpenFlags flage)
+int64_t sys_open(const char *pathname, uint32_t flage_t)
 {
+    OpenFlags flage;
+    flage.flags = flage_t;
     struct TaskControlBlock *current_task = processor_current_task();
-
-    // 使用栈上的布尔变量，避免动态分配内存
     bool readable = false;
     bool writable = false;
     bool creat = false;
@@ -307,71 +300,24 @@ int64_t sys_open(const char *pathname, OpenFlags flage)
     bool trunc = false;
     bool append = false;
     bool directory = false;
-
-    // 直接传递布尔变量的地址
     analyze_open_flags(&flage, &readable, &writable, &creat, &excl, &trunc, &append, &directory);
-
     Dirent *dir = find_dir_by_path(pathname);
     if (dir == NULL)
     {
-        if (creat)
-        {
-            Dirent *new_dir = create_file_or_dir_by_path(pathname, ATTR_FILE);
-            if (new_dir == NULL)
-            {
-                return -1; // 检查是否成功创建目录或文件
-            }
-            Inode inode = Inode_new_by_dirent(new_dir, readable, writable, append);
-            uint32_t sys_inode_index = add_inode_to_Inode_table(&inode);
-            uint32_t fd = queue_get_at(&current_task->inode_table_index, sys_inode_index);
-            return fd;
-        }
-        else
-        {
-            return -1;
-        }
+        Dirent *new_dir = create_file_or_dir_by_path(pathname, ATTR_FILE);
+        Inode inode = Inode_new_by_dirent(new_dir, read, write, append);
+        uint32_t inode_index = add_inode_to_Inode_table(&sys_inode_table, &inode);
+        uint64_t new_fd = vector_push(&current_task->inode_table_index, inode_index);
+        return new_fd;
     }
     else
     {
-        int32_t index = Find_Inode_By_Dir_In_Inode_Table(*dir);
-        if (index == -1)
-        {
-            Inode new_inode = Inode_new_by_dirent(dir, readable, writable, append);
-            uint32_t new_inode_index_sys = add_inode_to_Inode_table(&new_inode);
-            int32_t fd = queue_enqueue(&current_task->inode_table_index, new_inode_index_sys);
-            return fd;
-        }
-        else
-        {
-            index += 3;
-            int32_t fd = queue_enqueue(&current_task->inode_table_index, index);
-            return fd;
-        }
+        Inode inode = Inode_new_by_dirent(dir, read, write, append);
+        uint32_t inode_index = add_inode_to_Inode_table(&sys_inode_table, &inode);
+        uint64_t new_fd = vector_push(&current_task->inode_table_index, inode_index);
+        return new_fd;
     }
-}
-
-int32_t sys_close(uint32_t fd)
-{
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
-    if (sys_inode_index == NULL)
-    {
-        return -1;
-    }
-    else if (sys_inode_index == NULL)
-    {
-        return -1;
-    }
-    else
-    {
-        queue_set_at(&current_task->inode_table_index, fd, NULL);
-        uint32_t ref_cnt = Sys_Inode_Table_get_inode_ref(*sys_inode_index);
-        if (ref_cnt == 0)
-            return 0;
-        Sys_Inode_Table_set_inode_ref(*sys_inode_index, ref_cnt--);
-        *sys_inode_index = 0;
-        return 0;
-    }
+    return -1;
 }
 
 // buf：一个缓存区，用于保存所读取目录的信息。缓存区的结构如下：
@@ -385,95 +331,69 @@ int32_t sys_close(uint32_t fd)
 // };
 int64_t SYS_getdents64(int64_t fd, char *buffer)
 {
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
-    if (sys_inode_index == NULL)
+    struct dirent
     {
-        return -1;
-    }
-    else if (*sys_inode_index == 0)
-    {
-        return -1;
-    }
-
-    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
-
-    // 定义dirent_64结构，增加一个足够大的字符数组来存储文件名
-    struct dirent_64
-    {
-        uint64_t d_ino;          // 索引结点号
-        int64_t d_off;           // 到下一个dirent的偏移
-        unsigned short d_reclen; // 当前dirent的长度
-        unsigned char d_type;    // 文件类型
-        char d_name[20];         // 文件名，假设文件名不会超过255字符
+        uint64_t d_ino;                   // 索引结点号
+        int64_t d_off;                    // 到下一个dirent的偏移
+        unsigned short d_reclen;          // 当前dirent的长度
+        unsigned char d_type;             // 文件类型
+        char d_name[MAX_APP_NAME_LENGTH]; // 文件名
     };
-
-    struct dirent_64 *buffer_tmp = (struct dirent_64 *)buffer; // 假设外部buffer足够大
-    buffer_tmp->d_ino = *sys_inode_index;
-    buffer_tmp->d_reclen = sizeof(struct dirent_64);
-    buffer_tmp->d_type = inode->dir.DIR_Attr;
-    strncpy(buffer_tmp->d_name, inode->dir.DIR_Name, sizeof(buffer_tmp->d_name) - 1); // 安全复制字符串
-    buffer_tmp->d_name[sizeof(buffer_tmp->d_name) - 1] = '\0';                        // 确保字符串结束
-
-    return 0; // 返回填充的字节数
+    struct TaskControlBlock *current_task = processor_current_task();
+    uint64_t *sys_inode_index = vector_get(&current_task->inode_table_index, fd);
+    if (sys_inode_index == NULL)
+        return -1;
+    else
+    {
+        Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+        struct dirent dents;
+        dents.d_ino = inode->dir.DIR_FstClusHI;
+        dents.d_off = inode->dir.DIR_FstClusLO;
+        dents.d_reclen = inode->dir.DIR_FileSize;
+        dents.d_type = inode->dir.DIR_Attr;
+        memcpy(dents.d_name, inode->dir.DIR_Name, 11);
+        return 0;
+    }
+    return 0;
 }
 
 int64_t SYS_read(int64_t fd, char *buffer, uint32_t count)
 {
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    struct TaskControlBlock *task = processor_current_task();
+    uint64_t *sys_inode_index = vector_get(&task->inode_table_index, fd);
     Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
-    if (inode == NULL)
+    if (sys_inode_index == NULL)
         return -1;
-    uint32_t offset = inode->offset;
-    read_file_by_byte(&inode->dir, offset, buffer, count);
-    return 0;
+    if (fd == 0)
+    {
+        return console_stdin(buffer, count);
+    }
+    if (fd <= 2 || fd > MAX_APP_NUM || !inode)
+    {
+        return -1;
+    }
+    if (inode == NULL)
+    {
+        return -1;
+    }
+    else
+    {
+        read_file_by_byte(&inode->dir, 0, buffer, count);
+        return count;
+    }
+    return -1;
 }
 
 int64_t SYS_write(int64_t fd, char *buffer, uint64_t count)
 {
-    if (fd == 1 || fd == 2)
-    {
-        uint8_t stdout_write_buf[512];
-        copy_byte_buffer(processor_current_user_token(), stdout_write_buf,
-                         (uint8_t *)buffer, count, FROM_USER);
-        for (int i = 0; i < count; i++)
-        {
-            console_putchar(stdout_write_buf[i]);
-        }
-    }
-    else
-    {
-        uint8_t file_buffer[512];
-        copy_byte_buffer(processor_current_user_token(), file_buffer,
-                         (uint8_t *)buffer, count, FROM_USER);
-        struct TaskControlBlock *current_task = processor_current_task();
-        uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
-        Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
-        if (inode == NULL)
-            return -1;
-        if (buffer == NULL)
-            return -1;
-        bool append = inode->append;
-        bool write = inode->writable;
-        if (inode->dir.DIR_Attr == ATTR_DIRECTORY)
-            return -1;
-        if (!write)
-            return -1;
-        if (append)
-        {
-            append_to_file_by_dir(&inode->dir, file_buffer, count);
-        }
-        else
-        {
-            write_file_by_byte(&inode->dir, inode->offset, file_buffer, count);
-        }
-    }
-    return 0;
+    return console_stdout(buffer, count);
 }
 
-int64_t SYS_mkdirat(char *path, uint64_t mode)
+int64_t SYS_mkdirat(char *path_addr, uint64_t mode)
 {
+    char *path = bd_malloc(11);
+    copy_byte_buffer(processor_current_user_token(), (uint8_t *)path, (uint8_t *)path_addr,
+                     11, FROM_USER);
     Dirent *dir = find_dir_by_path(path);
     if (dir == NULL)
         return -1;
@@ -489,7 +409,6 @@ int64_t SYS_mkdirat(char *path, uint64_t mode)
 
 int64_t SYS_fstat(int64_t fd, char *kst)
 {
-
     struct kstat
     {
         uint8_t st_dev;
@@ -512,41 +431,15 @@ int64_t SYS_fstat(int64_t fd, char *kst)
         long st_ctime_nsec;
         unsigned __unused[2];
     };
-
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
-    if (sys_inode_index == NULL)
-    {
+    struct TaskControlBlock *task = processor_current_task();
+    uint64_t *sys_inode_index = vector_get(&task->inode_table_index, fd);
+    if (!sys_inode_index)
         return -1;
-    }
-
     Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
-    if (inode == NULL)
-    {
+    if (!inode)
         return -1;
-    }
-
-    Dirent dir = inode->dir;
-    struct kstat kstat_tmp;
-
-    memset(&kstat_tmp, 0, sizeof(kstat_tmp));
-    kstat_tmp.st_ino = *sys_inode_index;
-    kstat_tmp.st_size = dir.DIR_FileSize;
-    kstat_tmp.st_blocks = (dir.DIR_FileSize + 511) / 512;
-    kstat_tmp.st_blksize = BLOCK_SIZE;
-    kstat_tmp.st_mode = dir.DIR_Attr;
-    kstat_tmp.st_uid = 0;
-    kstat_tmp.st_gid = 0;
-    kstat_tmp.st_atime_sec = dir.DIR_LstAccDate;
-    kstat_tmp.st_mtime_sec = dir.DIR_WrtTime;
-    kstat_tmp.st_ctime_sec = dir.DIR_CrtTime;
-    kstat_tmp.st_nlink = inode->ref_cnt;
-    if (kst != NULL)
-    {
-        memcpy(kst, &kstat_tmp, sizeof(kstat_tmp));
-    }
-    else
-        return -1;
+    struct kstat kt;
+    memcpy(&kt, 0, sizeof(struct kstat));
     return 0;
 }
 
@@ -559,49 +452,43 @@ int64_t SYS_getcwd(char *buffer, size_t size)
     char *pwd = current_task->pwd;
     if (pwd == NULL)
         return -1;
+    copy_byte_buffer(processor_current_user_token(), pwd, buffer,
+                     size, TO_USER);
 
-    strncpy(buffer, pwd, size);
-
-    buffer[size - 1] = '\0';
-
-    return strlen(buffer);
+    return strlen(pwd);
 }
 
 int64_t SYS_chdir(char *path)
 {
     if (path == NULL)
         return -1;
-
+    char path_buf[MAX_PWD_LENTH];
+    copy_byte_buffer(processor_current_user_token(), (uint8_t *)path_buf, (uint8_t *)path,
+                     MAX_PWD_LENTH, FROM_USER);
     struct TaskControlBlock *current_task = processor_current_task();
-    strncpy(current_task->pwd, path, MAX_PWD_LENTH - 1);
+    strncpy(current_task->pwd, path_buf, MAX_PWD_LENTH - 1);
     current_task->pwd[MAX_PWD_LENTH - 1] = '\0';
     return 0;
 }
 
 int64_t SYS_dup(int64_t fd)
 {
-    struct TaskControlBlock *current_task = processor_current_task();
-    uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, fd);
+    struct TaskControlBlock *task = processor_current_task();
+    uint64_t *sys_inode_index = vector_get(&task->inode_table_index, fd);
+    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
     if (sys_inode_index == NULL)
         return -1;
-    int64_t new_fd = queue_enqueue(&current_task->inode_table_index, sys_inode_index);
-    return new_fd;
+    else
+    {
+        int64_t t = fd;
+        return vector_push(&task->inode_table_index, t);
+    }
 }
 
 int64_t SYS_dup3(int64_t old_fd, int64_t new_fd)
 {
-    printk("\ndup2\n");
-    // struct TaskControlBlock *current_task = processor_current_task();
-    // uint32_t *sys_inode_index = queue_get_at(&current_task->inode_table_index, old_fd);
-    // if (sys_inode_index == NULL)
-    //     return -1;
-    // uint32_t queue_size = current_task->inode_table_index.size;
-    // // for (int i = 0; i < old_fd - queue_size; i++)
-    // // {
-    // //     queue_enqueue(&current_task->inode_table_index, NULL);
-    // // }
-    // queue_enqueue(&current_task->inode_table_index, &new_fd);
-    return 0;
+    struct TaskControlBlock *task = processor_current_task();
+    uint64_t *sys_inode_index = vector_get(&task->inode_table_index, old_fd);
 }
 
 int64_t SYS_uname(char *uts)
@@ -641,7 +528,6 @@ int64_t SYS_times(char *uts)
     return 0;
 }
 
-// 只支持扩容不支持缩
 int64_t SYS_brk(uint64_t address_change)
 {
 
@@ -655,10 +541,11 @@ int64_t SYS_brk(uint64_t address_change)
     {
         current_task->user_pace_size += address_change;
         VirtAddr start_va = base_size;
-        VirtAddr end_va = base_size + address_change;
+        VirtAddr end_va = address_change;
         memory_set_insert_framed_area(&current_task->memory_set,
                                       start_va, end_va,
                                       PTE_W | PTE_R);
+        current_task->base_size = address_change;
         return 0;
     }
     else
@@ -751,4 +638,12 @@ uint64_t sys_mmap(uint64_t addr, uint64_t len, uint64_t prot,
 
     bd_free(buffer); // 清理临时分配的内存
     return 0;        // 成功
+}
+
+int32_t sys_close(uint32_t fd)
+{
+    struct TaskControlBlock *current_task = processor_current_task();
+
+    vector_zero_at_index(&current_task->inode_table_index, fd);
+    return 1;
 }

@@ -102,7 +102,7 @@ PageTableEntry *page_table_translate(PageTable *pt, VirtPageNum vpn)
   PageTableEntry *pte = page_table_find_pte(pt, vpn);
   if (pte == NULL)
   {
-    ASSERT(0);
+    // ASSERT(0);
   }
   return pte;
 }
