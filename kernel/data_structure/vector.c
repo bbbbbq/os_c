@@ -23,7 +23,7 @@ uint64_t vector_push(struct vector *v, void *d)
     v->buffer = t;
   }
   memcpy((uint8_t *)(v->buffer + (v->size++) * v->dsize), d, v->dsize);
-  return v->size;
+  return v->size - 1;
 }
 
 void vector_pop(struct vector *v)

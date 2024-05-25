@@ -475,13 +475,14 @@ int64_t SYS_dup(int64_t fd)
 {
     struct TaskControlBlock *task = processor_current_task();
     uint64_t *sys_inode_index = vector_get(&task->inode_table_index, fd);
-    Inode *inode = find_index_inode(sys_inode_table, *sys_inode_index);
+    Inode *inode = find_index_inode(sys_inode_table, sys_inode_index);
     if (sys_inode_index == NULL)
         return -1;
     else
     {
-        int64_t t = fd;
-        return vector_push(&task->inode_table_index, t);
+        int32_t t = fd;
+        int64_t tmp = vector_push(&task->inode_table_index, &t);
+        return tmp;
     }
 }
 

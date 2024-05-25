@@ -57,6 +57,7 @@ int main_os()
   parse_root_dir();
   init_fat_table();
   init_sys_info();
+  Sys_Inode_Table_init();
   ls_dir(&root_dir_entry);
   loader_init_and_list_apps();
   taks_init();

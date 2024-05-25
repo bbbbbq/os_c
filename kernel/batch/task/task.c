@@ -107,10 +107,11 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   s->user_pace_size = s->base_size;
   s->priority = DEFAULT_PRIORITY;
   s->stride = 0;
-  queue_init(&s->inode_table_index);
-  queue_enqueue(&s->inode_table_index, 0);
-  queue_enqueue(&s->inode_table_index, 1);
-  queue_enqueue(&s->inode_table_index, 2);
+  uint32_t num0 = 0, num1 = 1, num2 = 2;
+  vector_new(&s->inode_table_index, 3);
+  vector_push(&s->inode_table_index, &num0);
+  vector_push(&s->inode_table_index, &num1);
+  vector_push(&s->inode_table_index, &num2);
   memset(s->pwd, ".", 65);
   s->sys_times = 0;
   s->user_times = 0;

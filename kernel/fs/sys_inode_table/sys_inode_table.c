@@ -19,7 +19,7 @@ Inode *find_index_inode(Sys_Inode_Table table, uint32_t index)
         return NULL;
     }
 
-    Inode *inode = queue_get_at(&table.inode_table, index - 3);
+    Inode *inode = queue_get_at(&table.inode_table, index);
     return inode;
 }
 
@@ -136,6 +136,7 @@ void parse_mode(uint64_t mode, bool *owner_read, bool *owner_write, bool *owner_
 
 void Sys_Inode_Table_init()
 {
+    vector_new(&sys_inode_table.inode_table, 3);
     Inode inode1, inode2, inode3;
     inode1.type = INODE_TYPE_STDIN;
     inode2.type = INODE_TYPE_STDOUT;
