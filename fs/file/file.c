@@ -119,7 +119,7 @@ void over_write_file(char *name, void *buffer, size_t buffer_size)
     // 更新文件大小和结束标记
     set_file_or_dir_size(dir, buffer_size);
     update_dir(dir->DIR_Name, dir);
-    set_cluser_end(cluster_num);
+    set_cluser_end(cluster_num - 2);
     update_dir(name, dir);
     printf("Data successfully overwritten to file: %s\n", name);
 }

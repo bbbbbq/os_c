@@ -1,7 +1,7 @@
 {
     "configurations": [
     {
-        "name": "(gdb) Launch",
+        "name": "myfs",
         "type": "cppdbg",
         "request": "launch",
         "program": "/home/caigoubencai/Desktop/os_c-ch6/fs/myfs",

@@ -123,7 +123,7 @@ void release_linked_clusters(uint32_t start_cluster)
 bool init_fat_table()
 {
     uint32_t start_block_num = 33;
-    uint32_t end_block_num = 32 + (8176 * 4 + 511) / 512;
+    uint32_t end_block_num = 33 + (8176 * 4 + 511) / 512;
     uint32_t cur_block_num = start_block_num;
     uint32_t total_entries_needed = 8176;
     uint32_t entries_processed = 0;
@@ -154,4 +154,110 @@ bool init_fat_table()
         }
     }
     return true;
+}
+
+bool update_fat_table()
+{
+    uint32_t start_block_num = 33;
+    uint32_t total_entries_needed = 8176;
+    uint32_t entries_per_block = 512 / sizeof(uint32_t); // 假设每个条目是 uint32_t
+
+    // 遍历每个扇区
+    for (uint32_t i = 0; i < total_entries_needed / entries_per_block; i++)
+    {
+        Block block;
+        block.sector_number = start_block_num + i;
+        // 正确计算 fat_table 中的位置并拷贝数据
+        memcpy(block.data, ((uint32_t *)fat_table.entries) + i * entries_per_block, 512);
+        write_block(block);
+    }
+
+    // 处理可能的剩余部分
+    if (total_entries_needed % entries_per_block != 0)
+    {
+        Block block;
+        block.sector_number = start_block_num + total_entries_needed / entries_per_block;
+        memcpy(block.data, ((uint32_t *)fat_table.entries) + (total_entries_needed / entries_per_block) * entries_per_block, (total_entries_needed % entries_per_block) * sizeof(uint32_t));
+        write_block(block);
+    }
+}
+
+bool init_fat_table_test(Fat32Table *ft_tb)
+{
+    uint32_t start_block_num = 33;
+    uint32_t end_block_num = 33 + (8176 * 4 + 511) / 512; // 确保向上取整处理
+    uint32_t cur_block_num = start_block_num;
+    uint32_t total_entries_needed = 8176;
+    uint32_t entries_processed = 0;
+
+    while (cur_block_num < end_block_num)
+    {
+        Block block = read_block(cur_block_num);
+        uint32_t entries_in_this_block = BLOCK_SIZE / 4; // 每个块的条目数
+        if (entries_processed + entries_in_this_block > total_entries_needed)
+        {
+            entries_in_this_block = total_entries_needed - entries_processed; // 处理最后一个块可能的条目数调整
+        }
+
+        for (int i = 0; i < entries_in_this_block; i++)
+        {
+            if (entries_processed >= total_entries_needed)
+            {
+                break; // 不再处理超出需要的表项
+            }
+            // 正确使用memcpy，源地址为&block.data[i * 4]，目标地址为&ft_tb->entries[entries_processed].entry_value
+            memcpy(&ft_tb->entries[entries_processed].entry_value, &block.data[i * 4], sizeof(uint32_t));
+            entries_processed++;
+        }
+
+        cur_block_num++;
+        if (entries_processed >= total_entries_needed)
+        {
+            break; // 如果已处理足够的表项，提前退出循环
+        }
+    }
+    return true;
+}
+
+void clear_fat_table(Fat32Table *fat_table)
+{
+    // 检查传入的 fat_table 指针是否为 NULL
+    if (fat_table == NULL)
+    {
+        return; // 如果为 NULL，直接返回以避免解引用 NULL 指针
+    }
+
+    // 遍历 FAT 表中的所有条目
+    for (int i = 0; i < FAT_ENTRY_NUM; i++)
+    {
+        fat_table->entries[i].entry_value = 0; // 将每个条目的值置为 0
+    }
+}
+
+bool compare_fat_tables(const Fat32Table *table1, const Fat32Table *table2)
+{
+    // 检查是否有空指针传入
+    if (table1 == NULL || table2 == NULL)
+    {
+        return false; // 如果任一表为空，则认为它们不相同
+    }
+
+    // 遍历并比较两个表的所有条目
+    for (int i = 0; i < FAT_ENTRY_NUM; i++)
+    {
+        if (table1->entries[i].entry_value != table2->entries[i].entry_value)
+        {
+            return false; // 如果发现不相等的条目，立即返回false
+        }
+    }
+    return true; // 所有条目均相同，返回true
+}
+
+void printFatTable(const Fat32Table *table)
+{
+    printf("FAT32 Table Entries:\n");
+    for (int i = 0; i < FAT_ENTRY_NUM; ++i)
+    {
+        printf("Entry %d: %u\n", i + 2, table->entries[i].entry_value);
+    }
 }

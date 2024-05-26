@@ -215,8 +215,6 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return SYS_read((int)a0, (char *)a1, (uint32_t)a2);
     case SYS_WRITE:
         return SYS_write((int)a0, (char *)a1, (uint64_t)a2);
-    case SYS_CLONE:
-        return sys_fork();
     // case SYS_linkat:
     //     return sys_linkat((int)a0, (char *)a1, (int)a2, (char *)a3, (unsigned int)a4); // Assuming a3 and a4 are additional parameters
     // case SYS_unlinkat:
@@ -240,6 +238,8 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return -1; // sys_exit does not return
     case SYS_SCHED_YIELD:
         return yield(); // Assuming yield is correctly named and takes no parameters
+    case SYS_CLONE:
+        return sys_fork();
     // case :
     //     return SYS_gettimeofday((struct timespec *)a0, (int64_t)a1);
     // case SYS_nanosleep:
@@ -648,5 +648,4 @@ int32_t sys_close(uint32_t fd)
 
 int64_t sys_clone(uint64_t flags, void *stack, int64_t ptid, void *tls, int64_t ctid)
 {
-    // if ()
 }

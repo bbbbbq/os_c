@@ -28,4 +28,9 @@ void set_cluster_number(uint64_t index, uint32_t cluster_number);
 uint64_t find_last_cluster(uint64_t index);
 void release_linked_clusters(uint32_t start_cluster);
 bool init_fat_table();
+bool update_fat_table();
+bool init_fat_table_test(Fat32Table *ft_tb);
+void clear_fat_table(Fat32Table *fat_table);
+bool compare_fat_tables(const Fat32Table *table1, const Fat32Table *table2);
+void printFatTable(const Fat32Table *table);
 #endif

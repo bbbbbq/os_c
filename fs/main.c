@@ -60,8 +60,8 @@ void import_file_to_os(char *source_file_name, char *target_file_name, Dirent *p
 int main()
 {
     FILE *file;
-    char line[256]; // Assuming file names will not exceed 255 characters
-    const char *directory_prefix = "../user/riscv64/";
+    char line[256];
+    const char *directory_prefix = "../user/build/";
 
     init_fat_table();
     parse_root_dir();
@@ -87,7 +87,17 @@ int main()
 
     printf("Final directory listing:\n");
     ls_dir(&root_dir_entry);
-
+    Dirent *dir = find_dir_entry(&root_dir_entry, "initproc");
+    char *buffer = malloc(get_file_or_dir_size(dir));
+    read_file("initproc", buffer);
+    print_hex_data(buffer, get_file_or_dir_size(dir));
+    update_fat_table();
+    Fat32Table ft_tb;
+    printFatTable(&fat_table);
+    clear_fat_table(&ft_tb);
+    init_fat_table_test(&ft_tb);
+    if (compare_fat_tables(&fat_table, &ft_tb) == false)
+        printf("error\n");
     fclose(file);
     return 0;
 }

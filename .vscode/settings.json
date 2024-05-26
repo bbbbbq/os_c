@@ -58,7 +58,8 @@
         "unistd.h": "c",
         "fs_driver.h": "c",
         "timer.h": "c",
-        "queue.h": "c"
+        "queue.h": "c",
+        "dir.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true
