@@ -156,8 +156,9 @@ int64_t sys_getpid()
 
 int64_t sys_exec(char *path)
 {
+    // virtio_disk_init();
     char *test_buffer = bd_malloc(512);
-    memset(test_buffer, 0, 512);
+    memset(test_buffer, 1, 512);
     read_block_fs(1, test_buffer);
     char app_name[MAX_APP_NAME_LENGTH];
     copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
