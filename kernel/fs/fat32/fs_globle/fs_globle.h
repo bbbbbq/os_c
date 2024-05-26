@@ -6,10 +6,10 @@
 #define BPB_LOCATION_SECTOR 0
 #define BLOCK_SIZE 512
 #define BPB_BACK_LOCATION_SECTOR 6
-#define DISK_MEMORY_SUM 4294967296
+#define DISK_MEMORY_SUM 104857600
 #define SECTORS_PER_CLUSTER 8
 // 宏定义：根据簇号计算LBA地址
-#define cluster_begin_lba 16384
+#define cluster_begin_lba 157
 #define CLUSTER_TO_LBA(cluster_number) (cluster_begin_lba + ((cluster_number - 2) * SECTORS_PER_CLUSTER))
 
 extern struct BPB_common bpb_commen;

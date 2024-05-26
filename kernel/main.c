@@ -50,6 +50,7 @@ void print_file_data_as_binary(char *file_data, uint32_t file_size)
 
 int main_os()
 {
+  clear_bss();
   mm_init();
   plic_init();
   uart_init();

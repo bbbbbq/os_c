@@ -17,6 +17,7 @@
 #include "queue.h"
 #include "string.h"
 #include "console.h"
+#include "string.h"
 extern MemorySet KERNEL_SPACE;
 extern struct utsname globle_info;
 
@@ -155,12 +156,18 @@ int64_t sys_getpid()
 
 int64_t sys_exec(char *path)
 {
+    char *test_buffer = bd_malloc(512);
+    memset(test_buffer, 0, 512);
+    read_block_fs(1, test_buffer);
     char app_name[MAX_APP_NAME_LENGTH];
     copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
                      (uint8_t *)path, MAX_APP_NAME_LENGTH, FROM_USER);
-
-    uint8_t *data = loader_get_app_data_by_name(app_name);
-    size_t size = loader_get_app_size_by_name(app_name);
+    char *name = get_last_part(app_name);
+    char *heap_name = bd_malloc(11);
+    memcpy(heap_name, name, 11);
+    Dirent *dir = find_dir_entry(&root_dir_entry, name);
+    uint8_t *data = loader_get_app_data_by_name(heap_name);
+    size_t size = loader_get_app_size_by_name(heap_name);
     struct TaskControlBlock *task;
 
     if (data)

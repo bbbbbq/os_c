@@ -174,9 +174,9 @@ Dirent parse_directory_entry(void *buffer)
     dir_entry.DIR_WrtDate = *((uint16_t *)(buffer + 24));
     dir_entry.DIR_FstClusLO = *((uint16_t *)(buffer + 26));
     dir_entry.DIR_FileSize = *((uint32_t *)(buffer + 28));
-
     return dir_entry;
 }
+
 Dirent *find_dir_entry(Dirent *parent_dir_entry, char *dir_name)
 {
     uint32_t dir_cluster = extract_cluster_number(parent_dir_entry);
@@ -367,12 +367,13 @@ Dirent add_file_or_dir_to_parent_directory(char *name, uint64_t attr, Dirent *pa
 
 Dirent *find_directory_bfs(char *name, Dirent start_dir)
 {
-    struct queue_root *root;
-    fs_init_queue(&root);
+    Queue root;
+    queue_init(&root);
+    queue_enqueue(&root, &start_dir);
     fs_queue_add(root, &start_dir);
-    while (!queue_is_empty(root))
+    while (!queue_is_empty(&root))
     {
-        Dirent *tmp_dir = fs_queue_get(root);
+        Dirent *tmp_dir = queue_dequeue(&root);
         Dirent *res_dir = find_dir_entry(tmp_dir, name);
         if (res_dir != NULL)
             return res_dir;
@@ -400,7 +401,7 @@ Dirent *find_directory_bfs(char *name, Dirent start_dir)
                     Dirent dir_entry = parse_directory_entry(buffer + i * sizeof(Dirent));
                     if (is_directory(&dir_entry))
                     {
-                        fs_queue_add(root, &dir_entry);
+                        queue_enqueue(&root, &dir_entry);
                     }
                 }
                 bytes_read += CLUSER_SIZE;

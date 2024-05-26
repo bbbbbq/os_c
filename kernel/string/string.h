@@ -28,4 +28,6 @@ int strncmp(const char *s1, const char *s2, size_t n);
 char *strchr(const char *str, int c);
 char *strncat(char *dest, const char *src, size_t n);
 int strcmp(const char *s1, const char *s2);
+char *strrchr(const char *str, int c);
+char *get_last_part(const char *path);
 #endif // MY_STRING_H

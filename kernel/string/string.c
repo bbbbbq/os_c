@@ -250,3 +250,45 @@ int strcmp(const char *s1, const char *s2)
     }
     return (unsigned char)*s1 - (unsigned char)*s2;
 }
+
+char *strrchr(const char *str, int c)
+{
+    const char *last_occurrence = NULL; // 初始化指针，用于存放最后一次出现的位置
+
+    // 遍历字符串直到遇到字符串终结符 '\0'
+    while (*str != '\0')
+    {
+        if (*str == (char)c)
+        {
+            last_occurrence = str; // 如果找到匹配字符，更新最后出现的位置
+        }
+        str++; // 移动到下一个字符
+    }
+
+    // 需要检查字符串最后一个字符后的'\0'，因为可能需要查找'\0'
+    if (*str == (char)c)
+    {
+        last_occurrence = str;
+    }
+
+    return (char *)last_occurrence; // 强制类型转换并返回最后一次出现的位置
+}
+
+char *get_last_part(const char *path)
+{
+    if (path == NULL)
+    {
+        return NULL; // 如果输入的路径为NULL，返回NULL
+    }
+
+    // 使用 strrchr 来找到最后一个出现的斜杠
+    const char *last_slash = strrchr(path, '/');
+    if (last_slash == NULL)
+    {
+        return (char *)path; // 如果没有斜杠，返回整个字符串
+    }
+    else
+    {
+        return (char *)(last_slash + 1); // 返回最后一个斜杠后面的部分
+    }
+}
