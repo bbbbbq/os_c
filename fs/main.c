@@ -89,11 +89,11 @@ int main()
     ls_dir(&root_dir_entry);
     Dirent *dir = find_dir_entry(&root_dir_entry, "initproc");
     char *buffer = malloc(get_file_or_dir_size(dir));
-    read_file("initproc", buffer);
-    print_hex_data(buffer, get_file_or_dir_size(dir));
+    // read_file("initproc", buffer);
+    // print_hex_data(buffer, get_file_or_dir_size(dir));
     update_fat_table();
     Fat32Table ft_tb;
-    printFatTable(&fat_table);
+    // printFatTable(&fat_table);
     clear_fat_table(&ft_tb);
     init_fat_table_test(&ft_tb);
     if (compare_fat_tables(&fat_table, &ft_tb) == false)
