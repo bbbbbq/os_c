@@ -5,7 +5,7 @@
 #include "loader.h"
 char APP_NAMES[MAX_APP_NUM][256];
 uint64_t APP_NUM_GLOBLE = 0;
-uint64_t CURRENT_TASK_ID = 3;
+uint64_t CURRENT_TASK_ID = 0;
 uint64_t loader_get_num_app()
 {
   return APP_NUM_GLOBLE;

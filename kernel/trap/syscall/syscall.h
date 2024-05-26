@@ -73,4 +73,5 @@ int64_t sys_getppid();
 uint64_t sys_mmap(uint64_t addr, uint64_t len, uint64_t prot,
                   uint64_t flags, uint64_t fd, uint64_t pgoff);
 int64_t SYS_gettimeofday(char *buffer, int64_t t1);
+int64_t sys_clone(uint64_t flags, void *stack, int64_t ptid, void *tls, int64_t ctid);
 #endif

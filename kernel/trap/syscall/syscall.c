@@ -135,20 +135,13 @@ int64_t sys_waitpid(int64_t pid, int *exit_code_ptr)
 }
 int64_t sys_fork()
 {
-    printk("[kernel] sys_fork \n\n");
+    // printk("[kernel] sys_fork \n\n");
     struct TaskControlBlock *current_task = processor_current_task();
     struct TaskControlBlock *new_task = task_control_block_fork(current_task);
     PidHandle new_pid = new_task->pid;
 
-    // modify trap context of new_task, because it returns immediately after
-    // switching
     struct TrapContext *trap_cx = task_control_block_get_trap_cx(new_task);
-
-    // we do not have to move to next instruction since we have done it before
-    // for child process, fork returns 0
     trap_cx->x[10] = 0;
-
-    // add new task to scheduler
     task_manager_add_2(&TASK_MANAGER_2, new_task);
 
     return (int64_t)new_pid.pid;
@@ -198,6 +191,8 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
     // printk("syscall\n");
     switch (syscall_id)
     {
+    // case SYS_CLONE:
+    //     return sys_clone((char *)a0, (uint32_t)a1);
     case SYS_OPEN:
         return sys_open((char *)a0, (uint32_t)a1);
     case SYS_BRK:
@@ -220,6 +215,8 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return SYS_read((int)a0, (char *)a1, (uint32_t)a2);
     case SYS_WRITE:
         return SYS_write((int)a0, (char *)a1, (uint64_t)a2);
+    case SYS_CLONE:
+        return sys_fork();
     // case SYS_linkat:
     //     return sys_linkat((int)a0, (char *)a1, (int)a2, (char *)a3, (unsigned int)a4); // Assuming a3 and a4 are additional parameters
     // case SYS_unlinkat:
@@ -647,4 +644,9 @@ int32_t sys_close(uint32_t fd)
 
     vector_zero_at_index(&current_task->inode_table_index, fd);
     return 1;
+}
+
+int64_t sys_clone(uint64_t flags, void *stack, int64_t ptid, void *tls, int64_t ctid)
+{
+    // if ()
 }
