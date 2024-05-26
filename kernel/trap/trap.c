@@ -168,6 +168,3 @@ void set_kernel_trap_entry()
 {
   w_stvec((uint64_t)kernelvec & ~0x3);
 }
-// void set_user_trap_entry() {
-//     w_stvec(TRAMPOLINE);
-// }

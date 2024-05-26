@@ -82,7 +82,7 @@ int write_multiple_blocks(uint64_t start_block_id, const void *buffer, size_t bu
     return 1;
 }
 
-int read_by_cluster(uint64_t cluser_num, void *buffer)
+int read_by_cluster(uint64_t cluser_num, uint8_t *buffer)
 {
     uint64_t start_block_id = CLUSTER_TO_LBA(cluser_num);
     size_t buffer_size = CLUSER_SIZE;

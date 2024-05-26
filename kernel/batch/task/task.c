@@ -9,6 +9,7 @@
 #include "trap.h"
 #include "loader.h"
 #include "taskmanager.h"
+extern char APP_NAMES[MAX_APP_NUM][256];
 extern uint64_t CURRENT_TASK_ID;
 struct TaskManager TASK_MANAGER;
 struct TaskControlBlock FIRST_TASK;
@@ -161,12 +162,12 @@ void taks_init()
 {
   PidAllocator_init(&PID_ALLOCATOR);
   task_manager_init_2();
-  char *cur_app_name = loader_get_app_name_by_index(CURRENT_TASK_ID);
+  char *cur_app_name = APP_NAMES[CURRENT_TASK_ID];
   printk("cur_app_num : %s\n", cur_app_name);
   char *app_data = loader_get_app_data_by_name(cur_app_name);
-  // print_hex_data(app_data, 32);
   uint32_t app_size = loader_get_app_size_by_name(cur_app_name);
   memcpy(CUR_APP_DATA, app_data, app_size);
+  bd_free(app_data);
   task_control_block_new(&FIRST_TASK, CUR_APP_DATA, app_size);
 }
 
@@ -177,12 +178,13 @@ void task_manager_add_2_initproc()
 
 void task_manager_add_new_task()
 {
+  static uint8_t APP_DATA[MAX_APP_DATA_BYTES];
   CURRENT_TASK_ID++;
   struct TaskControlBlock *s;
   char *cur_app_name = loader_get_app_name_by_index(CURRENT_TASK_ID);
   printk("cur_app_num : %s\n", cur_app_name);
+  Dirent *dir = find_dir_entry(&root_dir_entry, cur_app_name);
   char *app_data = loader_get_app_data_by_name(cur_app_name);
-  // print_hex_data(app_data, 32);
   uint32_t app_size = loader_get_app_size_by_name(cur_app_name);
   memcpy(CUR_APP_DATA, app_data, app_size);
   task_control_block_new(s, CUR_APP_DATA, app_size);

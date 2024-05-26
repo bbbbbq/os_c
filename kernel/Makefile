@@ -80,13 +80,13 @@ $(OBJDIR)/%.d: %.c
 	$(CC) $(CFLAGS) -MM -MT '$(@:.d=.o)' $< -MF $@
 
 run: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M \
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 1024M \
 		-drive file=../sdcard.img,if=none,format=raw,id=x0 \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
 		-serial mon:stdio
 
 qemu_debug: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 512M \
+	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios default -m 1024M \
 		-drive file=../sdcard.img,if=none,format=raw,id=x0 \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
 		-serial mon:stdio -S -s

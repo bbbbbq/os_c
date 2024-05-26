@@ -373,7 +373,11 @@ Dirent *find_directory_bfs(char *name, Dirent start_dir)
     while (!queue_is_empty(root))
     {
         Dirent *tmp_dir = fs_queue_get(root);
-        Dirent *res_dir = find_dir_entry(tmp_dir, name);
+        char *tmp_name = bd_malloc(13);
+        memcpy(tmp_name, name, 13);
+        char *dir_heap = bd_malloc(sizeof(Dirent));
+        memcpy(dir_heap, tmp_dir, sizeof(Dirent));
+        Dirent *res_dir = find_dir_entry(dir_heap, tmp_name);
         if (res_dir != NULL)
             return res_dir;
         else

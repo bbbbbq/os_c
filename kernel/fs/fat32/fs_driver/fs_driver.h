@@ -12,7 +12,7 @@ int read_block_fs(uint64_t block_num, void *buffer);
 int write_block_fs(uint64_t block_num, const void *buffer);
 int read_multiple_blocks(uint64_t start_block_id, void *buffer, size_t buffer_size);
 int write_multiple_blocks(uint64_t start_block_id, const void *buffer, size_t buffer_size);
-int read_by_cluster(uint64_t cluser_num, void *buffer);
+int read_by_cluster(uint64_t cluser_num, uint8_t *buffer);
 int write_by_cluster(uint64_t cluser_num, const void *buffer, size_t buffer_size);
 int read_by_byte(uint64_t block_num, uint64_t offset, uint64_t size_byte, void *buffer);
 int write_by_byte(uint64_t block_num, uint64_t offset, uint64_t size_byte, const void *buffer);
