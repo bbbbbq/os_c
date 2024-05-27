@@ -81,14 +81,14 @@ $(OBJDIR)/%.d: %.c
 
 run: $(BIN)
 	qemu-system-riscv64 -machine virt -kernel obj/os_kernel.bin -nographic --bios ./bootloader/rustsbi-qemu.bin -m 512M \
-    	-drive file=../sdcard.img,if=none,format=raw,id=x0 \
+    	-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
     	-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
     	-serial mon:stdio
 
 
 qemu_debug: $(BIN)
 	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios ./bootloader/rustsbi-qemu.bin  -m 512M \
-		-drive file=../sdcard.img,if=none,format=raw,id=x0 \
+		-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
 		-serial mon:stdio -S -s
 elf: $(ELF)

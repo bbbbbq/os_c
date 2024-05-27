@@ -9,7 +9,9 @@ int read_block_fs(uint64_t block_num, void *buffer)
 {
     if (!buffer)
         return -1;
-    Block block = read_block(block_num);
+    Block block;
+    memset(block.data, 1, 512);
+    block = read_block(block_num);
     memcpy(buffer, block.data, 512);
 }
 

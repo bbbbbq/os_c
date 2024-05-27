@@ -3,6 +3,7 @@
 #include "virtio.h"
 #include "config.h"
 #define BLOCK_SIZE 512
+
 typedef struct
 {
     char pages[2 * PAGE_SIZE];

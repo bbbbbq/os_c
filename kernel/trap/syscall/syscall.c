@@ -158,8 +158,7 @@ int64_t sys_exec(char *path)
     // {
     //     disk.free[i] = 1;
     // }
-    disk.used_idx = 0;
-    asm volatile("sfence.vma zero, zero");
+    // asm volatile("sfence.vma zero, zero");
     char *test_buffer = bd_malloc(512);
     memset(test_buffer, 1, 512);
     read_block_fs(6, test_buffer);
