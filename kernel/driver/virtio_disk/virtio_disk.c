@@ -169,7 +169,6 @@ void virtio_disk_rw(Block *block, int write)
 
     // Wait for virtio_disk_intr() to say request has finished.
     intr_on();
-    int id = 1000000;
     while (disk.info[idx[0]] == 0xfb)
     {
         // WARN: No kernel concurrent support, DO NOT allow kernel yield
@@ -190,8 +189,8 @@ void virtio_disk_intr()
         __sync_synchronize();
         int id = disk.used->ring[disk.used_idx % NUM].id;
 
-        if (disk.info[id] != 0)
-            panic("virtio_disk_intr status\n");
+        // if (disk.info[id] != 0)
+        //     panic("virtio_disk_intr status\n");
         disk.used_idx += 1;
     }
 }

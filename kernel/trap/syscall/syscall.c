@@ -140,11 +140,9 @@ int64_t sys_fork()
     struct TaskControlBlock *current_task = processor_current_task();
     struct TaskControlBlock *new_task = task_control_block_fork(current_task);
     PidHandle new_pid = new_task->pid;
-
     struct TrapContext *trap_cx = task_control_block_get_trap_cx(new_task);
     trap_cx->x[10] = 0;
     task_manager_add_2(&TASK_MANAGER_2, new_task);
-
     return (int64_t)new_pid.pid;
 }
 
@@ -156,10 +154,16 @@ int64_t sys_getpid()
 
 int64_t sys_exec(char *path)
 {
-    // virtio_disk_init();
+    // for (int i = 0; i < NUM_DESCRIPTORS; i++)
+    // {
+    //     disk.free[i] = 1;
+    // }
+    disk.used_idx = 0;
+    asm volatile("sfence.vma zero, zero");
     char *test_buffer = bd_malloc(512);
     memset(test_buffer, 1, 512);
-    read_block_fs(1, test_buffer);
+    read_block_fs(6, test_buffer);
+    asm volatile("sfence.vma zero, zero");
     char app_name[MAX_APP_NAME_LENGTH];
     copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
                      (uint8_t *)path, MAX_APP_NAME_LENGTH, FROM_USER);

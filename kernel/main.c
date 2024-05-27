@@ -59,6 +59,9 @@ int main_os()
   init_fat_table();
   init_sys_info();
   Sys_Inode_Table_init();
+  char *test_buffer = bd_malloc(512);
+  memset(test_buffer, 1, 512);
+  read_block_fs(0, test_buffer);
   ls_dir(&root_dir_entry);
   loader_init_and_list_apps();
   taks_init();

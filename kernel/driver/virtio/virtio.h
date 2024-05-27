@@ -47,7 +47,12 @@
 
 #define VIRTIO_BLK_T_IN 0  // 读磁盘操作
 #define VIRTIO_BLK_T_OUT 1 // 写磁盘操作
-
+#define VIRTIO_MMIO_QUEUE_DESC_LOW 0x080 // physical address for descriptor table, write-only
+#define VIRTIO_MMIO_QUEUE_DESC_HIGH 0x084
+#define VIRTIO_MMIO_DRIVER_DESC_LOW 0x090 // physical address for available ring, write-only
+#define VIRTIO_MMIO_DRIVER_DESC_HIGH 0x094
+#define VIRTIO_MMIO_DEVICE_DESC_LOW 0x0a0 // physical address for used ring, write-only
+#define VIRTIO_MMIO_DEVICE_DESC_HIGH 0x0a4
 typedef struct
 {
     uint64_t addr;  // 缓冲区的物理地址
