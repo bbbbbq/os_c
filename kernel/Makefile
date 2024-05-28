@@ -26,7 +26,7 @@ INCLUDE_DIRS = -I$(KERNEL_DIR)/sbi -I$(KERNEL_DIR)/globle \
 				-I$(KERNEL_DIR)/batch/loader -I$(KERNEL_DIR)/batch/pid  \
 				-I$(KERNEL_DIR)/batch/processor -I$(KERNEL_DIR)/fs/file_desc \
 				-I$(KERNEL_DIR)/batch/processor	 -I$(KERNEL_DIR)/globle/sys_info\
-				-I$(KERNEL_DIR)/fs/block_cache\
+				-I$(KERNEL_DIR)/fs/block_cache  -I$(KERNEL_DIR)/driver\
 				-I$(KERNEL_DIR)/driver/plic -I$(KERNEL_DIR)/driver/uart\
 				-I$(KERNEL_DIR)/driver/virtio -I$(KERNEL_DIR)/driver/virtio_disk\
 				-I$(KERNEL_DIR)/fs/fat32 -I$(KERNEL_DIR)/fs/fat32/dir \
@@ -98,6 +98,7 @@ qemu_debug: $(BIN)
     	-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
     	-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
     	-m 512M -serial mon:stdio -s -S\
+		
 elf: $(ELF)
 
 $(ELF): $(OBJECTS)

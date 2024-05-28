@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "processor.h"
 #define min(a, b) ((a) < (b) ? (a) : (b))
+extern Dirent root_dir_entry;
 void read_file(char *name, void *buffer)
 {
     // 查找指定文件的目录项
@@ -320,4 +321,56 @@ bool append_to_file_by_dir(Dirent *dir, void *buffer, size_t buffer_size)
     update_dir(dir->DIR_Name, dir);
     bd_free(file_data);
     bd_free(merged_data);
+}
+
+void read_file_by_dirent(Dirent *dir, void *buffer)
+{
+    if (dir == NULL)
+    {
+        ASSERT(0);
+        return;
+    }
+    if (is_directory(dir))
+    {
+        printk("is_not_file\n");
+        return;
+    }
+
+    // 获取文件的起始簇号和文件大小
+    uint32_t cluster_num = extract_cluster_number(dir);
+    uint64_t file_size = get_file_or_dir_size(dir);
+    if (file_size == 0)
+    {
+        printk("file without data\n");
+        return;
+    }
+    uint32_t bytes_read = 0;
+    uint8_t *current_buffer = (uint8_t *)buffer;
+
+    // 循环读取每个簇的数据
+    while (bytes_read < file_size)
+    {
+        uint32_t bytes_to_read = CLUSER_SIZE;
+        if (file_size - bytes_read < CLUSER_SIZE)
+        {
+            bytes_to_read = file_size - bytes_read; // Ensure we don't read beyond the file
+        }
+
+        int result = read_by_byte_cluser(cluster_num, 0, bytes_to_read, current_buffer);
+        if (result == -1)
+        {
+            // printk("Error: Failed to read data\n");
+            return;
+        }
+
+        bytes_read += bytes_to_read;
+        current_buffer += bytes_to_read;
+        if (cluster_num < 2)
+        {
+            panic("cluster_num < 2");
+        }
+        cluster_num = parse_cluster_number(cluster_num - 2);
+        if (cluster_num > FAT_ENTRY_NUM)
+            break;
+    }
 }

@@ -7,5 +7,4 @@ obj/./trap/syscall/syscall.o: trap/syscall/syscall.c \
  string/string.h batch/pid/pid.h batch/batch.h batch/context/context.h \
  data_structure/queue.h sbi/sbi.h trap/trap.h batch/processor/processor.h \
  batch/task/taskmanager.h trap/timer/timer.h \
- fs/sys_inode_table/sys_inode_table.h driver/virtio_disk/virtio_disk.h \
- driver/virtio/virtio.h globle/sys_info/sys_info.h
+ fs/sys_inode_table/sys_inode_table.h globle/sys_info/sys_info.h

@@ -21,4 +21,5 @@ void write_file_by_byte(Dirent *dir, uint32_t offset, char *buffer, size_t write
 Dirent *find_dir_by_path(char *path);
 Dirent *create_file_or_dir_by_path(char *path, uint32_t attr);
 bool append_to_file_by_dir(Dirent *dir, void *buffer, size_t buffer_size);
+void read_file_by_dirent(Dirent *dir, void *buffer);
 #endif

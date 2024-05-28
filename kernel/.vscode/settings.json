@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "drivers.h": "c",
+        "fs_globle.h": "c",
+        "stdint.h": "c"
+    }
+}

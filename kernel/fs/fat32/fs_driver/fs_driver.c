@@ -3,7 +3,31 @@
 #include "fs_globle.h"
 #include "debug.h"
 #include "buddy.h"
-#include "virtio_disk.h"
+#include "drivers.h"
+#include "block_cache.h"
+extern BlockDevice BLOCK_DEVICE;
+
+Block read_block(uint32_t sector_num)
+{
+    BlockCache *bc = block_cache_get(sector_num, &BLOCK_DEVICE);
+    Block bl;
+    bl.sector_num = sector_num;
+    memcpy(bl.data, bc->cache, SECTOR_SIZE);
+    block_cache_release(bc);
+    return bl;
+}
+
+void write_block(Block block)
+{
+    BlockCache bc;
+    bc.block_device = &BLOCK_DEVICE;
+    bc.block_id = block.sector_num;
+    bc.next = NULL;
+    bc.prev = NULL;
+    bc.ref = 0;
+    memcpy(bc.cache, block.data, SECTOR_SIZE);
+    BLOCK_DEVICE.write_block(&bc);
+}
 // 读取指定块到缓冲区
 int read_block_fs(uint64_t block_num, void *buffer)
 {
@@ -21,7 +45,7 @@ int write_block_fs(uint64_t block_num, const void *buffer)
     if (!buffer)
         return -1;
     Block block;
-    block.sector_number = block_num;
+    block.sector_num = block_num;
     memcpy(block.data, buffer, 512);
     write_block(block);
 }

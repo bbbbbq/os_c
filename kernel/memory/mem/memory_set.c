@@ -3,7 +3,7 @@
 #include "riscv.h"
 #include "string.h"
 #include "debug.h"
-#include "uart.h"
+#include "drivers.h"
 static void map_area_from_another(MapArea *map_area, MapArea *another)
 {
   map_area->vpn_range.l = another->vpn_range.l;
@@ -232,11 +232,11 @@ static void memory_set_new_kernel()
   map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
   memory_set_push(memory_set, &map_area, NULL, 0);
 
-  map_area.vpn_range.l = page_floor((PhysAddr)UART_BASE);
-  map_area.vpn_range.r = page_ceil((PhysAddr)(UART_BASE + 8 * 64));
-  map_area.map_type = MAP_IDENTICAL;
-  map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
-  memory_set_push(memory_set, &map_area, NULL, 0);
+  // map_area.vpn_range.l = page_floor((PhysAddr)UART_BASE);
+  // map_area.vpn_range.r = page_ceil((PhysAddr)(UART_BASE + 8 * 64));
+  // map_area.map_type = MAP_IDENTICAL;
+  // map_area.map_perm = MAP_PERM_R | MAP_PERM_W;
+  // memory_set_push(memory_set, &map_area, NULL, 0);
 }
 
 void memory_set_from_elf(MemorySet *memory_set, uint8_t *elf_data,

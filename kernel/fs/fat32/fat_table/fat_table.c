@@ -1,7 +1,9 @@
 #include "fat_table.h"
 #include "debug.h"
-#include "virtio_disk.h"
+#include "drivers.h"
 #include "string.h"
+#include "fs_driver.h"
+#include "block_cache.h"
 Fat32Table fat_table;
 
 void format_fat_table()
@@ -130,8 +132,14 @@ bool init_fat_table()
 
     while (cur_block_num < end_block_num)
     {
+        if (cur_block_num == 47 || cur_block_num == 48)
+        {
+            printk("123\n");
+        }
         Block block = read_block(cur_block_num);
-        uint32_t entries_in_this_block = BLOCK_SIZE / 4;
+
+        // printk("block_id : %d\n", block.sector_num);
+        uint32_t entries_in_this_block = BLOCK_SZ / 4;
         if (entries_processed + entries_in_this_block > total_entries_needed)
         {
             entries_in_this_block = total_entries_needed - entries_processed;

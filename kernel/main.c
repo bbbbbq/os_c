@@ -12,12 +12,12 @@
 #include "taskmanager.h"
 #include "string.h"
 #include "riscv.h"
-#include "virtio_disk.h"
 #include "dir.h"
 #include "fs_globle.h"
 #include "sys_inode_table.h"
 #include "sys_info.h"
 #include "fat_table.h"
+#include "drivers.h"
 extern uint8_t sbss, ebss;
 void clear_bss()
 {
@@ -47,14 +47,16 @@ void print_file_data_as_binary(char *file_data, uint32_t file_size)
     }
   }
 }
-
 int main_os()
 {
   clear_bss();
   mm_init();
+  init_trap();
   plic_init();
-  uart_init();
+  // uart_init();
+  virtio_block_device_init();
   virtio_disk_init();
+  block_cache_manager_init();
   parse_root_dir();
   init_fat_table();
   init_sys_info();
@@ -65,7 +67,6 @@ int main_os()
   ls_dir(&root_dir_entry);
   loader_init_and_list_apps();
   taks_init();
-  init_trap();
   task_manager_add_2_initproc();
   processor_run_tasks();
   ASSERT(0);

@@ -105,16 +105,17 @@ uint64_t task_current_user_token()
 
 void trap_return()
 {
-  // printk("trap_return\n");
   set_user_trap_entry();
   uint64_t trap_cx_ptr = TRAP_CONTEXT;
   uint64_t user_satp = processor_current_user_token();
   uint64_t restore_va = (uint64_t)__restore - (uint64_t)__alltraps + TRAMPOLINE;
   asm volatile("fence.i");
-  asm volatile("mv x10, %0" : : "r"(trap_cx_ptr) : "x10");
-  asm volatile("mv x11, %0" : : "r"(user_satp) : "x11");
-  asm volatile("jr %0" : : "r"(restore_va));
-
+  asm volatile("mv x10, %1\n"
+               "mv x11, %2\n"
+               "jr %0\n"
+               :
+               : "r"(restore_va), "r"(trap_cx_ptr), "r"(user_satp)
+               : "memory", "x10", "x11");
   panic("Unreachable in back_to_user!\n");
 }
 
@@ -124,35 +125,23 @@ void init_trap()
   w_sie(r_sie() | SIE_SEIE | SIE_SSIE);
 }
 
-void trap_from_kernel(uint64_t cause)
+static void trap_from_kernel_interrupt(uint64_t cause)
 {
-  // printk("trap_from_kernel\n");
   int irq;
-  if (cause > 0x8000000000000000)
-    cause -= (uint64_t)0x8000000000000000;
   switch (cause)
   {
   case SupervisorTimer:
     timer_set_next_trigger();
-    struct TaskControlBlock *current_task = processor_current_task();
-    current_task->user_times++;
-    ticks++;
     break;
   case SupervisorExternal:
     irq = plic_claim();
-    // printk("irq : %d\n", irq);
     if (irq == VIRTIO0_IRQ)
     {
       virtio_disk_intr();
     }
-    else if (irq == UART0_IRQ)
-    {
-      uart_irq_handler();
-    }
     else if (irq)
     {
-      printk("unexpected interrupt irq=%d\n", irq);
-      ASSERT(0);
+      printk("unexpected interrupt irq = % d\n");
     }
     if (irq)
       plic_complete(irq);
@@ -161,6 +150,31 @@ void trap_from_kernel(uint64_t cause)
     ASSERT(0);
     break;
   }
+}
+
+void trap_from_kernel()
+{
+  uint64_t scause = r_scause();
+  uint64_t sstatus = r_sstatus();
+  uint64_t sepc = r_sepc();
+  uint64_t stval = r_stval();
+
+  if ((sstatus & SSTATUS_SPP) == 0)
+    ASSERT(0);
+
+  if (scause & (1ULL << 63))
+  {
+    trap_from_kernel_interrupt(scause & 0xff);
+  }
+  else
+  {
+    ASSERT(0);
+    // panic("invalid kernel trap: scause = 0x%llx stval = 0x%llx sepc = 0x%llx\n",
+    //       scause, stval, sepc);
+  }
+
+  w_sepc(sepc);
+  w_sstatus(sstatus);
 }
 
 extern void kernelvec();

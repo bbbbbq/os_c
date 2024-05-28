@@ -11,7 +11,6 @@
 #include "processor.h"
 #include "timer.h"
 #include "sys_inode_table.h"
-#include "virtio_disk.h"
 #include "sys_info.h"
 #include "timer.h"
 #include "queue.h"
@@ -159,9 +158,10 @@ int64_t sys_exec(char *path)
     //     disk.free[i] = 1;
     // }
     // asm volatile("sfence.vma zero, zero");
-    char *test_buffer = bd_malloc(512);
-    memset(test_buffer, 1, 512);
-    read_block_fs(6, test_buffer);
+
+    printk("sys_exec\n");
+    char *buffer = bd_malloc(512);
+    read_block_fs(0, buffer);
     asm volatile("sfence.vma zero, zero");
     char app_name[MAX_APP_NAME_LENGTH];
     copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
@@ -170,8 +170,9 @@ int64_t sys_exec(char *path)
     char *heap_name = bd_malloc(11);
     memcpy(heap_name, name, 11);
     Dirent *dir = find_dir_entry(&root_dir_entry, name);
-    uint8_t *data = loader_get_app_data_by_name(heap_name);
-    size_t size = loader_get_app_size_by_name(heap_name);
+    static uint8_t data[MAX_APP_SIZE];
+    read_file_by_dirent(dir, data);
+    size_t size = dir->DIR_FileSize;
     struct TaskControlBlock *task;
 
     if (data)

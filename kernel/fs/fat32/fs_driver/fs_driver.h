@@ -6,6 +6,12 @@
 #define SECTOR_SIZE 512
 #define CLUSER_SIZE (SECTOR_SIZE * 8)
 
+typedef struct
+{
+    uint8_t data[SECTOR_SIZE];
+    uint64_t sector_num;
+} Block;
+
 // 函数声明：初始化设备
 void print_by_cluster(uint64_t cluster_num);
 int read_block_fs(uint64_t block_num, void *buffer);
@@ -20,5 +26,5 @@ int copy_block(uint64_t src_block_num, uint64_t dest_block_num);
 int read_by_byte_cluser(uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer);
 int write_by_byte_cluser(uint64_t cluser_num, uint64_t offset, uint64_t size_byte, void *buffer);
 void print_hex_data(void *data, size_t size);
-
+Block read_block(uint32_t sector_num);
 #endif
