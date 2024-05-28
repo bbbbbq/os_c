@@ -71,3 +71,8 @@ void processor_schedule(struct TaskContext *switched_task_cx_ptr)
   struct TaskContext *idle_task_cx_ptr = processor_get_idle_task_cx_ptr(&PROCESSOR);
   __switch(switched_task_cx_ptr, idle_task_cx_ptr);
 }
+
+struct TaskControlBlock *processor_take_current_task()
+{
+  return processor_take_current(&PROCESSOR);
+}

@@ -19,15 +19,15 @@
 #include "string.h"
 extern MemorySet KERNEL_SPACE;
 extern struct utsname globle_info;
-
-int32_t exit(int32_t value)
+int64_t exit(int exit_code)
 {
-    print_str("exit : ");
-    print_uint32((uint32_t)value);
-    print_str("\n");
-    task_manager_add_new_task();
-    task_exit_current_and_run_next();
-    return value;
+    printk("Application (pid = %ld) exited with code %d\n",
+           processor_current_task()->pid, exit_code);
+    printk("Remaining physical pages %ld\n", frame_remaining_pages());
+    task_exit_current_and_run_next(exit_code);
+
+    printk("Unreachable in sys_exit!\n");
+    return 0;
 }
 
 void sys_exit(int32_t status)
@@ -97,6 +97,7 @@ int64_t sys_waitpid(int64_t pid, int *exit_code_ptr)
 {
     struct TaskControlBlock *task = processor_current_task();
 
+    // find a child process
     bool found = false;
     uint64_t found_idx;
     PidHandle found_pid;
@@ -139,9 +140,18 @@ int64_t sys_fork()
     struct TaskControlBlock *current_task = processor_current_task();
     struct TaskControlBlock *new_task = task_control_block_fork(current_task);
     PidHandle new_pid = new_task->pid;
+
+    // modify trap context of new_task, because it returns immediately after
+    // switching
     struct TrapContext *trap_cx = task_control_block_get_trap_cx(new_task);
+
+    // we do not have to move to next instruction since we have done it before
+    // for child process, fork returns 0
     trap_cx->x[10] = 0;
+
+    // add new task to scheduler
     task_manager_add_2(&TASK_MANAGER_2, new_task);
+
     return (int64_t)new_pid.pid;
 }
 
@@ -151,7 +161,7 @@ int64_t sys_getpid()
     return (int64_t)task->pid.pid;
 }
 
-int64_t sys_exec(char *path)
+int64_t sys_exec(char *path, char *args, char *evtr)
 {
     // for (int i = 0; i < NUM_DESCRIPTORS; i++)
     // {
@@ -159,10 +169,13 @@ int64_t sys_exec(char *path)
     // }
     // asm volatile("sfence.vma zero, zero");
 
-    printk("sys_exec\n");
-    char *buffer = bd_malloc(512);
-    read_block_fs(0, buffer);
+    // printk("sys_exec\n");
+    // char *buffer = bd_malloc(512);
+    // read_block_fs(0, buffer);
+    char **args_ve = bd_malloc(ARGC_BYTES_NUM);
+    uint64_t count = 0;
     asm volatile("sfence.vma zero, zero");
+
     char app_name[MAX_APP_NAME_LENGTH];
     copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
                      (uint8_t *)path, MAX_APP_NAME_LENGTH, FROM_USER);
@@ -178,13 +191,14 @@ int64_t sys_exec(char *path)
     if (data)
     {
         task = processor_current_task();
-        task_control_block_exec(task, data, size);
+        task_control_block_exec(task, data, size, args_ve, count);
         return 0;
     }
     else
     {
         return -1;
     }
+    bd_free(args_ve);
 }
 
 int64_t sys_get_time(TimeVal *ts, int64_t tz)
@@ -244,7 +258,7 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
     // case SYS_CLONE:
     //     return sys_clone((unsigned long)a0, (void *)a1, (int *)a2, (void *)a3, (int *)a4); // Assuming a1, a2, a3, and a4 are additional parameters
     case SYS_EXECVE:
-        return sys_exec((char *)a0); // Assuming execve is handled by sys_exec for simplification
+        return sys_exec((char *)a0, (char *)a1, (char *)a2); // Assuming execve is handled by sys_exec for simplification
     case SYS_EXIT:
         sys_exit((int)a0);
         return -1; // sys_exit does not return
@@ -252,6 +266,8 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return yield(); // Assuming yield is correctly named and takes no parameters
     case SYS_CLONE:
         return sys_fork();
+    case 260:
+        return sys_waitpid((int64_t)a0, (int32_t *)a1);
     // case :
     //     return SYS_gettimeofday((struct timespec *)a0, (int64_t)a1);
     // case SYS_nanosleep:
@@ -540,22 +556,28 @@ int64_t SYS_times(char *uts)
 
 int64_t SYS_brk(uint64_t address_change)
 {
-
     struct TaskControlBlock *current_task = processor_current_task();
+    if (current_task->user_pace_size == 0)
+        current_task->user_pace_size = current_task->base_size;
     if (address_change == 0)
-        return current_task->base_size;
+        return current_task->user_pace_size;
     if (current_task == NULL)
         return -1;
-    uint64_t base_size = current_task->user_pace_size;
+    // uint64_t base_size = current_task->user_pace_size;
     if (address_change > 0)
     {
-        current_task->user_pace_size += address_change;
-        VirtAddr start_va = base_size;
+        current_task->user_pace_size = address_change;
+        VirtAddr start_va = current_task->base_size;
         VirtAddr end_va = address_change;
+        if (page_floor(start_va) == page_floor(end_va))
+        {
+            return 0;
+        }
         memory_set_insert_framed_area(&current_task->memory_set,
                                       start_va, end_va,
                                       PTE_W | PTE_R);
         current_task->base_size = address_change;
+        current_task->user_pace_size = current_task->base_size;
         return 0;
     }
     else

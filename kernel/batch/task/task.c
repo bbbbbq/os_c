@@ -100,7 +100,6 @@ void task_control_block_new(struct TaskControlBlock *s, uint8_t *elf_data,
   s->parent = NULL;
   vector_new(&s->children, sizeof(struct TaskControlBlock *));
   s->exit_code = 0;
-
   struct TrapContext *trap_cx = task_control_block_get_trap_cx(s);
   app_init_context(entry_point, user_sp, kernel_space_token(), kernel_stack_top,
                    (uint64_t)trap_handler, trap_cx);

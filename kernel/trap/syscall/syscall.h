@@ -36,6 +36,7 @@
 #define SYS_GETDENTS64 61
 #define SYS_SPAWN 400
 #define SYS_OPEN 180
+#define ARGC_BYTES_NUM 20
 struct timespec
 {
     uint64_t tv_sec; // 秒
@@ -44,13 +45,13 @@ struct timespec
 
 // 系统调用函数原型
 int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2);
-int32_t exit(int32_t value);
+int64_t exit(int exit_code);
 int64_t write(uint64_t fd, char *buf, size_t count);
 int64_t yield();
 size_t read(int32_t fd, uint8_t *buf, size_t len);
 int64_t sys_waitpid(int64_t pid, int *exit_code_ptr);
 int64_t sys_fork();
-int64_t sys_exec(char *path);
+int64_t sys_exec(char *path, char *args, char *evtr);
 int64_t sys_getpid();
 void sys_exit(int32_t status);
 int64_t sys_openat(int32_t fd, char *path, OpenFlags flage);

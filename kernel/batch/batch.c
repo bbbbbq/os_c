@@ -8,6 +8,7 @@
 #include "mem.h"
 #include "task.h"
 #include "processor.h"
+extern struct TaskControlBlock FIRST_TASK;
 struct AppManager app_manager;
 extern struct TaskManager TASK_MANAGER;
 extern struct TaskControlBlock INITPROC;
@@ -176,22 +177,33 @@ void task_manager_run_next_task()
   }
 }
 
-void task_exit_current_and_run_next()
+void task_exit_current_and_run_next(int exit_code)
 {
-  struct TaskControlBlock *task = processor_current_task();
-  task->user_times++;
+  // take from Processor
+  struct TaskControlBlock *task = processor_take_current_task();
+
+  // Change status to Zombie
   task->task_status = Zombie;
-  task->exit_code = Exited;
-  // 收养操作
-  //  struct TaskControlBlock **x = (struct TaskControlBlock **)(task->children.buffer);
-  //  for (uint64_t i = 0; i < task->children.size; i++)
-  //  {
-  //    x[i]->parent = &INITPROC;
-  //    vector_push(&INITPROC.children, x[i]);
-  //  }
+
+  // Record exit code
+  task->exit_code = exit_code;
+  // do not move to its parent but under initproc
+
+  struct TaskControlBlock **x = (struct TaskControlBlock **)(task->children.buffer);
+  for (uint64_t i = 0; i < task->children.size; i++)
+  {
+    x[i]->parent = &FIRST_TASK;
+    vector_push(&FIRST_TASK.children, x[i]);
+  }
   vector_free(&task->children);
+
+  // deallocate user space
   memory_set_recycle_data_pages(&task->memory_set);
+
+  // deallocate kernel stack
   kernel_stack_free(&task->kernel_stack);
+
+  // we do not have to save task context
   struct TaskContext _unused;
   task_context_zero_init(&_unused);
   processor_schedule(&_unused);
@@ -247,7 +259,7 @@ struct TaskControlBlock *task_control_block_fork(struct TaskControlBlock *parent
 }
 
 void task_control_block_exec(struct TaskControlBlock *s, uint8_t *elf_data,
-                             size_t elf_size)
+                             size_t elf_size, char **args, uint64_t argc)
 {
   // memory_set with elf program headers/trampoline/trap context/user stack
   uint64_t user_sp;
@@ -257,6 +269,8 @@ void task_control_block_exec(struct TaskControlBlock *s, uint8_t *elf_data,
   // substitute memory_set
   memory_set_from_elf(&s->memory_set, elf_data, elf_size, &user_sp,
                       &entry_point);
+  // 压入argv
+  user_sp -= (argc + 1) * sizeof(char *);
 
   // update trap_cx ppn
   s->trap_cx_ppn = (PhysPageNum)pte_ppn(*memory_set_translate(
