@@ -80,17 +80,24 @@ $(OBJDIR)/%.d: %.c
 	$(CC) $(CFLAGS) -MM -MT '$(@:.d=.o)' $< -MF $@
 
 run: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel obj/os_kernel.bin -nographic --bios ./bootloader/rustsbi-qemu.bin -m 512M \
+	qemu-system-riscv64 \
+    	-machine virt \
+    	-nographic \
+    	-bios ./bootloader/rustsbi-qemu.bin \
+    	-device loader,file=obj/os_kernel.bin,addr=0x80200000 \
     	-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
     	-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
-    	-serial mon:stdio
-
+    	-m 512M -serial mon:stdio \
 
 qemu_debug: $(BIN)
-	qemu-system-riscv64 -machine virt -kernel $(BIN) -nographic --bios ./bootloader/rustsbi-qemu.bin  -m 512M \
-		-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
-		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
-		-serial mon:stdio -S -s
+	qemu-system-riscv64 \
+    	-machine virt \
+    	-nographic \
+    	-bios ./bootloader/rustsbi-qemu.bin \
+    	-device loader,file=obj/os_kernel.bin,addr=0x80200000 \
+    	-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
+    	-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
+    	-m 512M -serial mon:stdio -s -S\
 elf: $(ELF)
 
 $(ELF): $(OBJECTS)

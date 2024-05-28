@@ -8,13 +8,13 @@ static int cpuid()
 
 void plic_init()
 {
-    // printk("plic_init_start\n");
-    *(uint32_t *)(PLIC + UART0_IRQ * 4) = 1;
-    *(uint32_t *)(PLIC + VIRTIO0_IRQ * 4) = 1;
-    int hart = cpuid();
-    *(uint32_t *)PLIC_SENABLE(hart) = (1 << UART0_IRQ) | (1 << VIRTIO0_IRQ);
-    *(uint32_t *)PLIC_SPRIORITY(hart) = 0;
-    // printk("plic_init_end\n");
+  // set desired IRQ priorities non-zero (otherwise disabled).
+  int hart = cpuid();
+  *(uint32_t *)(PLIC + VIRTIO0_IRQ * 4) = 1;
+  // set uart's enable bit for this hart's S-mode.
+  *(uint32_t *)PLIC_SENABLE(hart) = (1 << VIRTIO0_IRQ);
+  // set this hart's S-mode priority threshold to 0.
+  *(uint32_t *)PLIC_SPRIORITY(hart) = 0;
 }
 
 int plic_claim()
