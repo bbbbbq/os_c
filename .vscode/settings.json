@@ -59,7 +59,8 @@
         "fs_driver.h": "c",
         "timer.h": "c",
         "queue.h": "c",
-        "dir.h": "c"
+        "dir.h": "c",
+        "drivers.h": "c"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true

@@ -76,7 +76,7 @@ $(DST_DIR)/%.o: %.S
 	$(AS) $(ASFLAGS) -c -o $@ $(realpath $<)
 
 clean:
-	-rm -rf $(BUILD_DIR)
+	-rm -f $(BUILD_DIR)/initproc
 	-rm -rf efs-fuse
 
 .PHONY: default build-lib clean

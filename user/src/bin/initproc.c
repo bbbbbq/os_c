@@ -3,31 +3,23 @@
 #include "stdio.h"
 #include "syscall.h"
 
-int main()
+char *syscall[] = {
+    "brk",
+    "chdir",
+};
+
+char *argv[] = {NULL};
+
+int main(void)
 {
-  printf("initproc_start\n");
-  int64_t f = fork();
-  int exit_code = 0;
-  int64_t pid;
-
-  if (f == 1)
-  {
-    exec("brk\0");
-  }
-  else
-  {
-    while (1)
+    int i, pid;
+    for (i = 0; i < sizeof(syscall) / sizeof(char *); ++i)
     {
-      pid = wait(&exit_code);
-      if (pid == -1)
-      {
-        yield();
-        continue;
-      }
-      printf("[initproc] Released a zombie process, pid=%lld, exit_code=%d\n",
-             pid, exit_code);
+        printf("app_index : %d\n", i);
+        pid = fork();
+        if (pid == 0)
+            exec(syscall[i]);
+        else
+            wait(0);
     }
-  }
-
-  return 0;
 }

@@ -185,9 +185,10 @@ int64_t sys_exec(char *path, char *args, char *evtr)
     Dirent *dir = find_dir_entry(&root_dir_entry, name);
     static uint8_t data[MAX_APP_SIZE];
     read_file_by_dirent(dir, data);
+
     size_t size = dir->DIR_FileSize;
     struct TaskControlBlock *task;
-
+    bd_free(args_ve);
     if (data)
     {
         task = processor_current_task();
@@ -198,7 +199,6 @@ int64_t sys_exec(char *path, char *args, char *evtr)
     {
         return -1;
     }
-    bd_free(args_ve);
 }
 
 int64_t sys_get_time(TimeVal *ts, int64_t tz)
