@@ -217,8 +217,8 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return SYS_brk((uint64_t)a0);
     case SYS_GETCWD:
         return SYS_getcwd((char *)a0, (size_t)a1);
-    // case SYS_pipe2:
-    //     return SYS_pipe2((int *)a0, (int)a1);
+    case SYS_PIPE2:
+        return SYS_pipe2((int *)a0, (int)a1);
     case SYS_DUP:
         return SYS_dup((int)a0);
     case SYS_DUP3:
@@ -233,22 +233,22 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return SYS_read((int)a0, (char *)a1, (uint32_t)a2);
     case SYS_WRITE:
         return SYS_write((int)a0, (char *)a1, (uint64_t)a2);
-    // case SYS_linkat:
-    //     return sys_linkat((int)a0, (char *)a1, (int)a2, (char *)a3, (unsigned int)a4); // Assuming a3 and a4 are additional parameters
-    // case SYS_unlinkat:
-    //     return sys_unlinkat((int)a0, (char *)a1, (unsigned int)a2);
+    case SYS_LINKAT:
+        return sys_linkat((int)a0, (char *)a1, (int)a2, (char *)a3, (unsigned int)a4); // Assuming a3 and a4 are additional parameters
+    case SYS_UNLINKAT:                                                                 // to
+        return sys_unlinkat((int)a0, (char *)a1, (unsigned int)a2);
     case SYS_MKDIRAT:
         return SYS_mkdirat((char *)a1, (uint64_t)a2);
-    // case SYS_mount:
-    //     return sys_mount((const char *)a0, (const char *)a1, (const char *)a2, (unsigned long)a3, (const void *)a4); // Assuming a2, a3, and a4 are additional parameters
-    // case SYS_umount2:
-    //     return sys_umount2((const char *)a0, (int)a1);
+    case SYS_MOUNT:                                                                                                  // to
+        return sys_mount((const char *)a0, (const char *)a1, (const char *)a2, (unsigned long)a3, (const void *)a4); // Assuming a2, a3, and a4 are additional parameters
+    case SYS_UMOUNT2:                                                                                                // to
+        return sys_umount2((const char *)a0, (int)a1);
     case SYS_FSTAT:
         return SYS_fstat((int)a0, (char *)a1);
     case SYS_GETDENTS64:
         return SYS_getdents64((int)a0, (char *)a1);
-    // case SYS_CLONE:
-    //     return sys_clone((unsigned long)a0, (void *)a1, (int *)a2, (void *)a3, (int *)a4); // Assuming a1, a2, a3, and a4 are additional parameters
+    case SYS_CLONE:                                                                        // to
+        return sys_clone((unsigned long)a0, (void *)a1, (int *)a2, (void *)a3, (int *)a4); // Assuming a1, a2, a3, and a4 are additional parameters
     case SYS_EXECVE:
         return sys_exec((char *)a0, (char *)a1, (char *)a2); // Assuming execve is handled by sys_exec for simplification
     case SYS_EXIT:
@@ -260,10 +260,23 @@ int64_t syscall(uint64_t syscall_id, uint64_t a0, uint64_t a1, uint64_t a2)
         return sys_fork();
     case 260:
         return sys_waitpid((int64_t)a0, (int32_t *)a1);
-    // case :
-    //     return SYS_gettimeofday((struct timespec *)a0, (int64_t)a1);
-    // case SYS_nanosleep:
-    //     return sys_nanosleep((const struct timespec *)a0, (struct timespec *)a1); // Assuming a1 is an additional parameter
+    case SYS_GETPPID:
+        return sys_getppid();
+    case SYS_GETPID:
+        return sys_getpid();
+    case SYS_MUNMAP():
+        return sys_munmap();
+    case SYS_MMAP:
+        return sys_mmap();
+    case SYS_TIMES:
+        return SYS_times();
+    case SYS_UNAME:
+        return SYS_uname();
+
+    case SYS_GETTIME:
+        return SYS_gettimeofday((struct timespec *)a0, (int64_t)a1);
+    case SYS_NANOSLEEP:
+        return sys_nanosleep((const struct timespec *)a0, (struct timespec *)a1); // Assuming a1 is an additional parameter
     default:
         printk("Unsupported syscall ID %d", syscall_id);
         ASSERT(0);

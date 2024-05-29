@@ -85,7 +85,7 @@ run: $(BIN)
     	-nographic \
     	-bios ./bootloader/rustsbi-qemu.bin \
     	-device loader,file=obj/os_kernel.bin,addr=0x80200000 \
-    	-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
+    	-drive file=../disk.img.ori,if=none,format=raw,id=x0,cache=none \
     	-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
     	-m 512M -serial mon:stdio \
 
@@ -95,7 +95,7 @@ qemu_debug: $(BIN)
     	-nographic \
     	-bios ./bootloader/rustsbi-qemu.bin \
     	-device loader,file=obj/os_kernel.bin,addr=0x80200000 \
-    	-drive file=../sdcard.img,if=none,format=raw,id=x0,cache=none \
+    	-drive file=../disk.img.ori,if=none,format=raw,id=x0,cache=none \
     	-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
     	-m 512M -serial mon:stdio -s -S\
 		
