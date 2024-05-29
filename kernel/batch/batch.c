@@ -190,12 +190,15 @@ void task_exit_current_and_run_next(int exit_code)
   // do not move to its parent but under initproc
 
   struct TaskControlBlock **x = (struct TaskControlBlock **)(task->children.buffer);
-  for (uint64_t i = 0; i < task->children.size; i++)
+  if (task->pid.pid != 0)
   {
-    x[i]->parent = &FIRST_TASK;
-    vector_push(&FIRST_TASK.children, x[i]);
+    for (uint64_t i = 0; i < task->children.size; i++)
+    {
+      x[i]->parent = &FIRST_TASK;
+      vector_push(&FIRST_TASK.children, x[i]);
+    }
+    vector_free(&task->children);
   }
-  vector_free(&task->children);
 
   // deallocate user space
   memory_set_recycle_data_pages(&task->memory_set);

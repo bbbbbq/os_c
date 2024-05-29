@@ -16,6 +16,7 @@
 #include "queue.h"
 #include "string.h"
 #include "console.h"
+#include "taskmanager.h"
 #include "string.h"
 extern MemorySet KERNEL_SPACE;
 extern struct utsname globle_info;
@@ -163,15 +164,6 @@ int64_t sys_getpid()
 
 int64_t sys_exec(char *path, char *args, char *evtr)
 {
-    // for (int i = 0; i < NUM_DESCRIPTORS; i++)
-    // {
-    //     disk.free[i] = 1;
-    // }
-    // asm volatile("sfence.vma zero, zero");
-
-    // printk("sys_exec\n");
-    // char *buffer = bd_malloc(512);
-    // read_block_fs(0, buffer);
     char **args_ve = bd_malloc(ARGC_BYTES_NUM);
     uint64_t count = 0;
     asm volatile("sfence.vma zero, zero");
@@ -683,3 +675,34 @@ int32_t sys_close(uint32_t fd)
 int64_t sys_clone(uint64_t flags, void *stack, int64_t ptid, void *tls, int64_t ctid)
 {
 }
+
+// int64_t sys_execv(char *path, char *args, char *evtr)
+// {
+//     char **args_ve = bd_malloc(ARGC_BYTES_NUM);
+//     uint64_t count = 0;
+//     asm volatile("sfence.vma zero, zero");
+
+//     char app_name[MAX_APP_NAME_LENGTH];
+//     copy_byte_buffer(processor_current_user_token(), (uint8_t *)app_name,
+//                      (uint8_t *)path, MAX_APP_NAME_LENGTH, FROM_USER);
+//     char *name = get_last_part(app_name);
+//     char *heap_name = bd_malloc(11);
+//     memcpy(heap_name, name, 11);
+//     Dirent *dir = find_dir_entry(&root_dir_entry, name);
+//     static uint8_t data[MAX_APP_SIZE];
+//     read_file_by_dirent(dir, data);
+
+//     size_t size = dir->DIR_FileSize;
+//     struct TaskControlBlock *task;
+//     bd_free(args_ve);
+//     if (data)
+//     {
+//         task_control_block_new(task, data, size);
+//         task_manager_add_2(&TASK_MANAGER_2, task);
+//         return 0;
+//     }
+//     else
+//     {
+//         return -1;
+//     }
+// }
